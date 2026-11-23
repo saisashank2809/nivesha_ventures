@@ -1,0 +1,305 @@
+import {
+  User,
+  UserRole,
+  VentureCard,
+  VentureDetail,
+  InvestorMandate,
+  Connection,
+  Message,
+  OnboardingQuestion,
+  AIChatResponse,
+  AIChatMessage,
+  MatchCase,
+  AppointmentRequest,
+  PlatformConfig,
+  ReviewStage,
+  AppointmentStatus,
+} from './types';
+
+const API_BASE = 'http://localhost:8000/api';
+
+export class Api {
+  private static token: string | null = localStorage.getItem('nv_token');
+  private static currentUser: User | null = null;
+
+  public static setToken(token: string | null) {
+    this.token = token;
+    if (token) {
+      localStorage.setItem('nv_token', token);
+    } else {
+      localStorage.removeItem('nv_token');
+    }
+  }
+
+  public static getToken(): string | null {
+    return this.token;
+  }
+
+  public static setCurrentUser(user: User | null) {
+    this.currentUser = user;
+    if (user) {
+      localStorage.setItem('nv_user', JSON.stringify(user));
+    } else {
+      localStorage.removeItem('nv_user');
+    }
+  }
+
+  public static getCurrentUser(): User | null {
+    if (this.currentUser) return this.currentUser;
+    const stored = localStorage.getItem('nv_user');
+    if (stored) {
+      try {
+        this.currentUser = JSON.parse(stored);
+        return this.currentUser;
+      } catch {
+        return null;
+      }
+    }
+    return null;
+  }
+
+  private static async request<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
+    const headers = new Headers(options.headers || {});
+    headers.set('Content-Type', 'application/json');
+
+    if (this.token) {
+      headers.set('Authorization', `Bearer ${this.token}`);
+    }
+
+    const res = await fetch(`${API_BASE}${endpoint}`, {
+      ...options,
+      headers,
+    });
+
+    if (!res.ok) {
+      let errorMsg = `Error ${res.status}`;
+      try {
+        const data = await res.json();
+        errorMsg = data.detail || data.message || errorMsg;
+      } catch {
+        // fallback
+      }
+      throw new Error(errorMsg);
+    }
+
+    return res.json();
+  }
+
+  // Platform Config
+  public static async getConfig(): Promise<PlatformConfig> {
+    return this.request<PlatformConfig>('/config');
+  }
+
+  // Auth
+  public static async login(email: string, password: string): Promise<{ access_token: string; user: User }> {
+    const res = await this.request<{ access_token: string; user: User }>('/auth/login', {
+      method: 'POST',
+      body: JSON.stringify({ email, password }),
+    });
+    this.setToken(res.access_token);
+    this.setCurrentUser(res.user);
+    return res;
+  }
+
+  public static async register(data: {
+    email: string;
+    password: string;
+    full_name: string;
+    role: UserRole;
+    firm_or_company?: string;
+  }): Promise<{ access_token: string; user: User }> {
+    const res = await this.request<{ access_token: string; user: User }>('/auth/register', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+    this.setToken(res.access_token);
+    this.setCurrentUser(res.user);
+    return res;
+  }
+
+  public static async switchDemo(role: UserRole, userId?: string): Promise<{ access_token: string; user: User }> {
+    const res = await this.request<{ access_token: string; user: User }>('/auth/switch-demo', {
+      method: 'POST',
+      body: JSON.stringify({ role, user_id: userId }),
+    });
+    this.setToken(res.access_token);
+    this.setCurrentUser(res.user);
+    return res;
+  }
+
+  public static async getMe(): Promise<User> {
+    const user = await this.request<User>('/auth/me');
+    this.setCurrentUser(user);
+    return user;
+  }
+
+  public static logout() {
+    this.setToken(null);
+    this.setCurrentUser(null);
+  }
+
+  // Ventures
+  public static async getVentures(filters?: {
+    sector?: string;
+    stage?: string;
+    min_ticket?: number;
+    max_ticket?: number;
+    search?: string;
+  }): Promise<VentureCard[]> {
+    const params = new URLSearchParams();
+    if (filters?.sector && filters.sector !== 'all') params.append('sector', filters.sector);
+    if (filters?.stage && filters.stage !== 'all') params.append('stage', filters.stage);
+    if (filters?.min_ticket) params.append('min_ticket', filters.min_ticket.toString());
+    if (filters?.max_ticket) params.append('max_ticket', filters.max_ticket.toString());
+    if (filters?.search) params.append('search', filters.search);
+
+    const queryStr = params.toString() ? `?${params.toString()}` : '';
+    return this.request<VentureCard[]>(`/ventures${queryStr}`);
+  }
+
+  public static async getVentureDetail(id: string): Promise<VentureDetail> {
+    return this.request<VentureDetail>(`/ventures/${id}`);
+  }
+
+  public static async getMyVenture(): Promise<VentureDetail> {
+    return this.request<VentureDetail>('/ventures/me/current');
+  }
+
+  public static async createVenture(data: Partial<VentureDetail>): Promise<VentureDetail> {
+    return this.request<VentureDetail>('/ventures', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  }
+
+  public static async updateMyVenture(id: string, data: Partial<VentureDetail>): Promise<VentureDetail> {
+    return this.request<VentureDetail>(`/ventures/${id}`, {
+      method: 'PATCH',
+      body: JSON.stringify(data),
+    });
+  }
+
+  // Investor Mandates
+  public static async getMyMandate(): Promise<InvestorMandate> {
+    return this.request<InvestorMandate>('/mandates/me');
+  }
+
+  public static async updateMyMandate(data: Partial<InvestorMandate>): Promise<InvestorMandate> {
+    return this.request<InvestorMandate>('/mandates/me', {
+      method: 'PATCH',
+      body: JSON.stringify(data),
+    });
+  }
+
+  public static async getAllMandates(): Promise<InvestorMandate[]> {
+    return this.request<InvestorMandate[]>('/mandates');
+  }
+
+  // Matching Engine
+  public static async runMatchAssessment(ventureId: string, mandateId?: string): Promise<MatchCase> {
+    return this.request<MatchCase>('/matches/run', {
+      method: 'POST',
+      body: JSON.stringify({ venture_id: ventureId, mandate_id: mandateId }),
+    });
+  }
+
+  public static async getMatchCases(): Promise<MatchCase[]> {
+    return this.request<MatchCase[]>('/matches');
+  }
+
+  public static async getMatchCase(id: string): Promise<MatchCase> {
+    return this.request<MatchCase>(`/matches/${id}`);
+  }
+
+  public static async updateMatchReviewStage(id: string, stage: ReviewStage): Promise<MatchCase> {
+    return this.request<MatchCase>(`/matches/${id}/review?stage=${stage}`, {
+      method: 'PATCH',
+    });
+  }
+
+  // Appointments
+  public static async createAppointment(data: {
+    venture_id: string;
+    match_case_id?: string | null;
+    meeting_purpose: string;
+    sharing_scope?: string;
+    preferred_times?: string[];
+    notes?: string;
+  }): Promise<AppointmentRequest> {
+    return this.request<AppointmentRequest>('/appointments', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  }
+
+  public static async getAppointments(): Promise<AppointmentRequest[]> {
+    return this.request<AppointmentRequest[]>('/appointments');
+  }
+
+  public static async updateAppointmentStatus(id: string, status: AppointmentStatus): Promise<AppointmentRequest> {
+    return this.request<AppointmentRequest>(`/appointments/${id}/status?status=${status}`, {
+      method: 'PATCH',
+    });
+  }
+
+  // Connections
+  public static async getConnections(): Promise<Connection[]> {
+    return this.request<Connection[]>('/connections');
+  }
+
+  public static async requestConnection(ventureId: string, note?: string): Promise<Connection> {
+    return this.request<Connection>('/connections/request', {
+      method: 'POST',
+      body: JSON.stringify({ venture_id: ventureId, note }),
+    });
+  }
+
+  public static async submitConsent(connectionId: string, consent: boolean): Promise<Connection> {
+    return this.request<Connection>(`/connections/${connectionId}/consent`, {
+      method: 'POST',
+      body: JSON.stringify({ consent }),
+    });
+  }
+
+  // Messaging (1-on-1 Chat)
+  public static async getMessages(connectionId: string): Promise<Message[]> {
+    return this.request<Message[]>(`/connections/${connectionId}/messages`);
+  }
+
+  public static async sendMessage(connectionId: string, content: string): Promise<Message> {
+    return this.request<Message>(`/connections/${connectionId}/messages`, {
+      method: 'POST',
+      body: JSON.stringify({ content }),
+    });
+  }
+
+  // AI Assistant Chatbot
+  public static async sendAIChat(
+    message: string,
+    context: 'INVESTOR' | 'FOUNDER',
+    ventureId?: string,
+    history: AIChatMessage[] = []
+  ): Promise<AIChatResponse> {
+    return this.request<AIChatResponse>('/ai/chat', {
+      method: 'POST',
+      body: JSON.stringify({ message, context, venture_id: ventureId, history }),
+    });
+  }
+
+  // Onboarding Questions
+  public static async getOnboardingQuestions(): Promise<OnboardingQuestion[]> {
+    return this.request<OnboardingQuestion[]>('/onboarding/questions');
+  }
+
+  public static async submitOnboardingAnswers(answers: Record<string, any>): Promise<any> {
+    return this.request<any>('/onboarding/submit', {
+      method: 'POST',
+      body: JSON.stringify({ answers }),
+    });
+  }
+
+  // Dev tools
+  public static async resetDevDatabase(): Promise<any> {
+    return this.request<any>('/dev/reset', { method: 'POST' });
+  }
+}
