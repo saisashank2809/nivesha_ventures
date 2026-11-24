@@ -3,44 +3,6 @@ import { VentureCard, InvestorMandate, User, MatchCase, AppointmentRequest } fro
 import { Api } from '../../shared/api';
 import { formatINR } from '../../shared/formatters';
 
-const SECTOR_IMAGE_PRESETS: Record<string, Array<{ label: string; url: string }>> = {
-  'Film / Entertainment': [
-    { label: 'Cinema Camera Rig', url: 'https://images.unsplash.com/photo-1536440136628-849c177e76a1?auto=format&fit=crop&w=1200&q=80' },
-    { label: 'Movie Clapper & Stage', url: 'https://images.unsplash.com/photo-1485846234645-a62644f84728?auto=format&fit=crop&w=1200&q=80' },
-    { label: 'Studio Spotlights', url: 'https://images.unsplash.com/photo-1518173946687-a4c8892bbd9f?auto=format&fit=crop&w=1200&q=80' },
-  ],
-  'Manufacturing / Consumer Brand': [
-    { label: 'Athletic Red Sneaker', url: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=1200&q=80' },
-    { label: 'Footwear Crafting Line', url: 'https://images.unsplash.com/photo-1556906781-9a412961c28c?auto=format&fit=crop&w=1200&q=80' },
-    { label: 'Brand Lifestyle Showroom', url: 'https://images.unsplash.com/photo-1460353581641-37baddab0fa2?auto=format&fit=crop&w=1200&q=80' },
-  ],
-  'Manufacturing / Industrial': [
-    { label: 'CNC Precision Lathe', url: 'https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=1200&q=80' },
-    { label: 'Industrial Tooling Floor', url: 'https://images.unsplash.com/photo-1581092335397-9583fe92d232?auto=format&fit=crop&w=1200&q=80' },
-    { label: '3 BHK Residential Collateral', url: 'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&w=1200&q=80' },
-  ],
-  'Logistics / Rural Delivery': [
-    { label: 'Distribution Warehouse', url: 'https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&w=1200&q=80' },
-    { label: 'EV Delivery Van', url: 'https://images.unsplash.com/photo-1616401784845-180882ba9ba8?auto=format&fit=crop&w=1200&q=80' },
-    { label: 'Parcel Sorting Hub', url: 'https://images.unsplash.com/photo-1578575437130-527eed3abbec?auto=format&fit=crop&w=1200&q=80' },
-  ],
-  'Healthcare / Hospital': [
-    { label: 'Tertiary Hospital Center', url: 'https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?auto=format&fit=crop&w=1200&q=80' },
-    { label: 'Digital Cath Lab Suite', url: 'https://images.unsplash.com/photo-1516549655169-df83a0774514?auto=format&fit=crop&w=1200&q=80' },
-    { label: 'ICU Critical Care Ward', url: 'https://images.unsplash.com/photo-1584515979956-d9f6e5d09982?auto=format&fit=crop&w=1200&q=80' },
-  ],
-  'Real Estate / Land Development': [
-    { label: 'Aerial Plotted Layout', url: 'https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&w=1200&q=80' },
-    { label: 'Roads & Infrastructure Works', url: 'https://images.unsplash.com/photo-1628744448840-55bdb2497bd4?auto=format&fit=crop&w=1200&q=80' },
-    { label: 'Gated Entrance Clubhouse', url: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1200&q=80' },
-  ],
-  'Food & Beverage / Hospitality': [
-    { label: 'Dining Hall Atmosphere', url: 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=1200&q=80' },
-    { label: 'Signature Malabar Cuisine', url: 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=1200&q=80' },
-    { label: 'Commercial Kitchen Station', url: 'https://images.unsplash.com/photo-1556910103-1c02745aae4d?auto=format&fit=crop&w=1200&q=80' },
-  ],
-};
-
 const getTenSections = (venture: VentureCard) => {
   const story = (venture.venture_story || {}) as Record<string, any>;
   const arr = venture.arrangement_details || {};
@@ -90,14 +52,6 @@ export const InvestorGuidedDiscovery: React.FC<InvestorGuidedDiscoveryProps> = (
   const [expandedDossierVentureId, setExpandedDossierVentureId] = useState<string | null>(null);
   const [selectedGalleryIndices, setSelectedGalleryIndices] = useState<Record<string, number>>({});
 
-  // Add Image Modal State
-  const [addImageModalVenture, setAddImageModalVenture] = useState<VentureCard | null>(null);
-  const [customImageUrl, setCustomImageUrl] = useState('');
-  const [imageCaption, setImageCaption] = useState('');
-  const [setAsHeroCheck, setSetAsHeroCheck] = useState(false);
-  const [submittingImage, setSubmittingImage] = useState(false);
-  const [imageActionSuccess, setImageActionSuccess] = useState<string | null>(null);
-
   // Direct DM Modal State
   const [directDMModalVenture, setDirectDMModalVenture] = useState<VentureCard | null>(null);
   const [directDMNote, setDirectDMNote] = useState('');
@@ -146,45 +100,6 @@ export const InvestorGuidedDiscovery: React.FC<InvestorGuidedDiscoveryProps> = (
   useEffect(() => {
     loadData();
   }, [currentUser]);
-
-  const handleOpenAddImageModal = (v: VentureCard) => {
-    setAddImageModalVenture(v);
-    setCustomImageUrl('');
-    setImageCaption('');
-    setSetAsHeroCheck(false);
-    setImageActionSuccess(null);
-  };
-
-  const handleAddImage = async () => {
-    if (!addImageModalVenture || !customImageUrl.trim()) return;
-    try {
-      setSubmittingImage(true);
-      const updated = await Api.addImageToVenture(
-        addImageModalVenture.id,
-        customImageUrl.trim(),
-        imageCaption.trim() || undefined,
-        setAsHeroCheck
-      );
-      setVentures((prev) =>
-        prev.map((v) =>
-          v.id === updated.id
-            ? { ...v, hero_image_url: updated.hero_image_url, gallery_urls: updated.gallery_urls }
-            : v
-        )
-      );
-      setImageActionSuccess('Image successfully added to venture media showcase!');
-      setTimeout(() => {
-        setAddImageModalVenture(null);
-        setCustomImageUrl('');
-        setImageCaption('');
-        setImageActionSuccess(null);
-      }, 1500);
-    } catch (err: any) {
-      alert(`Failed to add image: ${err.message}`);
-    } finally {
-      setSubmittingImage(false);
-    }
-  };
 
   const handleUpdatePreferences = async () => {
     if (!currentUser || currentUser.role !== 'INVESTOR') {
@@ -481,27 +396,6 @@ export const InvestorGuidedDiscovery: React.FC<InvestorGuidedDiscoveryProps> = (
                       {outcomeColor.label}
                     </span>
                   </div>
-
-                  {/* Add Image Button */}
-                  <button
-                    onClick={() => handleOpenAddImageModal(venture)}
-                    style={{
-                      padding: '5px 12px',
-                      borderRadius: '4px',
-                      backgroundColor: 'rgba(255, 255, 255, 0.92)',
-                      border: '1px solid #d6c9b2',
-                      color: '#0c1826',
-                      fontSize: '11.5px',
-                      fontWeight: 600,
-                      cursor: 'pointer',
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '4px',
-                      boxShadow: '0 2px 4px rgba(0,0,0,0.15)',
-                    }}
-                  >
-                    <span>📷</span> + Add Image
-                  </button>
                 </div>
 
                 {/* Overlaid Title on Banner Bottom */}
@@ -601,22 +495,6 @@ export const InvestorGuidedDiscovery: React.FC<InvestorGuidedDiscoveryProps> = (
                       <img src={imgUrl} alt={`Thumbnail ${gIdx + 1}`} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                     </button>
                   ))}
-                  <button
-                    onClick={() => handleOpenAddImageModal(venture)}
-                    style={{
-                      border: '1px dashed #7a5c2e',
-                      background: 'none',
-                      borderRadius: '4px',
-                      padding: '4px 10px',
-                      fontSize: '11px',
-                      color: '#7a5c2e',
-                      cursor: 'pointer',
-                      whiteSpace: 'nowrap',
-                      height: '36px',
-                    }}
-                  >
-                    + Add Photo
-                  </button>
                 </div>
               )}
 
@@ -897,21 +775,6 @@ export const InvestorGuidedDiscovery: React.FC<InvestorGuidedDiscoveryProps> = (
                     >
                       {isDiligenceOpen ? '▲ Hide 6 Diligence Categories' : '▼ Inspect 6 Diligence Categories'}
                     </button>
-
-                    <button
-                      onClick={() => handleOpenAddImageModal(venture)}
-                      style={{
-                        background: 'none',
-                        border: 'none',
-                        color: '#15803d',
-                        fontWeight: 600,
-                        fontSize: '13px',
-                        cursor: 'pointer',
-                        padding: 0,
-                      }}
-                    >
-                      📷 + Add Image
-                    </button>
                   </div>
 
                   {/* Right Primary Actions */}
@@ -984,179 +847,6 @@ export const InvestorGuidedDiscovery: React.FC<InvestorGuidedDiscoveryProps> = (
           );
         })}
       </div>
-
-      {/* Add Image Modal */}
-      {addImageModalVenture && (
-        <div
-          style={{
-            position: 'fixed',
-            inset: 0,
-            backgroundColor: 'rgba(12, 24, 38, 0.72)',
-            backdropFilter: 'blur(3px)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            zIndex: 1100,
-            padding: '20px',
-          }}
-          onClick={() => setAddImageModalVenture(null)}
-        >
-          <div
-            style={{
-              backgroundColor: '#ffffff',
-              borderRadius: '12px',
-              maxWidth: '560px',
-              width: '100%',
-              padding: '28px',
-              boxShadow: '0 20px 40px rgba(12, 24, 38, 0.25)',
-            }}
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px' }}>
-              <div>
-                <div className="eyebrow" style={{ marginBottom: '2px' }}>VENTURE MEDIA SHOWCASE</div>
-                <h3 style={{ fontSize: '20px', color: '#0c1826', margin: 0 }}>
-                  Add Image to {addImageModalVenture.company_name}
-                </h3>
-              </div>
-              <button
-                onClick={() => setAddImageModalVenture(null)}
-                style={{ background: 'none', border: 'none', fontSize: '24px', color: '#536074', cursor: 'pointer' }}
-              >
-                ×
-              </button>
-            </div>
-
-            {imageActionSuccess ? (
-              <div style={{ padding: '16px', background: '#edf5ee', color: '#15803d', borderRadius: '8px', textAlign: 'center', fontWeight: 600 }}>
-                ✓ {imageActionSuccess}
-              </div>
-            ) : (
-              <div>
-                <p style={{ fontSize: '13px', color: '#536074', marginBottom: '16px' }}>
-                  Provide visual proof of plant operations, product lines, machinery, land layouts, or facilities to substantiate founder declarations.
-                </p>
-
-                {/* Quick Sector Suggestions */}
-                {SECTOR_IMAGE_PRESETS[addImageModalVenture.sector] && (
-                  <div style={{ marginBottom: '16px' }}>
-                    <label style={{ display: 'block', fontSize: '11.5px', fontWeight: 700, color: '#7a5c2e', textTransform: 'uppercase', marginBottom: '6px' }}>
-                      Quick Curated Presets for {addImageModalVenture.sector}:
-                    </label>
-                    <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
-                      {SECTOR_IMAGE_PRESETS[addImageModalVenture.sector].map((preset, pIdx) => (
-                        <button
-                          key={pIdx}
-                          type="button"
-                          onClick={() => {
-                            setCustomImageUrl(preset.url);
-                            setImageCaption(preset.label);
-                          }}
-                          style={{
-                            padding: '4px 10px',
-                            borderRadius: '4px',
-                            backgroundColor: customImageUrl === preset.url ? '#0c1826' : '#f5efe5',
-                            color: customImageUrl === preset.url ? '#fff' : '#121a29',
-                            border: '1px solid #d6c9b2',
-                            fontSize: '11.5px',
-                            cursor: 'pointer',
-                          }}
-                        >
-                          + {preset.label}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                {/* Image URL Input */}
-                <div style={{ marginBottom: '14px' }}>
-                  <label style={{ display: 'block', fontSize: '12.5px', fontWeight: 600, color: '#0c1826', marginBottom: '6px' }}>
-                    Image URL
-                  </label>
-                  <input
-                    type="url"
-                    placeholder="https://images.unsplash.com/..."
-                    value={customImageUrl}
-                    onChange={(e) => setCustomImageUrl(e.target.value)}
-                    style={{ width: '100%', padding: '10px 12px', borderRadius: '6px', border: '1px solid #e6decb', fontSize: '13px' }}
-                  />
-                </div>
-
-                {/* Image Caption */}
-                <div style={{ marginBottom: '14px' }}>
-                  <label style={{ display: 'block', fontSize: '12.5px', fontWeight: 600, color: '#0c1826', marginBottom: '6px' }}>
-                    Caption / Description (Optional)
-                  </label>
-                  <input
-                    type="text"
-                    placeholder="e.g., Pledged 3 BHK apartment building collateral"
-                    value={imageCaption}
-                    onChange={(e) => setImageCaption(e.target.value)}
-                    style={{ width: '100%', padding: '10px 12px', borderRadius: '6px', border: '1px solid #e6decb', fontSize: '13px' }}
-                  />
-                </div>
-
-                {/* Set as Hero checkbox */}
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '20px' }}>
-                  <input
-                    type="checkbox"
-                    id="setAsHero"
-                    checked={setAsHeroCheck}
-                    onChange={(e) => setSetAsHeroCheck(e.target.checked)}
-                  />
-                  <label htmlFor="setAsHero" style={{ fontSize: '13px', color: '#121a29', cursor: 'pointer' }}>
-                    Set as Primary Cover/Hero Image
-                  </label>
-                </div>
-
-                {/* Preview if URL exists */}
-                {customImageUrl.trim() && (
-                  <div style={{ marginBottom: '20px', borderRadius: '6px', overflow: 'hidden', height: '140px', border: '1px solid #e6decb' }}>
-                    <img
-                      src={customImageUrl}
-                      alt="Preview"
-                      style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                      onError={(e) => {
-                        (e.target as HTMLImageElement).src =
-                          'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=1200&q=80';
-                      }}
-                    />
-                  </div>
-                )}
-
-                <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px' }}>
-                  <button
-                    type="button"
-                    onClick={() => setAddImageModalVenture(null)}
-                    style={{ padding: '8px 16px', background: 'transparent', border: '1px solid #e6decb', borderRadius: '6px' }}
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    type="button"
-                    onClick={handleAddImage}
-                    disabled={submittingImage || !customImageUrl.trim()}
-                    style={{
-                      padding: '8px 20px',
-                      backgroundColor: '#0c1826',
-                      color: '#fff',
-                      borderRadius: '6px',
-                      fontWeight: 600,
-                      fontSize: '13px',
-                      border: 'none',
-                      cursor: customImageUrl.trim() ? 'pointer' : 'not-allowed',
-                      opacity: customImageUrl.trim() ? 1 : 0.6,
-                    }}
-                  >
-                    {submittingImage ? 'Adding Image...' : 'Add Image to Showcase'}
-                  </button>
-                </div>
-              </div>
-            )}
-          </div>
-        </div>
-      )}
 
       {/* Direct DM Modal */}
       {directDMModalVenture && (
