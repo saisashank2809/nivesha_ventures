@@ -203,6 +203,7 @@ export function App() {
             currentUser={currentUser}
             onOpenLogin={() => handleOpenLogin('INVESTOR', false)}
             onOpenDirectChat={handleOpenChat}
+            onSelectVenture={handleSelectVenture}
           />
         )}
 

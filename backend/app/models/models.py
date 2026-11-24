@@ -101,6 +101,8 @@ class Venture(Base):
 
     pitch_deck_url = Column(String(256), nullable=True)
     video_url = Column(String(256), nullable=True)
+    hero_image_url = Column(String(512), nullable=True)
+    gallery_urls = Column(JSON, nullable=False, default=list)
     verification_status = Column(SQLEnum(VerificationStatus), nullable=False, default=VerificationStatus.UNDER_REVIEW)
 
     # Key verified traction stats (e.g., ARR, GMV, Growth)

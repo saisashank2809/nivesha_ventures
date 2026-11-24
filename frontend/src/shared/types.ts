@@ -99,6 +99,8 @@ export interface VentureCard {
   created_at: string;
   connection_status?: ConnectionStatus | null;
   connection_id?: string | null;
+  hero_image_url?: string | null;
+  gallery_urls?: string[];
 
   // Extended capital facilitation fields
   proposed_arrangement?: string;

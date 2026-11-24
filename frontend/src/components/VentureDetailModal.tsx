@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { VentureDetail } from '../shared/types';
 import { formatINR } from '../shared/formatters';
+import { Api } from '../shared/api';
 
 interface VentureDetailModalProps {
   venture: VentureDetail | null;
@@ -19,7 +20,26 @@ export const VentureDetailModal: React.FC<VentureDetailModalProps> = ({
 }) => {
   const [note, setNote] = useState('');
   const [showNoteInput, setShowNoteInput] = useState(false);
-  const [activeTab, setActiveTab] = useState<'DOSSIER' | 'FINDINGS' | 'TERMS'>('DOSSIER');
+  const [activeTab, setActiveTab] = useState<'DOSSIER' | 'FINDINGS' | 'GALLERY'>('DOSSIER');
+  const [selectedImgIndex, setSelectedImgIndex] = useState(0);
+  const [customImageUrl, setCustomImageUrl] = useState('');
+  const [imageCaption, setImageCaption] = useState('');
+  const [isAddingImage, setIsAddingImage] = useState(false);
+  const [imageSuccessMsg, setImageSuccessMsg] = useState<string | null>(null);
+  const [galleryUrls, setGalleryUrls] = useState<string[]>([]);
+
+  React.useEffect(() => {
+    if (venture) {
+      const urls =
+        venture.gallery_urls && venture.gallery_urls.length > 0
+          ? venture.gallery_urls
+          : venture.hero_image_url
+          ? [venture.hero_image_url]
+          : [];
+      setGalleryUrls(urls);
+      setSelectedImgIndex(0);
+    }
+  }, [venture]);
 
   if (!isOpen || !venture) return null;
 
@@ -48,6 +68,34 @@ export const VentureDetailModal: React.FC<VentureDetailModalProps> = ({
     setNote('');
   };
 
+  const handleAddImage = async () => {
+    if (!venture || !customImageUrl.trim()) return;
+    try {
+      setIsAddingImage(true);
+      const updated = await Api.addImageToVenture(
+        venture.id,
+        customImageUrl.trim(),
+        imageCaption.trim() || undefined,
+        false
+      );
+      const newUrls = updated.gallery_urls || [...galleryUrls, customImageUrl.trim()];
+      setGalleryUrls(newUrls);
+      setImageSuccessMsg('Image successfully added to gallery!');
+      setCustomImageUrl('');
+      setImageCaption('');
+      setTimeout(() => setImageSuccessMsg(null), 2500);
+    } catch (err: any) {
+      alert(`Failed to add image: ${err.message}`);
+    } finally {
+      setIsAddingImage(false);
+    }
+  };
+
+  const activeModalImage =
+    galleryUrls[selectedImgIndex] ||
+    venture.hero_image_url ||
+    'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=1200&q=80';
+
   return (
     <div
       style={{
@@ -66,7 +114,7 @@ export const VentureDetailModal: React.FC<VentureDetailModalProps> = ({
       <div
         style={{
           width: '100%',
-          maxWidth: '860px',
+          maxWidth: '880px',
           maxHeight: '92vh',
           backgroundColor: '#fffdf9',
           border: '1px solid #d6c9b2',
@@ -91,7 +139,7 @@ export const VentureDetailModal: React.FC<VentureDetailModalProps> = ({
         >
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
             <span style={{ fontSize: '11px', fontWeight: 600, letterSpacing: '0.14em', textTransform: 'uppercase', color: '#7a5c2e' }}>
-              Standardized 10-Section Dossier
+              Standardized 10-Section Dossier & Evidence
             </span>
             <span
               style={{
@@ -124,6 +172,91 @@ export const VentureDetailModal: React.FC<VentureDetailModalProps> = ({
 
         {/* Scrollable Content */}
         <div style={{ padding: '24px 28px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '20px' }}>
+          {/* Visual Showcase Banner */}
+          {galleryUrls.length > 0 && (
+            <div style={{ borderRadius: '8px', overflow: 'hidden', border: '1px solid #e6decb' }}>
+              <div style={{ position: 'relative', width: '100%', height: '220px', backgroundColor: '#0c1826' }}>
+                <img
+                  src={activeModalImage}
+                  alt={venture.company_name}
+                  style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+                  onError={(e) => {
+                    (e.target as HTMLImageElement).src =
+                      'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=1200&q=80';
+                  }}
+                />
+                <div
+                  style={{
+                    position: 'absolute',
+                    inset: 0,
+                    background: 'linear-gradient(to top, rgba(12, 24, 38, 0.75) 0%, transparent 60%)',
+                  }}
+                />
+                <div style={{ position: 'absolute', bottom: '12px', left: '16px', right: '16px', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
+                  <div style={{ color: '#fff', fontSize: '13px', fontWeight: 600 }}>
+                    Photo {selectedImgIndex + 1} of {galleryUrls.length}
+                  </div>
+                  <button
+                    onClick={() => setActiveTab('GALLERY')}
+                    style={{
+                      padding: '4px 10px',
+                      borderRadius: '4px',
+                      backgroundColor: 'rgba(255, 255, 255, 0.92)',
+                      border: 'none',
+                      fontSize: '11.5px',
+                      fontWeight: 600,
+                      color: '#0c1826',
+                      cursor: 'pointer',
+                    }}
+                  >
+                    View All {galleryUrls.length} Images ↗
+                  </button>
+                </div>
+              </div>
+
+              {/* Thumbnails row */}
+              {galleryUrls.length > 1 && (
+                <div style={{ display: 'flex', gap: '8px', padding: '8px 12px', backgroundColor: '#fbf8f2', overflowX: 'auto', alignItems: 'center' }}>
+                  {galleryUrls.map((url, idx) => (
+                    <button
+                      key={idx}
+                      onClick={() => setSelectedImgIndex(idx)}
+                      style={{
+                        width: '54px',
+                        height: '36px',
+                        borderRadius: '3px',
+                        padding: 0,
+                        overflow: 'hidden',
+                        border: selectedImgIndex === idx ? '2px solid #7a5c2e' : '1px solid #d6c9b2',
+                        cursor: 'pointer',
+                        opacity: selectedImgIndex === idx ? 1 : 0.65,
+                        flexShrink: 0,
+                      }}
+                    >
+                      <img src={url} alt={`Thumb ${idx}`} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                    </button>
+                  ))}
+                  <button
+                    onClick={() => setActiveTab('GALLERY')}
+                    style={{
+                      fontSize: '11px',
+                      color: '#7a5c2e',
+                      background: 'none',
+                      border: '1px dashed #7a5c2e',
+                      borderRadius: '3px',
+                      padding: '4px 8px',
+                      cursor: 'pointer',
+                      whiteSpace: 'nowrap',
+                      height: '36px',
+                    }}
+                  >
+                    + Add Image
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
+
           {/* Header Info */}
           <div>
             <h2
@@ -204,8 +337,8 @@ export const VentureDetailModal: React.FC<VentureDetailModalProps> = ({
             </div>
           )}
 
-          {/* Subtabs for View: 10-Section Dossier vs Evidence Checklist */}
-          <div style={{ display: 'flex', gap: '8px', borderBottom: '1px solid #d6c9b2', paddingBottom: '8px' }}>
+          {/* Subtabs for View: 10-Section Dossier vs Evidence Checklist vs Media */}
+          <div style={{ display: 'flex', gap: '8px', borderBottom: '1px solid #d6c9b2', paddingBottom: '8px', flexWrap: 'wrap' }}>
             <button
               onClick={() => setActiveTab('DOSSIER')}
               style={{
@@ -233,6 +366,23 @@ export const VentureDetailModal: React.FC<VentureDetailModalProps> = ({
               }}
             >
               Evidence & Verification Checks
+            </button>
+            <button
+              onClick={() => setActiveTab('GALLERY')}
+              style={{
+                padding: '6px 14px',
+                border: 'none',
+                background: activeTab === 'GALLERY' ? '#0c1826' : 'transparent',
+                color: activeTab === 'GALLERY' ? '#fff' : '#4c5262',
+                fontSize: '12.5px',
+                fontWeight: 600,
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '6px',
+              }}
+            >
+              <span>📷</span> Media & Visual Proof ({galleryUrls.length})
             </button>
           </div>
 
@@ -307,6 +457,109 @@ export const VentureDetailModal: React.FC<VentureDetailModalProps> = ({
                   Standard evidence review pending platform desk dispatch.
                 </div>
               )}
+            </div>
+          )}
+
+          {/* TAB 3: MEDIA & VISUAL PROOF */}
+          {activeTab === 'GALLERY' && (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '8px' }}>
+                <div style={{ fontSize: '13.5px', color: '#4c5262' }}>
+                  Audited photographic evidence of facilities, assets, and operational reality:
+                </div>
+                {imageSuccessMsg && (
+                  <span style={{ fontSize: '12px', color: '#15803d', fontWeight: 600 }}>
+                    ✓ {imageSuccessMsg}
+                  </span>
+                )}
+              </div>
+
+              {/* Photos Grid */}
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '16px' }}>
+                {galleryUrls.map((imgUrl, idx) => (
+                  <div
+                    key={idx}
+                    style={{
+                      borderRadius: '8px',
+                      overflow: 'hidden',
+                      border: '1px solid #e3d6bf',
+                      backgroundColor: '#fbf8f2',
+                    }}
+                  >
+                    <div style={{ height: '170px', overflow: 'hidden', backgroundColor: '#0c1826' }}>
+                      <img
+                        src={imgUrl}
+                        alt={`Venture media ${idx + 1}`}
+                        style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                        onError={(e) => {
+                          (e.target as HTMLImageElement).src =
+                            'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=1200&q=80';
+                        }}
+                      />
+                    </div>
+                    <div style={{ padding: '10px 12px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <span style={{ fontSize: '12px', fontWeight: 600, color: '#121a29' }}>
+                        Image {idx + 1}
+                      </span>
+                      <a
+                        href={imgUrl}
+                        target="_blank"
+                        rel="noreferrer"
+                        style={{ fontSize: '11px', color: '#7a5c2e', textDecoration: 'none', fontWeight: 600 }}
+                      >
+                        Open Full ↗
+                      </a>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {/* Quick Add Image Form inside Modal */}
+              <div
+                style={{
+                  padding: '18px 20px',
+                  backgroundColor: '#f5efe5',
+                  border: '1px solid #d6c9b2',
+                  borderRadius: '8px',
+                  marginTop: '10px',
+                }}
+              >
+                <div style={{ fontSize: '13.5px', fontWeight: 700, color: '#0c1826', marginBottom: '8px' }}>
+                  + Add Additional Image to Venture
+                </div>
+                <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+                  <input
+                    type="url"
+                    placeholder="Paste image URL (https://...)"
+                    value={customImageUrl}
+                    onChange={(e) => setCustomImageUrl(e.target.value)}
+                    style={{ flex: 2, minWidth: '220px', padding: '8px 12px', border: '1px solid #d6c9b2', fontSize: '13px' }}
+                  />
+                  <input
+                    type="text"
+                    placeholder="Caption (e.g. Factory floor)"
+                    value={imageCaption}
+                    onChange={(e) => setImageCaption(e.target.value)}
+                    style={{ flex: 1, minWidth: '150px', padding: '8px 12px', border: '1px solid #d6c9b2', fontSize: '13px' }}
+                  />
+                  <button
+                    onClick={handleAddImage}
+                    disabled={isAddingImage || !customImageUrl.trim()}
+                    style={{
+                      padding: '8px 18px',
+                      backgroundColor: '#0c1826',
+                      color: '#fff',
+                      border: 'none',
+                      fontWeight: 600,
+                      fontSize: '13px',
+                      cursor: customImageUrl.trim() ? 'pointer' : 'not-allowed',
+                      opacity: customImageUrl.trim() ? 1 : 0.6,
+                    }}
+                  >
+                    {isAddingImage ? 'Saving...' : 'Add Image'}
+                  </button>
+                </div>
+              </div>
             </div>
           )}
         </div>

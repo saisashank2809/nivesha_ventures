@@ -172,6 +172,18 @@ export class Api {
     });
   }
 
+  public static async addImageToVenture(
+    ventureId: string,
+    imageUrl: string,
+    caption?: string,
+    setAsHero: boolean = false
+  ): Promise<VentureDetail> {
+    return this.request<VentureDetail>(`/ventures/${ventureId}/images`, {
+      method: 'POST',
+      body: JSON.stringify({ image_url: imageUrl, caption, set_as_hero: setAsHero }),
+    });
+  }
+
   // Investor Mandates
   public static async getMyMandate(): Promise<InvestorMandate> {
     return this.request<InvestorMandate>('/mandates/me');

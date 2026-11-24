@@ -97,6 +97,8 @@ class VentureCardResponse(BaseModel):
     created_at: datetime
     connection_status: Optional[ConnectionStatus] = None
     connection_id: Optional[str] = None
+    hero_image_url: Optional[str] = None
+    gallery_urls: List[str] = Field(default_factory=list)
 
     # Extended capital facilitation fields
     proposed_arrangement: str = "LOAN"
@@ -131,6 +133,8 @@ class VentureCreateRequest(BaseModel):
     capital_structures: List[str] = Field(default_factory=list)
     pitch_deck_url: Optional[str] = None
     video_url: Optional[str] = None
+    hero_image_url: Optional[str] = None
+    gallery_urls: Optional[List[str]] = None
     custom_answers: Dict[str, Any] = Field(default_factory=dict)
     proposed_arrangement: Optional[str] = "LOAN"
     arrangement_details: Optional[Dict[str, Any]] = None
@@ -155,6 +159,8 @@ class VentureUpdateRequest(BaseModel):
     capital_structures: Optional[List[str]] = None
     pitch_deck_url: Optional[str] = None
     video_url: Optional[str] = None
+    hero_image_url: Optional[str] = None
+    gallery_urls: Optional[List[str]] = None
     traction_metrics: Optional[List[Dict[str, Any]]] = None
     custom_answers: Optional[Dict[str, Any]] = None
     proposed_arrangement: Optional[str] = None
@@ -165,6 +171,12 @@ class VentureUpdateRequest(BaseModel):
     due_diligence_findings: Optional[Dict[str, Any]] = None
     missing_information: Optional[List[str]] = None
     venture_story: Optional[Dict[str, Any]] = None
+
+
+class AddImageRequest(BaseModel):
+    image_url: str
+    caption: Optional[str] = None
+    set_as_hero: bool = False
 
 
 # --- Investor Mandate Schemas ---

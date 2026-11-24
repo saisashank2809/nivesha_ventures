@@ -9,6 +9,7 @@ from app.schemas.schemas import (
     VentureDetailResponse,
     VentureCreateRequest,
     VentureUpdateRequest,
+    AddImageRequest,
 )
 from app.api.auth import get_current_user
 
@@ -53,6 +54,8 @@ def build_card_response(v: Venture, current_user: Optional[User], db: Session) -
         created_at=v.created_at,
         connection_status=conn_status,
         connection_id=conn_id,
+        hero_image_url=v.hero_image_url,
+        gallery_urls=v.gallery_urls or [],
         proposed_arrangement=v.proposed_arrangement or "LOAN",
         arrangement_details=v.arrangement_details or {},
         operating_track_record=v.operating_track_record or {},
@@ -170,6 +173,8 @@ def create_venture(
         capital_structures=payload.capital_structures,
         pitch_deck_url=payload.pitch_deck_url,
         video_url=payload.video_url,
+        hero_image_url=payload.hero_image_url,
+        gallery_urls=payload.gallery_urls or [],
         custom_answers=payload.custom_answers,
         verification_status=VerificationStatus.UNDER_REVIEW,
     )
@@ -205,6 +210,40 @@ def update_venture(
     update_data = payload.model_dump(exclude_unset=True)
     for field, value in update_data.items():
         setattr(v, field, value)
+
+    v.version += 1
+    db.commit()
+    db.refresh(v)
+
+    card = build_card_response(v, current_user, db)
+    return VentureDetailResponse(
+        **card.model_dump(),
+        pitch_deck_url=v.pitch_deck_url,
+        video_url=v.video_url,
+        diligence_brief=v.diligence_brief or {},
+        custom_answers=v.custom_answers or {},
+        version=v.version,
+    )
+
+
+@router.post("/{id}/images", response_model=VentureDetailResponse)
+def add_venture_image(
+    id: str,
+    payload: AddImageRequest,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    v = db.query(Venture).filter(Venture.id == id).first()
+    if not v:
+        raise HTTPException(status_code=404, detail="Venture not found.")
+
+    urls = list(v.gallery_urls or [])
+    if payload.image_url not in urls:
+        urls.append(payload.image_url)
+    v.gallery_urls = urls
+
+    if payload.set_as_hero or not v.hero_image_url:
+        v.hero_image_url = payload.image_url
 
     v.version += 1
     db.commit()

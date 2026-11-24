@@ -101,6 +101,7 @@ export const FounderGuidedJourney: React.FC<FounderGuidedJourneyProps> = ({
   const [itemizedBudget, setItemizedBudget] = useState(
     'Production Shoot (₹3.8 Cr), VFX & CGI pipeline (₹1.8 Cr), Sound & Post-production (₹40 Lakhs).'
   );
+  const [heroImageUrl, setHeroImageUrl] = useState('');
 
   // Step 6: Evidence & Uncertainties Checklist
   const [evidenceItems, setEvidenceItems] = useState([
@@ -222,6 +223,7 @@ export const FounderGuidedJourney: React.FC<FounderGuidedJourneyProps> = ({
           setLocation(v.location);
           if (v.ticket_min) setTicketMin(v.ticket_min);
           if (v.ticket_max) setTicketMax(v.ticket_max);
+          if (v.hero_image_url) setHeroImageUrl(v.hero_image_url);
         }
       } catch {
         // First-time founder or no venture saved yet
@@ -339,6 +341,7 @@ export const FounderGuidedJourney: React.FC<FounderGuidedJourneyProps> = ({
         ticket_min: ticketMin,
         ticket_max: ticketMax,
         currency: 'INR',
+        hero_image_url: heroImageUrl || undefined,
         capital_structures: [proposedArrangement],
         proposed_arrangement: proposedArrangement,
         arrangement_details: {
@@ -913,6 +916,19 @@ export const FounderGuidedJourney: React.FC<FounderGuidedJourneyProps> = ({
               value={itemizedBudget}
               onChange={(e) => setItemizedBudget(e.target.value)}
               placeholder="e.g. Equipment (₹10L), Working capital (₹5L), Fit-out (₹5L)..."
+              style={{ width: '100%', padding: '12px', border: '1px solid #8a8070', background: '#fffdf9', fontSize: '14px', boxSizing: 'border-box', marginBottom: '16px' }}
+            />
+          </div>
+
+          <div>
+            <label style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#121a29', marginBottom: '6px' }}>
+              Primary Venture Media / Showcase Photo URL (Optional)
+            </label>
+            <input
+              type="url"
+              value={heroImageUrl}
+              onChange={(e) => setHeroImageUrl(e.target.value)}
+              placeholder="https://images.unsplash.com/... (Photo of plant, facility, asset, or prototype)"
               style={{ width: '100%', padding: '12px', border: '1px solid #8a8070', background: '#fffdf9', fontSize: '14px', boxSizing: 'border-box' }}
             />
           </div>

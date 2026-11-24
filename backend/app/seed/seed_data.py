@@ -247,6 +247,13 @@ def seed_database(db: Session):
         ticket_max=20000000.0,      # ₹2 Cr (Producer tier)
         currency="INR",
         capital_structures=["Fractional Equity Units", "Profit Participation", "Tiered Producer Credits"],
+        hero_image_url="https://images.unsplash.com/photo-1485846234645-a62644f84728?auto=format&fit=crop&w=1200&q=80",
+        gallery_urls=[
+            "https://images.unsplash.com/photo-1485846234645-a62644f84728?auto=format&fit=crop&w=1200&q=80",
+            "https://images.unsplash.com/photo-1536440136628-849c177e76a1?auto=format&fit=crop&w=1200&q=80",
+            "https://images.unsplash.com/photo-1518173946687-a4c8892bbd9f?auto=format&fit=crop&w=1200&q=80",
+            "https://images.unsplash.com/photo-1478760329108-5c3ed9d495a0?auto=format&fit=crop&w=1200&q=80",
+        ],
         verification_status=VerificationStatus.PARTIALLY_VERIFIED,
         proposed_arrangement="FRACTIONAL_EQUITY_UNITS",
         arrangement_details={
@@ -347,6 +354,13 @@ def seed_database(db: Session):
         ticket_max=30000000.0,
         currency="INR",
         capital_structures=["Growth Equity", "Mezzanine Debt", "Revenue Share Hybrid"],
+        hero_image_url="https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=1200&q=80",
+        gallery_urls=[
+            "https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=1200&q=80",
+            "https://images.unsplash.com/photo-1556906781-9a412961c28c?auto=format&fit=crop&w=1200&q=80",
+            "https://images.unsplash.com/photo-1460353581641-37baddab0fa2?auto=format&fit=crop&w=1200&q=80",
+            "https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a?auto=format&fit=crop&w=1200&q=80",
+        ],
         verification_status=VerificationStatus.PARTIALLY_VERIFIED,
         proposed_arrangement="GROWTH_EQUITY_WITH_REV_SHARE",
         arrangement_details={
@@ -434,6 +448,13 @@ def seed_database(db: Session):
         ticket_max=2500000.0,      # ₹25 Lakhs
         currency="INR",
         capital_structures=["Secured Debt / Loan", "Mortgage-Backed Loan", "Convertible Debt Option"],
+        hero_image_url="https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=1200&q=80",
+        gallery_urls=[
+            "https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=1200&q=80",
+            "https://images.unsplash.com/photo-1581092335397-9583fe92d232?auto=format&fit=crop&w=1200&q=80",
+            "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&w=1200&q=80",
+            "https://images.unsplash.com/photo-1565043589221-1a6fd9ae45c7?auto=format&fit=crop&w=1200&q=80",
+        ],
         verification_status=VerificationStatus.VERIFIED,
         proposed_arrangement="SECURED_COLLATERAL_DEBT",
         arrangement_details={
@@ -523,6 +544,13 @@ def seed_database(db: Session):
         ticket_max=7500000.0,
         currency="INR",
         capital_structures=["Early-Stage Equity", "Revenue Share", "Convertible Note"],
+        hero_image_url="https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&w=1200&q=80",
+        gallery_urls=[
+            "https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&w=1200&q=80",
+            "https://images.unsplash.com/photo-1616401784845-180882ba9ba8?auto=format&fit=crop&w=1200&q=80",
+            "https://images.unsplash.com/photo-1578575437130-527eed3abbec?auto=format&fit=crop&w=1200&q=80",
+            "https://images.unsplash.com/photo-1580674684081-7617fbf3d745?auto=format&fit=crop&w=1200&q=80",
+        ],
         verification_status=VerificationStatus.PARTIALLY_VERIFIED,
         proposed_arrangement="EARLY_STAGE_EQUITY",
         arrangement_details={
@@ -609,6 +637,13 @@ def seed_database(db: Session):
         ticket_max=50000000.0,      # ₹5 Cr
         currency="INR",
         capital_structures=["Partial Buyout / Secondary", "Growth Equity", "Asset Acquisition"],
+        hero_image_url="https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?auto=format&fit=crop&w=1200&q=80",
+        gallery_urls=[
+            "https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?auto=format&fit=crop&w=1200&q=80",
+            "https://images.unsplash.com/photo-1516549655169-df83a0774514?auto=format&fit=crop&w=1200&q=80",
+            "https://images.unsplash.com/photo-1584515979956-d9f6e5d09982?auto=format&fit=crop&w=1200&q=80",
+            "https://images.unsplash.com/photo-1538108149393-fbbd81895907?auto=format&fit=crop&w=1200&q=80",
+        ],
         verification_status=VerificationStatus.VERIFIED,
         proposed_arrangement="PARTIAL_EQUITY_BUYOUT",
         arrangement_details={
@@ -695,6 +730,13 @@ def seed_database(db: Session):
         ticket_max=40000000.0,      # ₹4 Cr
         currency="INR",
         capital_structures=["Project Financing", "Joint Development Equity", "Mezzanine Debt with Plot Security"],
+        hero_image_url="https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&w=1200&q=80",
+        gallery_urls=[
+            "https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&w=1200&q=80",
+            "https://images.unsplash.com/photo-1628744448840-55bdb2497bd4?auto=format&fit=crop&w=1200&q=80",
+            "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1200&q=80",
+            "https://images.unsplash.com/photo-1513694203232-719a280e022f?auto=format&fit=crop&w=1200&q=80",
+        ],
         verification_status=VerificationStatus.PARTIALLY_VERIFIED,
         proposed_arrangement="PROJECT_DEVELOPMENT_FINANCING",
         arrangement_details={
@@ -781,6 +823,13 @@ def seed_database(db: Session):
         ticket_max=2000000.0,
         currency="INR",
         capital_structures=["Revenue-Share Loan", "Term Debt", "Mezzanine Debt"],
+        hero_image_url="https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=1200&q=80",
+        gallery_urls=[
+            "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=1200&q=80",
+            "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=1200&q=80",
+            "https://images.unsplash.com/photo-1556910103-1c02745aae4d?auto=format&fit=crop&w=1200&q=80",
+            "https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=1200&q=80",
+        ],
         verification_status=VerificationStatus.PARTIALLY_VERIFIED,
         proposed_arrangement="LOAN",
         arrangement_details={

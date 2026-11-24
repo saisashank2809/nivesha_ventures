@@ -452,109 +452,133 @@ export const LandingPageView: React.FC<LandingPageViewProps> = ({
               gap: '24px',
             }}
           >
-            {ventures.slice(0, 3).map((v) => (
-              <div
-                key={v.id}
-                style={{
-                  background: '#ffffff',
-                  border: '1px solid var(--border-light)',
-                  borderRadius: '12px',
-                  padding: '24px',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  justifyContent: 'space-between',
-                  boxShadow: 'var(--shadow-sm)',
-                }}
-              >
-                <div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '12px', gap: '8px', flexWrap: 'wrap' }}>
-                    <div>
-                      <h3 style={{ fontSize: '20px', fontWeight: 600, color: 'var(--bg-dark)', margin: 0 }}>
-                        {v.company_name}
-                      </h3>
-                      <div style={{ fontSize: '13px', color: 'var(--text-subtle)', marginTop: '2px' }}>
-                        {v.sector} • {v.location}
-                      </div>
-                    </div>
-                    <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
-                      <span
-                        style={{
-                          padding: '3px 8px',
-                          borderRadius: '4px',
-                          background: '#f5efe5',
-                          border: '1px solid #d6c9b2',
-                          color: '#7a5c2e',
-                          fontSize: '10.5px',
-                          fontWeight: 600,
-                          textTransform: 'uppercase',
-                        }}
-                      >
-                        {(v.proposed_arrangement || 'Standard').replace(/_/g, ' ')}
-                      </span>
-                      <span
-                        style={{
-                          padding: '3px 8px',
-                          borderRadius: '4px',
-                          background: '#e9f5ed',
-                          color: 'var(--accent-green)',
-                          fontSize: '11px',
-                          fontWeight: 600,
-                        }}
-                      >
-                        {v.stage}
-                      </span>
-                    </div>
-                  </div>
-
-                  <p style={{ fontSize: '14px', color: 'var(--text-muted)', lineHeight: 1.5, marginBottom: '18px' }}>
-                    {v.tag_line}
-                  </p>
-
-                  {/* Traction Grid */}
-                  <div
-                    style={{
-                      background: '#fcfaf5',
-                      border: '1px solid var(--border-light)',
-                      borderRadius: '8px',
-                      padding: '12px',
-                      marginBottom: '18px',
-                      display: 'grid',
-                      gridTemplateColumns: '1fr 1fr',
-                      gap: '10px',
-                    }}
-                  >
-                    {v.traction_metrics && v.traction_metrics.slice(0, 2).map((m, i) => (
-                      <div key={i}>
-                        <div style={{ fontSize: '11px', color: 'var(--text-subtle)' }}>{m.label}</div>
-                        <div style={{ fontSize: '14px', fontWeight: 600, color: 'var(--bg-dark)' }}>{m.value}</div>
-                      </div>
-                    ))}
-                  </div>
-
-                  <div style={{ fontSize: '13px', color: 'var(--text-muted)', marginBottom: '8px' }}>
-                    Seeking: <strong style={{ color: 'var(--bg-dark)' }}>{formatINR(v.capital_target)}</strong>
-                  </div>
-                </div>
-
-                <button
-                  onClick={() => onSelectVenture(v)}
+            {ventures.slice(0, 3).map((v) => {
+              const coverImg = v.hero_image_url || (v.gallery_urls && v.gallery_urls[0]);
+              return (
+                <div
+                  key={v.id}
                   style={{
-                    width: '100%',
-                    padding: '10px',
-                    borderRadius: '6px',
-                    background: '#f2eae0',
-                    border: '1px solid #d4c5ae',
-                    color: 'var(--bg-dark)',
-                    fontWeight: 600,
-                    fontSize: '13px',
-                    cursor: 'pointer',
-                    marginTop: '12px',
+                    background: '#ffffff',
+                    border: '1px solid var(--border-light)',
+                    borderRadius: '12px',
+                    overflow: 'hidden',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    justifyContent: 'space-between',
+                    boxShadow: 'var(--shadow-sm)',
                   }}
                 >
-                  Inspect 10-Section Dossier & Diligence Brief &rarr;
-                </button>
-              </div>
-            ))}
+                  {coverImg && (
+                    <div style={{ position: 'relative', height: '150px', width: '100%', backgroundColor: '#0c1826' }}>
+                      <img
+                        src={coverImg}
+                        alt={v.company_name}
+                        style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                        onError={(e) => {
+                          (e.target as HTMLImageElement).style.display = 'none';
+                        }}
+                      />
+                      <div
+                        style={{
+                          position: 'absolute',
+                          inset: 0,
+                          background: 'linear-gradient(to top, rgba(12, 24, 38, 0.5) 0%, transparent 70%)',
+                        }}
+                      />
+                    </div>
+                  )}
+                  <div style={{ padding: '20px 24px 24px', display: 'flex', flexDirection: 'column', flex: 1, justifyContent: 'space-between' }}>
+                    <div>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '12px', gap: '8px', flexWrap: 'wrap' }}>
+                        <div>
+                          <h3 style={{ fontSize: '20px', fontWeight: 600, color: 'var(--bg-dark)', margin: 0 }}>
+                            {v.company_name}
+                          </h3>
+                          <div style={{ fontSize: '13px', color: 'var(--text-subtle)', marginTop: '2px' }}>
+                            {v.sector} • {v.location}
+                          </div>
+                        </div>
+                        <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
+                          <span
+                            style={{
+                              padding: '3px 8px',
+                              borderRadius: '4px',
+                              background: '#f5efe5',
+                              border: '1px solid #d6c9b2',
+                              color: '#7a5c2e',
+                              fontSize: '10.5px',
+                              fontWeight: 600,
+                              textTransform: 'uppercase',
+                            }}
+                          >
+                            {(v.proposed_arrangement || 'Standard').replace(/_/g, ' ')}
+                          </span>
+                          <span
+                            style={{
+                              padding: '3px 8px',
+                              borderRadius: '4px',
+                              background: '#e9f5ed',
+                              color: 'var(--accent-green)',
+                              fontSize: '11px',
+                              fontWeight: 600,
+                            }}
+                          >
+                            {v.stage}
+                          </span>
+                        </div>
+                      </div>
+
+                      <p style={{ fontSize: '14px', color: 'var(--text-muted)', lineHeight: 1.5, marginBottom: '18px' }}>
+                        {v.tag_line}
+                      </p>
+
+                      {/* Traction Grid */}
+                      <div
+                        style={{
+                          background: '#fcfaf5',
+                          border: '1px solid var(--border-light)',
+                          borderRadius: '8px',
+                          padding: '12px',
+                          marginBottom: '18px',
+                          display: 'grid',
+                          gridTemplateColumns: '1fr 1fr',
+                          gap: '10px',
+                        }}
+                      >
+                        {v.traction_metrics && v.traction_metrics.slice(0, 2).map((m, i) => (
+                          <div key={i}>
+                            <div style={{ fontSize: '11px', color: 'var(--text-subtle)' }}>{m.label}</div>
+                            <div style={{ fontSize: '14px', fontWeight: 600, color: 'var(--bg-dark)' }}>{m.value}</div>
+                          </div>
+                        ))}
+                      </div>
+
+                      <div style={{ fontSize: '13px', color: 'var(--text-muted)', marginBottom: '8px' }}>
+                        Seeking: <strong style={{ color: 'var(--bg-dark)' }}>{formatINR(v.capital_target)}</strong>
+                      </div>
+                    </div>
+
+                    <button
+                      onClick={() => onSelectVenture(v)}
+                      style={{
+                        width: '100%',
+                        padding: '10px',
+                        borderRadius: '6px',
+                        background: '#f2eae0',
+                        border: '1px solid #d4c5ae',
+                        color: 'var(--bg-dark)',
+                        fontWeight: 600,
+                        fontSize: '13px',
+                        cursor: 'pointer',
+                        marginTop: '12px',
+                      }}
+                    >
+                      Inspect 10-Section Dossier & Diligence Brief &rarr;
+                    </button>
+                  </div>
+                </div>
+              );
+            })}
           </div>
         </div>
       </section>

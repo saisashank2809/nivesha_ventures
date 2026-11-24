@@ -74,6 +74,8 @@ CREATE TABLE IF NOT EXISTS ventures (
     capital_structures JSONB NOT NULL DEFAULT '[]'::jsonb,
     pitch_deck_url VARCHAR(256),
     video_url VARCHAR(256),
+    hero_image_url VARCHAR(512),
+    gallery_urls JSONB NOT NULL DEFAULT '[]'::jsonb,
     verification_status verificationstatus NOT NULL DEFAULT 'UNDER_REVIEW',
     traction_metrics JSONB NOT NULL DEFAULT '[]'::jsonb,
     diligence_brief JSONB NOT NULL DEFAULT '{}'::jsonb,
