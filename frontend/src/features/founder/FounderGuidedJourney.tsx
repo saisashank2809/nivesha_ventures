@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { VentureDetail, User, TenSections } from '../../shared/types';
+import { VentureDetail, User, TenSections, VentureCard as IVentureCard } from '../../shared/types';
 import { Api } from '../../shared/api';
 import { formatINR } from '../../shared/formatters';
+import { VentureDetailModal } from '../../components/VentureDetailModal';
+import { VentureCard } from '../../components/VentureCard';
 
 interface FounderGuidedJourneyProps {
   currentUser: User | null;
@@ -25,7 +27,8 @@ export type StageType =
   | 'EARLY_OPERATIONS'
   | 'ESTABLISHED_OPERATING'
   | 'EXPANSION_PHASE'
-  | 'BUYOUT_ACQUISITION';
+  | 'BUYOUT_ACQUISITION'
+  | 'OTHER';
 
 export type ArrangementType =
   | 'SECURED_COLLATERAL_DEBT'
@@ -34,7 +37,8 @@ export type ArrangementType =
   | 'PARTIAL_EQUITY_BUYOUT'
   | 'PROJECT_DEVELOPMENT_FINANCING'
   | 'LOAN'
-  | 'NEED_GUIDANCE';
+  | 'NEED_GUIDANCE'
+  | 'OTHER';
 
 export const FounderGuidedJourney: React.FC<FounderGuidedJourneyProps> = ({
   currentUser,
@@ -57,6 +61,27 @@ export const FounderGuidedJourney: React.FC<FounderGuidedJourneyProps> = ({
 
   // Step 3: Proposed Funding Arrangement (Decoupled from Business Type!)
   const [proposedArrangement, setProposedArrangement] = useState<ArrangementType>('FRACTIONAL_EQUITY_UNITS');
+
+  // Custom "Other" specifications
+  const [customBusinessType, setCustomBusinessType] = useState('');
+  const [customStage, setCustomStage] = useState('');
+  const [customArrangement, setCustomArrangement] = useState('');
+
+  // Custom Step 4 Contextual fields (for OTHER or customized branches)
+  const [customBusinessModel, setCustomBusinessModel] = useState('');
+  const [customMetrics, setCustomMetrics] = useState('');
+  const [customSecurity, setCustomSecurity] = useState('');
+  const [customInvestorConsideration, setCustomInvestorConsideration] = useState('');
+
+  // Custom Evidence item creation
+  const [showAddEvidence, setShowAddEvidence] = useState(false);
+  const [newEvidenceLabel, setNewEvidenceLabel] = useState('');
+  const [newEvidenceNote, setNewEvidenceNote] = useState('');
+  const [newEvidenceStatus, setNewEvidenceStatus] = useState<'VERIFIED' | 'SUPPORTED' | 'UNRESOLVED_CHECK'>('SUPPORTED');
+
+  // Preview states
+  const [previewModalOpen, setPreviewModalOpen] = useState(false);
+  const [step7ActiveTab, setStep7ActiveTab] = useState<'SECTIONS' | 'LIVE_CARD'>('SECTIONS');
 
   // Step 4: Contextual Branching Variables
   // Film specific
@@ -205,6 +230,19 @@ export const FounderGuidedJourney: React.FC<FounderGuidedJourneyProps> = ({
         { label: 'RERA Phase-2 Registration', status: 'PARTLY_VERIFIED', note: 'Application submitted; formal certificate pending' },
         { label: '38 Unencumbered Mortgage Plots', status: 'SUPPORTED', note: 'Assigned escrow plots valued at ₹9.2 Cr (2.3x cover)' },
       ]);
+    } else if (type === 'OTHER') {
+      setCompanyName('My Venture Enterprise');
+      setCapitalTarget(2500000);
+      setTicketMin(500000);
+      setTicketMax(2500000);
+      setProposedArrangement('OTHER');
+      setItemizedBudget('Capital expenditure (₹12 L), Working capital & inventory (₹8 L), Technology & marketing (₹5 L).');
+      setEvidenceItems([
+        { label: 'Entity Incorporation / GST Registration', status: 'VERIFIED', note: 'Certificate of incorporation and active tax records' },
+        { label: 'Operating Financial Records / Bank Statements', status: 'SUPPORTED', note: '12-month verified primary bank ledger' },
+        { label: 'Commercial Agreements / Client Orders', status: 'SUPPORTED', note: 'Customer contracts and pipeline documentation' },
+        { label: 'Regulatory Clearances / Certifications', status: 'UNRESOLVED_CHECK', note: 'Sector-specific operating permits under audit' },
+      ]);
     }
   };
 
@@ -303,6 +341,19 @@ export const FounderGuidedJourney: React.FC<FounderGuidedJourneyProps> = ({
       execCap = `Civil engineering management with 20+ years infrastructure pedigree in Telangana.`;
       risks = `Market absorption velocity and pending formal physical copy of Phase-2 RERA certificate.`;
       invPart = `Joint signing on project escrow account and monthly drone milestone reports.`;
+    } else if (businessType === 'OTHER') {
+      const sectorLabel = customBusinessType.trim() || 'Custom Specialized Sector';
+      const stageLabel = stage === 'OTHER' ? (customStage.trim() || 'Operational Phase') : stage.replace(/_/g, ' ');
+      const arrangeLabel = proposedArrangement === 'OTHER' ? (customArrangement.trim() || 'Custom Funding Structure') : proposedArrangement.replace(/_/g, ' ');
+
+      overview = `${companyName} is an operating enterprise based in ${location} within the ${sectorLabel} domain.`;
+      currentPos = `Operating at stage: ${stageLabel}. ${customMetrics ? `Reported operational benchmarks: ${customMetrics}.` : 'Operations actively developing with founder records on file.'}`;
+      opp = customBusinessModel ? `Commercial opportunity: ${customBusinessModel}` : `Targeting domestic market expansion in ${sectorLabel} with verifiable proprietary delivery capabilities.`;
+      capReq = `Seeking ${formatINR(capitalTarget)} in capital facilitation (minimum ticket size: ${formatINR(ticketMin)}).`;
+      invProp = `Proposed arrangement: ${arrangeLabel}. ${customInvestorConsideration ? `Structure terms: ${customInvestorConsideration}.` : ''} ${customSecurity ? `Security/collateral: ${customSecurity}.` : ''}`;
+      execCap = `Led by promoter team with direct domain and execution credentials in ${sectorLabel}.`;
+      risks = `Subject to regulatory compliance, milestone execution schedules, and market customer adoption velocity.`;
+      invPart = `Structured investor reporting, regular operational MIS, and defined recoupment/dividend distributions.`;
     }
 
     return {
@@ -330,24 +381,33 @@ export const FounderGuidedJourney: React.FC<FounderGuidedJourneyProps> = ({
       const tenSections = assembleTenSections();
       const derived = calculateDerivedUnits();
 
+      const finalSector = businessType === 'OTHER' ? (customBusinessType.trim() || 'Other') : businessType.replace(/_/g, ' ');
+      const finalStage = stage === 'OTHER' ? (customStage.trim() || 'Other') : stage.replace(/_/g, ' ');
+      const finalArrangement = proposedArrangement === 'OTHER' ? (customArrangement.trim() || 'Custom Structure') : proposedArrangement;
+
       const payload: Partial<VentureDetail> = {
         company_name: companyName,
         tag_line: `${companyName} - ${tenSections.opportunity.slice(0, 80)}...`,
         business_context: tenSections.venture_overview,
-        sector: businessType.replace(/_/g, ' '),
+        sector: finalSector,
         location: location,
-        stage: stage.replace(/_/g, ' '),
+        stage: finalStage,
         capital_target: capitalTarget,
         ticket_min: ticketMin,
         ticket_max: ticketMax,
         currency: 'INR',
         hero_image_url: heroImageUrl || undefined,
-        capital_structures: [proposedArrangement],
-        proposed_arrangement: proposedArrangement,
+        capital_structures: [finalArrangement],
+        proposed_arrangement: finalArrangement,
         arrangement_details: {
           arrangement_type: proposedArrangement,
+          custom_arrangement: customArrangement,
           derived_calculations: derived,
           itemized_budget: itemizedBudget,
+          custom_business_model: customBusinessModel,
+          custom_metrics: customMetrics,
+          custom_security: customSecurity,
+          custom_investor_consideration: customInvestorConsideration,
         },
         venture_story: tenSections,
         missing_information: evidenceItems.filter((e) => e.status === 'UNRESOLVED_CHECK').map((e) => e.label),
@@ -392,6 +452,70 @@ export const FounderGuidedJourney: React.FC<FounderGuidedJourneyProps> = ({
   const derived = calculateDerivedUnits();
   const previewTenSections = assembleTenSections();
 
+  const previewVenture: VentureDetail = {
+    id: ventureId || 'preview-draft',
+    founder_id: currentUser?.id || 'draft-founder',
+    founder_name: currentUser?.full_name || 'Founder',
+    company_name: companyName || 'My Venture',
+    tag_line: `${companyName || 'Venture'} — ${(previewTenSections.opportunity || '').slice(0, 85)}...`,
+    business_context: previewTenSections.venture_overview,
+    sector: businessType === 'OTHER' ? (customBusinessType || 'Other / Specialized') : businessType.replace(/_/g, ' '),
+    location: location,
+    stage: stage === 'OTHER' ? (customStage || 'Custom Stage') : stage.replace(/_/g, ' '),
+    capital_target: capitalTarget,
+    ticket_min: ticketMin,
+    ticket_max: ticketMax,
+    currency: 'INR',
+    hero_image_url: heroImageUrl || 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=1200&q=80',
+    gallery_urls: heroImageUrl ? [heroImageUrl] : ['https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=1200&q=80'],
+    capital_structures: [proposedArrangement === 'OTHER' ? (customArrangement || 'Custom') : proposedArrangement],
+    proposed_arrangement: proposedArrangement === 'OTHER' ? (customArrangement || 'Custom Structure') : proposedArrangement,
+    arrangement_details: {
+      arrangement_type: proposedArrangement,
+      custom_arrangement_name: customArrangement,
+      derived_calculations: derived,
+      itemized_budget: itemizedBudget,
+      custom_business_model: customBusinessModel,
+      custom_metrics: customMetrics,
+      custom_security: customSecurity,
+      custom_investor_consideration: customInvestorConsideration,
+    },
+    venture_story: previewTenSections,
+    missing_information: evidenceItems.filter((e) => e.status === 'UNRESOLVED_CHECK').map((e) => e.label),
+    due_diligence_findings: {
+      evidence_checklist: evidenceItems,
+      review_status: 'DRAFT_PREVIEW',
+    },
+    verification_status: 'PARTIALLY_VERIFIED',
+    traction_metrics: [],
+    diligence_brief: {},
+    custom_answers: {},
+    version: 1,
+    created_at: new Date().toISOString(),
+  };
+
+  const previewCard: IVentureCard = {
+    id: previewVenture.id,
+    founder_id: previewVenture.founder_id,
+    founder_name: previewVenture.founder_name,
+    company_name: previewVenture.company_name,
+    tag_line: previewVenture.tag_line,
+    business_context: previewVenture.business_context,
+    sector: previewVenture.sector,
+    location: previewVenture.location,
+    stage: previewVenture.stage,
+    capital_target: previewVenture.capital_target,
+    ticket_min: previewVenture.ticket_min,
+    ticket_max: previewVenture.ticket_max,
+    currency: previewVenture.currency,
+    hero_image_url: previewVenture.hero_image_url,
+    capital_structures: previewVenture.capital_structures,
+    proposed_arrangement: previewVenture.proposed_arrangement,
+    verification_status: 'PARTIALLY_VERIFIED',
+    traction_metrics: [],
+    created_at: previewVenture.created_at,
+  };
+
   return (
     <div style={{ maxWidth: '1080px', margin: '30px auto', padding: '0 20px', fontFamily: "-apple-system, BlinkMacSystemFont, 'Inter', sans-serif" }}>
       {/* Top Wizard Steps Bar */}
@@ -412,6 +536,26 @@ export const FounderGuidedJourney: React.FC<FounderGuidedJourneyProps> = ({
             </h2>
           </div>
           <div style={{ display: 'flex', gap: '8px' }}>
+            <button
+              type="button"
+              onClick={() => setPreviewModalOpen(true)}
+              style={{
+                padding: '8px 16px',
+                backgroundColor: '#f5efe5',
+                border: '1px solid #7a5c2e',
+                color: '#7a5c2e',
+                fontSize: '13px',
+                fontWeight: 600,
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '6px',
+              }}
+              title="Preview how verified investors will view your venture dossier"
+            >
+              <span>👁️</span>
+              <span>Preview</span>
+            </button>
             {step > 1 && (
               <button
                 onClick={() => setStep(step - 1)}
@@ -474,6 +618,7 @@ export const FounderGuidedJourney: React.FC<FounderGuidedJourneyProps> = ({
               { type: 'HEALTHCARE_HOSPITAL', title: 'Hospital & Clinical Care', desc: 'Multi-speciality hospitals, surgical clinics, diagnostic centers' },
               { type: 'REAL_ESTATE_LAND', title: 'Real Estate & Plotted Layouts', desc: 'Township developments, plotted villa communities, master layouts' },
               { type: 'FOOD_HOSPITALITY', title: 'Food, Beverage & Restaurants', desc: 'Multi-outlet casual dining, QSR expansion, cloud kitchens' },
+              { type: 'OTHER', title: 'Other Sector / Custom Industry', desc: 'Emerging technology, specialized services, green energy, or custom enterprise.' },
             ].map((item) => (
               <div
                 key={item.type}
@@ -490,6 +635,21 @@ export const FounderGuidedJourney: React.FC<FounderGuidedJourneyProps> = ({
               </div>
             ))}
           </div>
+
+          {businessType === 'OTHER' && (
+            <div style={{ marginBottom: '24px', padding: '16px', backgroundColor: '#faf4eb', border: '1px solid #d6c9b2' }}>
+              <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: '#121a29', marginBottom: '6px' }}>
+                Specify Custom Sector / Industry Name <span style={{ color: '#b45309' }}>*</span>
+              </label>
+              <input
+                type="text"
+                value={customBusinessType}
+                onChange={(e) => setCustomBusinessType(e.target.value)}
+                placeholder="e.g. Agritech & Cold Chain, Solar EPC, SaaS / DeepTech, Specialty Chemicals, EdTech..."
+                style={{ width: '100%', padding: '10px 12px', border: '1px solid #8a8070', background: '#fffdf9', fontSize: '14px', boxSizing: 'border-box' }}
+              />
+            </div>
+          )}
 
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
             <div>
@@ -529,6 +689,7 @@ export const FounderGuidedJourney: React.FC<FounderGuidedJourneyProps> = ({
               { type: 'ESTABLISHED_OPERATING', title: 'Established & Operating Business', desc: 'Multi-year track record with audited financials and stable cash flows.' },
               { type: 'EXPANSION_PHASE', title: 'Expansion Phase (Multi-Location)', desc: 'Scaling successful flagship unit to additional cities or industrial capacity.' },
               { type: 'BUYOUT_ACQUISITION', title: 'Ownership Buyout / Shareholder Exit', desc: 'Transaction involving secondary stake purchase from an existing director or partner.' },
+              { type: 'OTHER', title: 'Other Operating Stage (Custom)', desc: 'Define your venture\'s unique operational maturity, special situation, or milestone phase.' },
             ].map((item) => (
               <div
                 key={item.type}
@@ -545,6 +706,21 @@ export const FounderGuidedJourney: React.FC<FounderGuidedJourneyProps> = ({
               </div>
             ))}
           </div>
+
+          {stage === 'OTHER' && (
+            <div style={{ marginTop: '20px', padding: '16px', backgroundColor: '#faf4eb', border: '1px solid #d6c9b2' }}>
+              <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: '#121a29', marginBottom: '6px' }}>
+                Specify Custom Operating Stage <span style={{ color: '#b45309' }}>*</span>
+              </label>
+              <input
+                type="text"
+                value={customStage}
+                onChange={(e) => setCustomStage(e.target.value)}
+                placeholder="e.g. Commercial Pilot Complete, Asset Holding & IP Licensing, Turnaround & Revitalization, Special Situation..."
+                style={{ width: '100%', padding: '10px 12px', border: '1px solid #8a8070', background: '#fffdf9', fontSize: '14px', boxSizing: 'border-box' }}
+              />
+            </div>
+          )}
         </div>
       )}
 
@@ -593,6 +769,11 @@ export const FounderGuidedJourney: React.FC<FounderGuidedJourneyProps> = ({
                 title: 'Help Me Structure My Arrangement',
                 desc: 'Platform reviewer will assess cash flows and recommend an optimal structure before investor matching.',
               },
+              {
+                type: 'OTHER',
+                title: 'Other Proposed Funding Arrangement (Custom)',
+                desc: 'Propose an alternative structure (e.g. SAFE / i-SAFE, convertible debenture, royalty note, or mezzanine).',
+              },
             ].map((item) => (
               <div
                 key={item.type}
@@ -609,6 +790,21 @@ export const FounderGuidedJourney: React.FC<FounderGuidedJourneyProps> = ({
               </div>
             ))}
           </div>
+
+          {proposedArrangement === 'OTHER' && (
+            <div style={{ marginTop: '20px', padding: '16px', backgroundColor: '#faf4eb', border: '1px solid #d6c9b2' }}>
+              <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: '#121a29', marginBottom: '6px' }}>
+                Specify Custom Proposed Funding Arrangement <span style={{ color: '#b45309' }}>*</span>
+              </label>
+              <input
+                type="text"
+                value={customArrangement}
+                onChange={(e) => setCustomArrangement(e.target.value)}
+                placeholder="e.g. Compulsorily Convertible Debenture (CCD) at 12% coupon, Gross Revenue Royalty Note..."
+                style={{ width: '100%', padding: '10px 12px', border: '1px solid #8a8070', background: '#fffdf9', fontSize: '14px', boxSizing: 'border-box' }}
+              />
+            </div>
+          )}
         </div>
       )}
 
@@ -865,6 +1061,67 @@ export const FounderGuidedJourney: React.FC<FounderGuidedJourneyProps> = ({
               </div>
             </div>
           )}
+
+          {/* Custom / Other Business & Structure Branch */}
+          {(businessType === 'OTHER' || proposedArrangement === 'OTHER' || (!['FILM_ENTERTAINMENT', 'MANUFACTURING_CONSUMER', 'HEALTHCARE_HOSPITAL', 'LOGISTICS_RURAL', 'REAL_ESTATE_LAND'].includes(businessType) && proposedArrangement !== 'SECURED_COLLATERAL_DEBT')) && (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', marginTop: '16px', padding: '16px', backgroundColor: '#faf4eb', border: '1px solid #d6c9b2' }}>
+              <div style={{ fontSize: '13.5px', fontWeight: 600, color: '#121a29' }}>
+                Custom Contextual Briefing: {customBusinessType || businessType.replace(/_/g, ' ')} ({customArrangement || proposedArrangement.replace(/_/g, ' ')})
+              </div>
+              <div>
+                <label style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#121a29', marginBottom: '6px' }}>
+                  Business Model & Core Operational Engine
+                </label>
+                <textarea
+                  rows={3}
+                  value={customBusinessModel}
+                  onChange={(e) => setCustomBusinessModel(e.target.value)}
+                  placeholder="Describe how the venture generates revenue, acquires customers, and delivers its product/service..."
+                  style={{ width: '100%', padding: '10px 12px', border: '1px solid #8a8070', background: '#fffdf9', fontSize: '14px', boxSizing: 'border-box' }}
+                />
+              </div>
+
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+                <div>
+                  <label style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#121a29', marginBottom: '6px' }}>
+                    Historical Revenue / Key Metrics (If any)
+                  </label>
+                  <input
+                    type="text"
+                    value={customMetrics}
+                    onChange={(e) => setCustomMetrics(e.target.value)}
+                    placeholder="e.g. ₹42L last year, 12,000 active users, 3 retail outlets..."
+                    style={{ width: '100%', padding: '10px 12px', border: '1px solid #8a8070', background: '#fffdf9', fontSize: '14px', boxSizing: 'border-box' }}
+                  />
+                </div>
+                <div>
+                  <label style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#121a29', marginBottom: '6px' }}>
+                    Offered Collateral, Security, or Founder Guarantees (Optional)
+                  </label>
+                  <input
+                    type="text"
+                    value={customSecurity}
+                    onChange={(e) => setCustomSecurity(e.target.value)}
+                    placeholder="e.g. First charge on equipment, personal guarantee, or equity pledge..."
+                    style={{ width: '100%', padding: '10px 12px', border: '1px solid #8a8070', background: '#fffdf9', fontSize: '14px', boxSizing: 'border-box' }}
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#121a29', marginBottom: '6px' }}>
+                  Investor Participation & Proposed Consideration Details
+                </label>
+                <textarea
+                  rows={2}
+                  value={customInvestorConsideration}
+                  onChange={(e) => setCustomInvestorConsideration(e.target.value)}
+                  placeholder="Specific terms: e.g. 15% equity dilution, 16% coupon return, board seat, revenue royalty, or milestones..."
+                  style={{ width: '100%', padding: '10px 12px', border: '1px solid #8a8070', background: '#fffdf9', fontSize: '14px', boxSizing: 'border-box' }}
+                />
+              </div>
+            </div>
+          )}
         </div>
       )}
 
@@ -1022,22 +1279,128 @@ export const FounderGuidedJourney: React.FC<FounderGuidedJourneyProps> = ({
               </div>
             ))}
           </div>
+
+          {/* Add Custom Evidence / Verification Item */}
+          <div style={{ marginTop: '20px', borderTop: '1px solid #d6c9b2', paddingTop: '16px' }}>
+            {!showAddEvidence ? (
+              <button
+                type="button"
+                onClick={() => setShowAddEvidence(true)}
+                style={{
+                  padding: '8px 16px',
+                  backgroundColor: '#fffdf9',
+                  border: '1px dashed #7a5c2e',
+                  color: '#7a5c2e',
+                  fontSize: '13px',
+                  fontWeight: 600,
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                }}
+              >
+                <span>+</span> Add Custom Verification / Document Item
+              </button>
+            ) : (
+              <div style={{ padding: '16px', backgroundColor: '#faf4eb', border: '1px solid #d6c9b2' }}>
+                <h4 style={{ margin: '0 0 12px', fontSize: '13.5px', color: '#121a29' }}>Add Custom Verification or Document</h4>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '12px' }}>
+                  <div>
+                    <label style={{ display: 'block', fontSize: '12px', fontWeight: 500, color: '#121a29', marginBottom: '4px' }}>Document / Check Title</label>
+                    <input
+                      type="text"
+                      value={newEvidenceLabel}
+                      onChange={(e) => setNewEvidenceLabel(e.target.value)}
+                      placeholder="e.g. ISO 9001:2015 Certificate, Patent Grant, Valuation Report..."
+                      style={{ width: '100%', padding: '8px 10px', border: '1px solid #8a8070', background: '#fffdf9', fontSize: '13px', boxSizing: 'border-box' }}
+                    />
+                  </div>
+                  <div>
+                    <label style={{ display: 'block', fontSize: '12px', fontWeight: 500, color: '#121a29', marginBottom: '4px' }}>Verification Note / Citation</label>
+                    <input
+                      type="text"
+                      value={newEvidenceNote}
+                      onChange={(e) => setNewEvidenceNote(e.target.value)}
+                      placeholder="e.g. Certified copy uploaded; valid through 2028"
+                      style={{ width: '100%', padding: '8px 10px', border: '1px solid #8a8070', background: '#fffdf9', fontSize: '13px', boxSizing: 'border-box' }}
+                    />
+                  </div>
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                    <span style={{ fontSize: '12px', color: '#4c5262' }}>Status:</span>
+                    {(['VERIFIED', 'SUPPORTED', 'UNRESOLVED_CHECK'] as const).map((st) => (
+                      <button
+                        key={st}
+                        type="button"
+                        onClick={() => setNewEvidenceStatus(st)}
+                        style={{
+                          padding: '4px 8px',
+                          fontSize: '11px',
+                          fontWeight: 600,
+                          backgroundColor: newEvidenceStatus === st ? '#0c1826' : '#fff',
+                          color: newEvidenceStatus === st ? '#fff' : '#4c5262',
+                          border: '1px solid #8a8070',
+                          cursor: 'pointer',
+                        }}
+                      >
+                        {st === 'VERIFIED' ? 'Verified' : st === 'SUPPORTED' ? 'Supported' : 'Unresolved'}
+                      </button>
+                    ))}
+                  </div>
+                  <div style={{ display: 'flex', gap: '8px' }}>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setShowAddEvidence(false);
+                        setNewEvidenceLabel('');
+                        setNewEvidenceNote('');
+                      }}
+                      style={{ padding: '6px 12px', backgroundColor: '#fff', border: '1px solid #8a8070', fontSize: '12px', cursor: 'pointer' }}
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        if (!newEvidenceLabel.trim()) return;
+                        setEvidenceItems([
+                          ...evidenceItems,
+                          {
+                            label: newEvidenceLabel.trim(),
+                            status: newEvidenceStatus,
+                            note: newEvidenceNote.trim() || 'Custom founder disclosure',
+                          },
+                        ]);
+                        setNewEvidenceLabel('');
+                        setNewEvidenceNote('');
+                        setShowAddEvidence(false);
+                      }}
+                      style={{ padding: '6px 14px', backgroundColor: '#15803d', color: '#fff', border: 'none', fontSize: '12px', fontWeight: 600, cursor: 'pointer' }}
+                    >
+                      Add Checklist Item
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
         </div>
       )}
 
-      {/* STEP 7: REVIEW UNIFIED 10-SECTION DOSSIER */}
+      {/* STEP 7: REVIEW UNIFIED 10-SECTION DOSSIER & PREVIEW */}
       {step === 7 && (
         <div style={{ backgroundColor: '#fffdf9', border: '1px solid #d6c9b2', padding: '32px' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid #d6c9b2', paddingBottom: '16px', marginBottom: '24px' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid #d6c9b2', paddingBottom: '16px', marginBottom: '20px' }}>
             <div>
               <span style={{ fontSize: '11px', color: '#7a5c2e', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.12em' }}>
-                Unified Presentation Dossier
+                Unified Presentation Dossier & Investor Preview
               </span>
               <h3 style={{ margin: '4px 0 0', fontFamily: "Newsreader, Georgia, serif", fontSize: '26px', color: '#121a29', fontWeight: 400 }}>
                 {companyName}
               </h3>
               <div style={{ fontSize: '12.5px', color: '#4c5262', marginTop: '2px' }}>
-                {businessType.replace(/_/g, ' ')} • {proposedArrangement.replace(/_/g, ' ')} • {location}
+                {businessType === 'OTHER' ? (customBusinessType || 'Other') : businessType.replace(/_/g, ' ')} • {proposedArrangement === 'OTHER' ? (customArrangement || 'Custom Structure') : proposedArrangement.replace(/_/g, ' ')} • {location}
               </div>
             </div>
             <div style={{ textAlign: 'right' }}>
@@ -1046,45 +1409,160 @@ export const FounderGuidedJourney: React.FC<FounderGuidedJourneyProps> = ({
             </div>
           </div>
 
-          {/* 10 Standard Sections Grid */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-            {[
-              { num: '01', title: 'Venture Overview', content: previewTenSections.venture_overview, tag: 'FOUNDER INPUTS' },
-              { num: '02', title: 'Current Position', content: previewTenSections.current_position, tag: 'OPERATING RECORDS' },
-              { num: '03', title: 'Opportunity', content: previewTenSections.opportunity, tag: 'MARKET CONTEXT' },
-              { num: '04', title: 'Capital Requirement', content: previewTenSections.capital_requirement, tag: 'BUDGET SCHEDULE' },
-              { num: '05', title: 'Use of Capital', content: previewTenSections.use_of_capital, tag: 'DEPLOYMENT PLAN' },
-              { num: '06', title: 'Investment Proposal', content: previewTenSections.investment_proposal, tag: 'PROPOSED TERMS' },
-              { num: '07', title: 'Execution Capability', content: previewTenSections.execution_capability, tag: 'TEAM & PARTNERS' },
-              { num: '08', title: 'Risks & Dependencies', content: previewTenSections.risks_and_dependencies, tag: 'DISCLOSURES' },
-              { num: '09', title: 'Investor Participation', content: previewTenSections.investor_participation, tag: 'GOVERNANCE' },
-              { num: '10', title: 'Evidence & Next Steps', content: previewTenSections.evidence_and_next_steps, tag: 'REVIEW AUDIT' },
-            ].map((sec) => (
-              <div
-                key={sec.num}
+          {/* Step 7 View Switcher & Live Preview Controls */}
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px', flexWrap: 'wrap', gap: '12px' }}>
+            <div style={{ display: 'flex', gap: '8px' }}>
+              <button
+                type="button"
+                onClick={() => setStep7ActiveTab('SECTIONS')}
                 style={{
-                  padding: '16px 20px',
-                  backgroundColor: '#f5efe5',
-                  border: '1px solid #d6c9b2',
+                  padding: '8px 16px',
+                  backgroundColor: step7ActiveTab === 'SECTIONS' ? '#0c1826' : '#fffdf9',
+                  color: step7ActiveTab === 'SECTIONS' ? '#f5efe5' : '#121a29',
+                  border: '1px solid #0c1826',
+                  fontSize: '13px',
+                  fontWeight: 600,
+                  cursor: 'pointer',
                 }}
               >
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <span style={{ fontSize: '11px', fontWeight: 700, color: '#7a5c2e', fontFamily: 'monospace' }}>{sec.num}</span>
-                    <span style={{ fontSize: '14px', fontWeight: 600, color: '#121a29' }}>{sec.title}</span>
-                  </div>
-                  <span style={{ fontSize: '10px', color: '#7a5c2e', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.08em', backgroundColor: '#fff', padding: '2px 8px', border: '1px solid #d6c9b2' }}>
-                    {sec.tag}
-                  </span>
-                </div>
-                <div style={{ fontSize: '13.5px', color: '#121a29', lineHeight: 1.55 }}>
-                  {sec.content}
-                </div>
-              </div>
-            ))}
+                📋 Standardized 10 Sections
+              </button>
+              <button
+                type="button"
+                onClick={() => setStep7ActiveTab('LIVE_CARD')}
+                style={{
+                  padding: '8px 16px',
+                  backgroundColor: step7ActiveTab === 'LIVE_CARD' ? '#0c1826' : '#fffdf9',
+                  color: step7ActiveTab === 'LIVE_CARD' ? '#f5efe5' : '#121a29',
+                  border: '1px solid #0c1826',
+                  fontSize: '13px',
+                  fontWeight: 600,
+                  cursor: 'pointer',
+                }}
+              >
+                🗂️ Live Investor Card View
+              </button>
+            </div>
+
+            <button
+              type="button"
+              onClick={() => setPreviewModalOpen(true)}
+              style={{
+                padding: '8px 18px',
+                backgroundColor: '#f5efe5',
+                border: '1px solid #7a5c2e',
+                color: '#7a5c2e',
+                fontSize: '13px',
+                fontWeight: 600,
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '6px',
+              }}
+            >
+              <span>👁️</span>
+              <span>Open Full Interactive Investor Preview</span>
+            </button>
           </div>
 
-          <div style={{ marginTop: '32px', textAlign: 'center' }}>
+          {step7ActiveTab === 'LIVE_CARD' ? (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+              <div style={{ padding: '16px 20px', backgroundColor: '#faf5ec', border: '1px solid #e3d6bf' }}>
+                <div style={{ fontSize: '13.5px', fontWeight: 600, color: '#7a5c2e' }}>
+                  Live Capital Directory Card Simulation
+                </div>
+                <div style={{ fontSize: '12.5px', color: '#4c5262', marginTop: '3px' }}>
+                  This interactive card reflects how accredited investors, family offices, and platform reviewers discover your opportunity. Click to open the complete dossier.
+                </div>
+              </div>
+
+              <div style={{ maxWidth: '440px', margin: '0 auto', width: '100%' }}>
+                <VentureCard
+                  venture={previewCard}
+                  onSelect={() => setPreviewModalOpen(true)}
+                  onRequestConnection={() => setPreviewModalOpen(true)}
+                />
+              </div>
+
+              <div style={{ textAlign: 'center', marginTop: '10px' }}>
+                <button
+                  type="button"
+                  onClick={() => setPreviewModalOpen(true)}
+                  style={{
+                    padding: '9px 20px',
+                    backgroundColor: '#fffdf9',
+                    border: '1px solid #7a5c2e',
+                    color: '#7a5c2e',
+                    fontSize: '13px',
+                    fontWeight: 600,
+                    cursor: 'pointer',
+                  }}
+                >
+                  👁️ Click to Expand Complete 10-Section Investor Dossier
+                </button>
+              </div>
+            </div>
+          ) : (
+            /* 10 Standard Sections Grid */
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+              {[
+                { num: '01', title: 'Venture Overview', content: previewTenSections.venture_overview, tag: 'FOUNDER INPUTS' },
+                { num: '02', title: 'Current Position', content: previewTenSections.current_position, tag: 'OPERATING RECORDS' },
+                { num: '03', title: 'Opportunity', content: previewTenSections.opportunity, tag: 'MARKET CONTEXT' },
+                { num: '04', title: 'Capital Requirement', content: previewTenSections.capital_requirement, tag: 'BUDGET SCHEDULE' },
+                { num: '05', title: 'Use of Capital', content: previewTenSections.use_of_capital, tag: 'DEPLOYMENT PLAN' },
+                { num: '06', title: 'Investment Proposal', content: previewTenSections.investment_proposal, tag: 'PROPOSED TERMS' },
+                { num: '07', title: 'Execution Capability', content: previewTenSections.execution_capability, tag: 'TEAM & PARTNERS' },
+                { num: '08', title: 'Risks & Dependencies', content: previewTenSections.risks_and_dependencies, tag: 'DISCLOSURES' },
+                { num: '09', title: 'Investor Participation', content: previewTenSections.investor_participation, tag: 'GOVERNANCE' },
+                { num: '10', title: 'Evidence & Next Steps', content: previewTenSections.evidence_and_next_steps, tag: 'REVIEW AUDIT' },
+              ].map((sec) => (
+                <div
+                  key={sec.num}
+                  style={{
+                    padding: '16px 20px',
+                    backgroundColor: '#f5efe5',
+                    border: '1px solid #d6c9b2',
+                  }}
+                >
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <span style={{ fontSize: '11px', fontWeight: 700, color: '#7a5c2e', fontFamily: 'monospace' }}>{sec.num}</span>
+                      <span style={{ fontSize: '14px', fontWeight: 600, color: '#121a29' }}>{sec.title}</span>
+                    </div>
+                    <span style={{ fontSize: '10px', color: '#7a5c2e', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.08em', backgroundColor: '#fff', padding: '2px 8px', border: '1px solid #d6c9b2' }}>
+                      {sec.tag}
+                    </span>
+                  </div>
+                  <div style={{ fontSize: '13.5px', color: '#121a29', lineHeight: 1.55 }}>
+                    {sec.content}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+
+          <div style={{ marginTop: '32px', display: 'flex', justifyContent: 'center', gap: '16px', flexWrap: 'wrap' }}>
+            <button
+              type="button"
+              onClick={() => setPreviewModalOpen(true)}
+              style={{
+                padding: '12px 28px',
+                backgroundColor: '#fffdf9',
+                border: '1px solid #7a5c2e',
+                color: '#7a5c2e',
+                fontSize: '14.5px',
+                fontWeight: 600,
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
+              }}
+            >
+              <span>👁️</span>
+              <span>View Full Investor Preview</span>
+            </button>
+
             <button
               onClick={handleSaveAndSubmit}
               disabled={saving}
@@ -1101,6 +1579,59 @@ export const FounderGuidedJourney: React.FC<FounderGuidedJourneyProps> = ({
               {saving ? 'Saving...' : 'Submit to Review Desk & Enter Matching'}
             </button>
           </div>
+        </div>
+      )}
+
+      {/* Full-Screen Interactive Preview Modal */}
+      {previewModalOpen && (
+        <div style={{ position: 'relative', zIndex: 1100 }}>
+          <div
+            style={{
+              position: 'fixed',
+              top: '12px',
+              left: '50%',
+              transform: 'translateX(-50%)',
+              zIndex: 1200,
+              backgroundColor: '#0c1826',
+              color: '#f5efe5',
+              padding: '8px 24px',
+              borderRadius: '24px',
+              boxShadow: '0 8px 24px rgba(0,0,0,0.3)',
+              fontSize: '13px',
+              fontWeight: 600,
+              display: 'flex',
+              alignItems: 'center',
+              gap: '12px',
+            }}
+          >
+            <span>✨ Live Investor Preview Mode</span>
+            <span style={{ color: '#d6c9b2' }}>|</span>
+            <span style={{ fontSize: '12px', color: '#e3d6bf' }}>This is how verified investors and reviewers see your dossier.</span>
+            <button
+              onClick={() => setPreviewModalOpen(false)}
+              style={{
+                marginLeft: '8px',
+                padding: '3px 10px',
+                backgroundColor: '#7a5c2e',
+                color: '#fff',
+                border: 'none',
+                borderRadius: '12px',
+                fontSize: '11.5px',
+                cursor: 'pointer',
+              }}
+            >
+              Close Preview
+            </button>
+          </div>
+
+          <VentureDetailModal
+            venture={previewVenture}
+            isOpen={previewModalOpen}
+            onClose={() => setPreviewModalOpen(false)}
+            onRequestConnection={() => {
+              alert('Preview Mode: In live discovery, investors click this to request direct appointment and diligence chat with you.');
+            }}
+          />
         </div>
       )}
     </div>
