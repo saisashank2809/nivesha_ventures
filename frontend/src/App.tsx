@@ -16,6 +16,7 @@ export function App() {
   const [activeTab, setActiveTab] = useState<string>('LANDING');
   const [loginModalOpen, setLoginModalOpen] = useState(false);
   const [loginModalRole, setLoginModalRole] = useState<UserRole>('INVESTOR');
+  const [loginModalIsRegister, setLoginModalIsRegister] = useState(false);
 
   const [ventures, setVentures] = useState<IVentureCard[]>([]);
   const [selectedVentureDetail, setSelectedVentureDetail] = useState<VentureDetail | null>(null);
@@ -28,6 +29,22 @@ export function App() {
     setNotification(msg);
     setTimeout(() => setNotification(null), 4000);
   };
+
+  // Check and verify authentic session on startup
+  useEffect(() => {
+    const token = Api.getToken();
+    if (token) {
+      Api.getMe()
+        .then((user) => {
+          setCurrentUser(user);
+        })
+        .catch(() => {
+          // Token expired or invalid
+          Api.logout();
+          setCurrentUser(null);
+        });
+    }
+  }, []);
 
   // Load ventures and calculate unread / pending items
   const loadData = useCallback(async () => {
@@ -78,6 +95,7 @@ export function App() {
   const handleRequestConnection = async (ventureId: string, note?: string) => {
     if (!currentUser) {
       setLoginModalRole('INVESTOR');
+      setLoginModalIsRegister(false);
       setLoginModalOpen(true);
       return;
     }
@@ -99,8 +117,9 @@ export function App() {
   };
 
   // Handle Login Modal
-  const handleOpenLogin = (role: UserRole = 'INVESTOR') => {
+  const handleOpenLogin = (role: UserRole = 'INVESTOR', isRegister: boolean = false) => {
     setLoginModalRole(role);
+    setLoginModalIsRegister(isRegister);
     setLoginModalOpen(true);
   };
 
@@ -171,10 +190,10 @@ export function App() {
               if (currentUser?.role === 'FOUNDER') {
                 setActiveTab('FOUNDER_JOURNEY');
               } else {
-                handleOpenLogin('FOUNDER');
+                handleOpenLogin('FOUNDER', true);
               }
             }}
-            onOpenLogin={() => handleOpenLogin('INVESTOR')}
+            onOpenLogin={() => handleOpenLogin('INVESTOR', false)}
             onSelectVenture={handleSelectVenture}
           />
         )}
@@ -182,7 +201,7 @@ export function App() {
         {(activeTab === 'INVESTOR_DISCOVERY' || activeTab === 'DIRECTORY') && (
           <InvestorGuidedDiscovery
             currentUser={currentUser}
-            onOpenLogin={() => handleOpenLogin('INVESTOR')}
+            onOpenLogin={() => handleOpenLogin('INVESTOR', false)}
             onOpenDirectChat={handleOpenChat}
           />
         )}
@@ -195,14 +214,14 @@ export function App() {
               setActiveTab('INVESTOR_DISCOVERY');
             }}
             onCancel={() => setActiveTab('LANDING')}
-            onOpenLogin={() => handleOpenLogin('FOUNDER')}
+            onOpenLogin={() => handleOpenLogin('FOUNDER', false)}
           />
         )}
 
         {activeTab === 'PLATFORM_REVIEW' && (
           <PlatformReviewView
             currentUser={currentUser}
-            onOpenLogin={() => handleOpenLogin('REVIEWER')}
+            onOpenLogin={() => handleOpenLogin('REVIEWER', false)}
             onSelectVenture={handleSelectVenture}
           />
         )}
@@ -216,15 +235,22 @@ export function App() {
             />
           ) : (
             <div style={{ textAlign: 'center', padding: '100px 20px' }}>
-              <h2>Sign in to view direct messages</h2>
+              <h2 style={{ fontFamily: "Newsreader, Georgia, serif", fontSize: '24px', color: '#121a29' }}>
+                Sign in to view direct messages
+              </h2>
+              <p style={{ color: '#4c5262', fontSize: '14px', margin: '8px 0 20px' }}>
+                Direct communication is unlocked once introductions are reviewed and approved.
+              </p>
               <button
-                onClick={() => handleOpenLogin()}
+                onClick={() => handleOpenLogin('INVESTOR', false)}
                 style={{
-                  marginTop: '16px',
                   padding: '10px 24px',
-                  borderRadius: '6px',
-                  background: 'var(--bg-dark)',
+                  border: 'none',
+                  background: '#0c1826',
                   color: '#ffffff',
+                  fontSize: '13.5px',
+                  fontWeight: 600,
+                  cursor: 'pointer',
                 }}
               >
                 Sign In
@@ -247,6 +273,7 @@ export function App() {
       <LoginModal
         isOpen={loginModalOpen}
         initialRole={loginModalRole}
+        initialIsRegister={loginModalIsRegister}
         onClose={() => setLoginModalOpen(false)}
         onLoginSuccess={handleLoginSuccess}
       />

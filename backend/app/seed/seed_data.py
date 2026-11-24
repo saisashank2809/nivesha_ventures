@@ -1,4 +1,4 @@
-import hashlib
+import bcrypt
 from datetime import datetime, timezone, timedelta
 from sqlalchemy.orm import Session
 
@@ -22,7 +22,7 @@ from app.services.matching_service import evaluate_match
 
 
 def hash_pw(pw: str) -> str:
-    return hashlib.sha256(pw.encode("utf-8")).hexdigest()
+    return bcrypt.hashpw(pw.encode("utf-8"), bcrypt.gensalt(rounds=10)).decode("utf-8")
 
 
 def seed_database(db: Session):

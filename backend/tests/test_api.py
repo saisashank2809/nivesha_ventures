@@ -40,6 +40,12 @@ def setup_test_db():
     Base.metadata.drop_all(bind=test_engine)
 
 
+def get_auth_token(email: str = "investor@peakindia.vc", password: str = "password123") -> str:
+    resp = client.post("/api/auth/login", json={"email": email, "password": password})
+    assert resp.status_code == 200, f"Login failed for {email}: {resp.text}"
+    return resp.json()["access_token"]
+
+
 def test_platform_config():
     """Verify centralized branding and ₹10 Lakh working assumption."""
     resp = client.get("/api/config")
@@ -62,18 +68,25 @@ def test_auth_login_and_me():
     assert data["user"]["full_name"] == "Rohan Varma"
     assert data["user"]["role"] == "INVESTOR"
 
-    # Test me endpoint with token
+    # Test me endpoint with authentic token
     token = data["access_token"]
     me_resp = client.get("/api/auth/me", headers={"Authorization": f"Bearer {token}"})
     assert me_resp.status_code == 200
     assert me_resp.json()["email"] == "investor@peakindia.vc"
 
 
+def test_unauthenticated_access_denied():
+    """Verify protected endpoints reject requests without a valid Bearer token."""
+    resp = client.get("/api/auth/me")
+    assert resp.status_code == 401
+
+
 def test_restaurant_venture_detail_and_story():
     """Verify primary coherent restaurant venture has declared track record, projections, and due diligence."""
+    token = get_auth_token("investor@peakindia.vc")
     resp = client.get(
         "/api/ventures/ven-malabar-01",
-        headers={"X-Demo-Role": "INVESTOR", "X-Demo-User-Id": "usr-investor-01"},
+        headers={"Authorization": f"Bearer {token}"},
     )
     assert resp.status_code == 200
     detail = resp.json()
@@ -104,11 +117,13 @@ def test_matching_scenarios_for_restaurant():
     2. Siddharth Rao (Tech / Equity) -> UNSUITABLE
     3. Meera Nair (Hands-off) -> POTENTIALLY_SUITABLE with explicit Trade-Off
     """
+    reviewer_token = get_auth_token("reviewer@nivesha.in")
+
     # 1. Compatible match run
     r1 = client.post(
         "/api/matches/run",
         json={"venture_id": "ven-malabar-01", "mandate_id": "man-compatible-01"},
-        headers={"X-Demo-Role": "REVIEWER", "X-Demo-User-Id": "usr-reviewer-01"},
+        headers={"Authorization": f"Bearer {reviewer_token}"},
     )
     assert r1.status_code == 200
     c1 = r1.json()
@@ -119,7 +134,7 @@ def test_matching_scenarios_for_restaurant():
     r2 = client.post(
         "/api/matches/run",
         json={"venture_id": "ven-malabar-01", "mandate_id": "man-incompatible-02"},
-        headers={"X-Demo-Role": "REVIEWER", "X-Demo-User-Id": "usr-reviewer-01"},
+        headers={"Authorization": f"Bearer {reviewer_token}"},
     )
     assert r2.status_code == 200
     c2 = r2.json()
@@ -131,7 +146,7 @@ def test_matching_scenarios_for_restaurant():
     r3 = client.post(
         "/api/matches/run",
         json={"venture_id": "ven-malabar-01", "mandate_id": "man-conflict-03"},
-        headers={"X-Demo-Role": "REVIEWER", "X-Demo-User-Id": "usr-reviewer-01"},
+        headers={"Authorization": f"Bearer {reviewer_token}"},
     )
     assert r3.status_code == 200
     c3 = r3.json()
@@ -142,6 +157,9 @@ def test_matching_scenarios_for_restaurant():
 
 def test_appointment_request_and_review():
     """Verify creating an appointment request preserves identities, meeting purpose, and scope."""
+    investor_token = get_auth_token("investor@peakindia.vc")
+    reviewer_token = get_auth_token("reviewer@nivesha.in")
+
     resp = client.post(
         "/api/appointments",
         json={
@@ -151,7 +169,7 @@ def test_appointment_request_and_review():
             "sharing_scope": "Declared sales breakdown and contractor quotation",
             "preferred_times": ["Thursday 3:00 PM IST", "Friday 11:00 AM IST"],
         },
-        headers={"X-Demo-Role": "INVESTOR", "X-Demo-User-Id": "usr-investor-01"},
+        headers={"Authorization": f"Bearer {investor_token}"},
     )
     assert resp.status_code == 200
     appt = resp.json()
@@ -162,7 +180,7 @@ def test_appointment_request_and_review():
     # Verify review stage updated on linked match case
     mc_resp = client.get(
         "/api/matches/mc-malabar-compatible",
-        headers={"X-Demo-Role": "REVIEWER"},
+        headers={"Authorization": f"Bearer {reviewer_token}"},
     )
     assert mc_resp.status_code == 200
     assert mc_resp.json()["review_stage"] == "APPOINTMENT_REQUESTED"
@@ -171,11 +189,13 @@ def test_appointment_request_and_review():
 def test_direct_messaging_unlocked_when_connected():
     """Verify connected parties can chat 1-on-1 through web interface."""
     conn_id = "conn-rohan-malabar-01"
+    investor_token = get_auth_token("investor@peakindia.vc")
+    founder_token = get_auth_token("founder@malabarcoast.in")
 
     # 1. Fetch initial message history
     msgs_resp = client.get(
         f"/api/connections/{conn_id}/messages",
-        headers={"X-Demo-Role": "INVESTOR", "X-Demo-User-Id": "usr-investor-01"},
+        headers={"Authorization": f"Bearer {investor_token}"},
     )
     assert msgs_resp.status_code == 200
     msgs = msgs_resp.json()
@@ -185,7 +205,7 @@ def test_direct_messaging_unlocked_when_connected():
     send_resp = client.post(
         f"/api/connections/{conn_id}/messages",
         json={"content": "Thursday at 3 PM works perfectly for me. Looking forward to our discussion!"},
-        headers={"X-Demo-Role": "FOUNDER", "X-Demo-User-Id": "usr-founder-restaurant"},
+        headers={"Authorization": f"Bearer {founder_token}"},
     )
     assert send_resp.status_code == 201
     new_msg = send_resp.json()

@@ -6,7 +6,7 @@ interface NavbarProps {
   currentUser: User | null;
   activeTab: string;
   onNavigate: (tab: string) => void;
-  onOpenLogin: (role?: UserRole) => void;
+  onOpenLogin: (role?: UserRole, isRegister?: boolean) => void;
   onUserChanged: (user: User | null) => void;
   unreadCount?: number;
 }
@@ -19,22 +19,6 @@ export const Navbar: React.FC<NavbarProps> = ({
   onUserChanged,
   unreadCount = 0,
 }) => {
-  const handleDemoSwitch = async (role: UserRole) => {
-    try {
-      const res = await Api.switchDemo(role);
-      onUserChanged(res.user);
-      if (role === 'INVESTOR') {
-        onNavigate('INVESTOR_DISCOVERY');
-      } else if (role === 'FOUNDER') {
-        onNavigate('FOUNDER_JOURNEY');
-      } else if (role === 'REVIEWER') {
-        onNavigate('PLATFORM_REVIEW');
-      }
-    } catch (err) {
-      console.error('Failed to switch demo user:', err);
-    }
-  };
-
   const handleLogout = () => {
     Api.logout();
     onUserChanged(null);
@@ -103,8 +87,8 @@ export const Navbar: React.FC<NavbarProps> = ({
           </div>
         </div>
 
-        {/* Center Nav Links */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+        {/* Center Nav Links - Contextual by User Role */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
           <button
             onClick={() => onNavigate('LANDING')}
             style={{
@@ -121,54 +105,64 @@ export const Navbar: React.FC<NavbarProps> = ({
             Overview
           </button>
 
-          <button
-            onClick={() => onNavigate('INVESTOR_DISCOVERY')}
-            style={{
-              padding: '6px 12px',
-              border: 'none',
-              background: 'none',
-              fontSize: '13.5px',
-              fontWeight: activeTab === 'INVESTOR_DISCOVERY' ? 600 : 500,
-              color: activeTab === 'INVESTOR_DISCOVERY' ? '#0c1826' : '#4c5262',
-              cursor: 'pointer',
-              borderBottom: activeTab === 'INVESTOR_DISCOVERY' ? '2px solid #7a5c2e' : '2px solid transparent',
-            }}
-          >
-            Investor Discovery
-          </button>
+          {/* Unauthenticated / Investor / Reviewer can explore opportunities */}
+          {(!currentUser || currentUser.role === 'INVESTOR' || currentUser.role === 'REVIEWER') && (
+            <button
+              onClick={() => onNavigate('INVESTOR_DISCOVERY')}
+              style={{
+                padding: '6px 12px',
+                border: 'none',
+                background: 'none',
+                fontSize: '13.5px',
+                fontWeight: activeTab === 'INVESTOR_DISCOVERY' ? 600 : 500,
+                color: activeTab === 'INVESTOR_DISCOVERY' ? '#0c1826' : '#4c5262',
+                cursor: 'pointer',
+                borderBottom: activeTab === 'INVESTOR_DISCOVERY' ? '2px solid #7a5c2e' : '2px solid transparent',
+              }}
+            >
+              {currentUser?.role === 'INVESTOR' ? 'Venture Matches & Mandate' : 'Verified Opportunities'}
+            </button>
+          )}
 
-          <button
-            onClick={() => onNavigate('FOUNDER_JOURNEY')}
-            style={{
-              padding: '6px 12px',
-              border: 'none',
-              background: 'none',
-              fontSize: '13.5px',
-              fontWeight: activeTab === 'FOUNDER_JOURNEY' ? 600 : 500,
-              color: activeTab === 'FOUNDER_JOURNEY' ? '#0c1826' : '#4c5262',
-              cursor: 'pointer',
-              borderBottom: activeTab === 'FOUNDER_JOURNEY' ? '2px solid #7a5c2e' : '2px solid transparent',
-            }}
-          >
-            Founder Story Builder
-          </button>
+          {/* Founder specific views */}
+          {currentUser?.role === 'FOUNDER' && (
+            <button
+              onClick={() => onNavigate('FOUNDER_JOURNEY')}
+              style={{
+                padding: '6px 12px',
+                border: 'none',
+                background: 'none',
+                fontSize: '13.5px',
+                fontWeight: activeTab === 'FOUNDER_JOURNEY' ? 600 : 500,
+                color: activeTab === 'FOUNDER_JOURNEY' ? '#0c1826' : '#4c5262',
+                cursor: 'pointer',
+                borderBottom: activeTab === 'FOUNDER_JOURNEY' ? '2px solid #7a5c2e' : '2px solid transparent',
+              }}
+            >
+              My Venture Story
+            </button>
+          )}
 
-          <button
-            onClick={() => onNavigate('PLATFORM_REVIEW')}
-            style={{
-              padding: '6px 12px',
-              border: 'none',
-              background: 'none',
-              fontSize: '13.5px',
-              fontWeight: activeTab === 'PLATFORM_REVIEW' ? 600 : 500,
-              color: activeTab === 'PLATFORM_REVIEW' ? '#0c1826' : '#4c5262',
-              cursor: 'pointer',
-              borderBottom: activeTab === 'PLATFORM_REVIEW' ? '2px solid #7a5c2e' : '2px solid transparent',
-            }}
-          >
-            Review Desk
-          </button>
+          {/* Reviewer / Operator specific views */}
+          {currentUser?.role === 'REVIEWER' && (
+            <button
+              onClick={() => onNavigate('PLATFORM_REVIEW')}
+              style={{
+                padding: '6px 12px',
+                border: 'none',
+                background: 'none',
+                fontSize: '13.5px',
+                fontWeight: activeTab === 'PLATFORM_REVIEW' ? 600 : 500,
+                color: activeTab === 'PLATFORM_REVIEW' ? '#0c1826' : '#4c5262',
+                cursor: 'pointer',
+                borderBottom: activeTab === 'PLATFORM_REVIEW' ? '2px solid #7a5c2e' : '2px solid transparent',
+              }}
+            >
+              Review Desk
+            </button>
+          )}
 
+          {/* Authenticated Messaging */}
           {currentUser && (
             <button
               onClick={() => onNavigate('MESSAGES')}
@@ -205,100 +199,75 @@ export const Navbar: React.FC<NavbarProps> = ({
           )}
         </div>
 
-        {/* Right: Quick Demo Persona Switcher & Auth */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-          {/* Quick Demo Switcher Pill */}
-          <div
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              backgroundColor: '#f5efe5',
-              border: '1px solid #d6c9b2',
-              padding: '2px',
-              fontSize: '12px',
-            }}
-          >
-            <span style={{ padding: '0 6px', color: '#7a5c2e', fontWeight: 600, fontSize: '11px', textTransform: 'uppercase' }}>
-              Switch:
-            </span>
-            <button
-              onClick={() => handleDemoSwitch('INVESTOR')}
-              style={{
-                padding: '4px 8px',
-                border: 'none',
-                backgroundColor: currentUser?.role === 'INVESTOR' ? '#0c1826' : 'transparent',
-                color: currentUser?.role === 'INVESTOR' ? '#fff' : '#121a29',
-                cursor: 'pointer',
-                fontWeight: currentUser?.role === 'INVESTOR' ? 600 : 400,
-              }}
-            >
-              Investor
-            </button>
-            <button
-              onClick={() => handleDemoSwitch('FOUNDER')}
-              style={{
-                padding: '4px 8px',
-                border: 'none',
-                backgroundColor: currentUser?.role === 'FOUNDER' ? '#0c1826' : 'transparent',
-                color: currentUser?.role === 'FOUNDER' ? '#fff' : '#121a29',
-                cursor: 'pointer',
-                fontWeight: currentUser?.role === 'FOUNDER' ? 600 : 400,
-              }}
-            >
-              Founder
-            </button>
-            <button
-              onClick={() => handleDemoSwitch('REVIEWER')}
-              style={{
-                padding: '4px 8px',
-                border: 'none',
-                backgroundColor: currentUser?.role === 'REVIEWER' ? '#0c1826' : 'transparent',
-                color: currentUser?.role === 'REVIEWER' ? '#fff' : '#121a29',
-                cursor: 'pointer',
-                fontWeight: currentUser?.role === 'REVIEWER' ? 600 : 400,
-              }}
-            >
-              Reviewer
-            </button>
-          </div>
-
+        {/* Right: Authenticated User Profile & Real Sign In */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
           {currentUser ? (
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
               <div style={{ textAlign: 'right' }}>
-                <div style={{ fontSize: '12.5px', fontWeight: 600, color: '#121a29' }}>{currentUser.full_name}</div>
-                <div style={{ fontSize: '10.5px', color: '#7a5c2e' }}>
+                <div style={{ fontSize: '13px', fontWeight: 600, color: '#121a29' }}>
+                  {currentUser.full_name}
+                </div>
+                <div style={{ fontSize: '11px', color: '#7a5c2e', display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '4px' }}>
+                  <span
+                    style={{
+                      display: 'inline-block',
+                      width: '6px',
+                      height: '6px',
+                      borderRadius: '50%',
+                      backgroundColor: '#15803d',
+                    }}
+                  />
                   {currentUser.role.charAt(0) + currentUser.role.slice(1).toLowerCase()}
+                  {currentUser.firm_or_company ? ` • ${currentUser.firm_or_company}` : ''}
                 </div>
               </div>
+
               <button
                 onClick={handleLogout}
                 style={{
-                  padding: '5px 10px',
+                  padding: '6px 12px',
                   backgroundColor: '#fffdf9',
                   border: '1px solid #d6c9b2',
-                  fontSize: '11.5px',
+                  fontSize: '12px',
                   color: '#4c5262',
                   cursor: 'pointer',
+                  fontWeight: 500,
                 }}
               >
                 Sign out
               </button>
             </div>
           ) : (
-            <button
-              onClick={() => onOpenLogin()}
-              style={{
-                padding: '6px 14px',
-                backgroundColor: '#0c1826',
-                color: '#fff',
-                border: 'none',
-                fontSize: '12.5px',
-                fontWeight: 600,
-                cursor: 'pointer',
-              }}
-            >
-              Sign In
-            </button>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <button
+                onClick={() => onOpenLogin('INVESTOR', false)}
+                style={{
+                  padding: '7px 16px',
+                  backgroundColor: '#fffdf9',
+                  border: '1px solid #8a8070',
+                  color: '#121a29',
+                  fontSize: '13px',
+                  fontWeight: 600,
+                  cursor: 'pointer',
+                }}
+              >
+                Sign In
+              </button>
+              <button
+                onClick={() => onOpenLogin('FOUNDER', true)}
+                style={{
+                  padding: '7px 16px',
+                  backgroundColor: '#0c1826',
+                  color: '#f5efe5',
+                  border: 'none',
+                  fontSize: '13px',
+                  fontWeight: 600,
+                  cursor: 'pointer',
+                }}
+              >
+                Join Platform
+              </button>
+            </div>
           )}
         </div>
       </div>

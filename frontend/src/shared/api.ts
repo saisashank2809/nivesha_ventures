@@ -72,6 +72,9 @@ export class Api {
     });
 
     if (!res.ok) {
+      if (res.status === 401) {
+        this.logout();
+      }
       let errorMsg = `Error ${res.status}`;
       try {
         const data = await res.json();
@@ -111,16 +114,6 @@ export class Api {
     const res = await this.request<{ access_token: string; user: User }>('/auth/register', {
       method: 'POST',
       body: JSON.stringify(data),
-    });
-    this.setToken(res.access_token);
-    this.setCurrentUser(res.user);
-    return res;
-  }
-
-  public static async switchDemo(role: UserRole, userId?: string): Promise<{ access_token: string; user: User }> {
-    const res = await this.request<{ access_token: string; user: User }>('/auth/switch-demo', {
-      method: 'POST',
-      body: JSON.stringify({ role, user_id: userId }),
     });
     this.setToken(res.access_token);
     this.setCurrentUser(res.user);
