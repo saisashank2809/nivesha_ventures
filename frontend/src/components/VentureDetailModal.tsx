@@ -43,12 +43,17 @@ export const VentureDetailModal: React.FC<VentureDetailModalProps> = ({
 
   if (!isOpen || !venture) return null;
 
-  const story = (venture.venture_story || {}) as Record<string, string>;
+  const story = (venture.venture_story || {}) as Record<string, any>;
   const arrDetails = venture.arrangement_details || {};
   const findings = venture.due_diligence_findings || {};
   const evidenceChecklist = findings.evidence_checklist as Array<{ label: string; status: string; note: string }> | undefined;
 
-  // The 10 standardized presentation sections
+  const customSections: Array<{ num?: string; title: string; content: string; source?: string }> =
+    (story.custom_sections as any[]) ||
+    ((arrDetails as any)?.custom_sections as any[]) ||
+    [];
+
+  // The 10 standardized presentation sections + any custom sections added by founder
   const tenSections = [
     { num: '01', title: 'Venture Overview', content: story.venture_overview || venture.business_context, source: 'FOUNDER INPUTS' },
     { num: '02', title: 'Current Position', content: story.current_position || 'Active operating enterprise with verifiable records.', source: 'OPERATING RECORDS' },
@@ -60,6 +65,12 @@ export const VentureDetailModal: React.FC<VentureDetailModalProps> = ({
     { num: '08', title: 'Risks & Dependencies', content: story.risks_and_dependencies || 'Subject to statutory approvals, supply chain milestones, and delivery timelines.', source: 'DISCLOSURES' },
     { num: '09', title: 'Investor Participation', content: story.investor_participation || 'Audited financial reporting, priority recoupment waterfall, and governance rights.', source: 'GOVERNANCE' },
     { num: '10', title: 'Evidence & Next Steps', content: story.evidence_and_next_steps || 'Initial documentation submitted and ready for platform review clearance.', source: 'REVIEW AUDIT' },
+    ...customSections.map((cs, i) => ({
+      num: cs.num || String(11 + i).padStart(2, '0'),
+      title: cs.title,
+      content: cs.content,
+      source: cs.source || 'FOUNDER CUSTOM SECTION',
+    })),
   ];
 
   const handleSendRequest = () => {

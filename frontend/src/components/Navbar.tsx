@@ -160,21 +160,38 @@ export const Navbar: React.FC<NavbarProps> = ({
 
           {/* Founder specific views */}
           {currentUser?.role === 'FOUNDER' && (
-            <button
-              onClick={() => onNavigate('FOUNDER_JOURNEY')}
-              style={{
-                padding: '6px 12px',
-                border: 'none',
-                background: 'none',
-                fontSize: '13.5px',
-                fontWeight: activeTab === 'FOUNDER_JOURNEY' ? 600 : 500,
-                color: activeTab === 'FOUNDER_JOURNEY' ? '#0c1826' : '#4c5262',
-                cursor: 'pointer',
-                borderBottom: activeTab === 'FOUNDER_JOURNEY' ? '2px solid #7a5c2e' : '2px solid transparent',
-              }}
-            >
-              My Venture Story
-            </button>
+            <>
+              <button
+                onClick={() => onNavigate('FOUNDER_DASHBOARD')}
+                style={{
+                  padding: '6px 12px',
+                  border: 'none',
+                  background: 'none',
+                  fontSize: '13.5px',
+                  fontWeight: activeTab === 'FOUNDER_DASHBOARD' ? 600 : 500,
+                  color: activeTab === 'FOUNDER_DASHBOARD' ? '#0c1826' : '#4c5262',
+                  cursor: 'pointer',
+                  borderBottom: activeTab === 'FOUNDER_DASHBOARD' ? '2px solid #7a5c2e' : '2px solid transparent',
+                }}
+              >
+                Dashboard
+              </button>
+              <button
+                onClick={() => onNavigate('FOUNDER_JOURNEY')}
+                style={{
+                  padding: '6px 12px',
+                  border: 'none',
+                  background: 'none',
+                  fontSize: '13.5px',
+                  fontWeight: activeTab === 'FOUNDER_JOURNEY' ? 600 : 500,
+                  color: activeTab === 'FOUNDER_JOURNEY' ? '#0c1826' : '#4c5262',
+                  cursor: 'pointer',
+                  borderBottom: activeTab === 'FOUNDER_JOURNEY' ? '2px solid #7a5c2e' : '2px solid transparent',
+                }}
+              >
+                Venture Story Builder
+              </button>
+            </>
           )}
 
           {/* Reviewer / Operator specific views */}

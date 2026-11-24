@@ -42,8 +42,13 @@ const SECTOR_IMAGE_PRESETS: Record<string, Array<{ label: string; url: string }>
 };
 
 const getTenSections = (venture: VentureCard) => {
-  const story = (venture.venture_story || {}) as Record<string, string>;
+  const story = (venture.venture_story || {}) as Record<string, any>;
   const arr = venture.arrangement_details || {};
+  const customSections: Array<{ num?: string; title: string; content: string; source?: string }> =
+    (story.custom_sections as any[]) ||
+    ((arr as any)?.custom_sections as any[]) ||
+    [];
+
   return [
     { num: '01', title: 'Venture Overview', content: story.venture_overview || venture.business_context, source: 'FOUNDER DECLARATION' },
     { num: '02', title: 'Current Position', content: story.current_position || 'Active operating enterprise with verifiable baseline records.', source: 'OPERATING AUDIT' },
@@ -55,6 +60,12 @@ const getTenSections = (venture: VentureCard) => {
     { num: '08', title: 'Risks & Dependencies', content: story.risks_and_dependencies || 'Subject to supply milestones, contractor timelines, and statutory clearances.', source: 'DISCLOSURES' },
     { num: '09', title: 'Investor Participation', content: story.investor_participation || 'Audited financial reporting, priority recoupment waterfall, and governance rights.', source: 'GOVERNANCE' },
     { num: '10', title: 'Evidence & Next Steps', content: story.evidence_and_next_steps || 'Submitted documentation undergoing independent platform verification review.', source: 'REVIEW DESK' },
+    ...customSections.map((cs, i) => ({
+      num: cs.num || String(11 + i).padStart(2, '0'),
+      title: cs.title,
+      content: cs.content,
+      source: cs.source || 'CUSTOM ADDITION',
+    })),
   ];
 };
 

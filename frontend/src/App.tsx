@@ -9,6 +9,7 @@ import { ChatbotWidget } from './components/ChatbotWidget';
 import { LandingPageView } from './features/landing/LandingPageView';
 import { InvestorGuidedDiscovery } from './features/investor/InvestorGuidedDiscovery';
 import { FounderGuidedJourney } from './features/founder/FounderGuidedJourney';
+import { FounderDashboard } from './features/founder/FounderDashboard';
 import { PlatformReviewView } from './features/platform/PlatformReviewView';
 
 export function App() {
@@ -130,7 +131,7 @@ export function App() {
     if (user.role === 'INVESTOR') {
       setActiveTab('INVESTOR_DISCOVERY');
     } else if (user.role === 'FOUNDER') {
-      setActiveTab('FOUNDER_JOURNEY');
+      setActiveTab('FOUNDER_DASHBOARD');
     } else if (user.role === 'REVIEWER') {
       setActiveTab('PLATFORM_REVIEW');
     }
@@ -207,14 +208,24 @@ export function App() {
           />
         )}
 
-        {(activeTab === 'FOUNDER_JOURNEY' || activeTab === 'FOUNDER_PORTAL' || activeTab === 'ONBOARDING') && (
+        {(activeTab === 'FOUNDER_DASHBOARD' || activeTab === 'FOUNDER_PORTAL') && (
+          <FounderDashboard
+            currentUser={currentUser}
+            onOpenBuilder={() => setActiveTab('FOUNDER_JOURNEY')}
+            onOpenChat={handleOpenChat}
+            onOpenLogin={() => handleOpenLogin('FOUNDER', false)}
+            onSelectVenture={handleSelectVenture}
+          />
+        )}
+
+        {(activeTab === 'FOUNDER_JOURNEY' || activeTab === 'ONBOARDING') && (
           <FounderGuidedJourney
             currentUser={currentUser}
             onComplete={() => {
               showToast('Venture profile and story saved successfully!');
-              setActiveTab('INVESTOR_DISCOVERY');
+              setActiveTab('FOUNDER_DASHBOARD');
             }}
-            onCancel={() => setActiveTab('LANDING')}
+            onCancel={() => setActiveTab('FOUNDER_DASHBOARD')}
             onOpenLogin={() => handleOpenLogin('FOUNDER', false)}
           />
         )}
