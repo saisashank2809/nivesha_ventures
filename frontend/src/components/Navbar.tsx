@@ -121,7 +121,7 @@ export const Navbar: React.FC<NavbarProps> = ({
           </div>
         </div>
 
-        {/* Center Nav Links - Contextual by User Role */}
+        {/* Center Nav Links - Clear Distinction between Public Home and Private Dashboards */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
           <button
             onClick={() => onNavigate('LANDING')}
@@ -136,11 +136,46 @@ export const Navbar: React.FC<NavbarProps> = ({
               borderBottom: activeTab === 'LANDING' ? '2px solid #7a5c2e' : '2px solid transparent',
             }}
           >
-            Overview
+            Home
           </button>
 
-          {/* Unauthenticated / Investor / Reviewer can explore opportunities */}
-          {(!currentUser || currentUser.role === 'INVESTOR' || currentUser.role === 'REVIEWER') && (
+          {/* Unauthenticated visitors */}
+          {!currentUser && (
+            <>
+              <button
+                onClick={() => onNavigate('INVESTOR_DISCOVERY')}
+                style={{
+                  padding: '6px 12px',
+                  border: 'none',
+                  background: 'none',
+                  fontSize: '13.5px',
+                  fontWeight: activeTab === 'INVESTOR_DISCOVERY' ? 600 : 500,
+                  color: activeTab === 'INVESTOR_DISCOVERY' ? '#0c1826' : '#4c5262',
+                  cursor: 'pointer',
+                  borderBottom: activeTab === 'INVESTOR_DISCOVERY' ? '2px solid #7a5c2e' : '2px solid transparent',
+                }}
+              >
+                Verified Opportunities
+              </button>
+              <button
+                onClick={() => onOpenLogin('FOUNDER', true)}
+                style={{
+                  padding: '6px 12px',
+                  border: 'none',
+                  background: 'none',
+                  fontSize: '13.5px',
+                  fontWeight: 500,
+                  color: '#4c5262',
+                  cursor: 'pointer',
+                }}
+              >
+                For Founders
+              </button>
+            </>
+          )}
+
+          {/* Investor specific view */}
+          {currentUser?.role === 'INVESTOR' && (
             <button
               onClick={() => onNavigate('INVESTOR_DISCOVERY')}
               style={{
@@ -152,9 +187,13 @@ export const Navbar: React.FC<NavbarProps> = ({
                 color: activeTab === 'INVESTOR_DISCOVERY' ? '#0c1826' : '#4c5262',
                 cursor: 'pointer',
                 borderBottom: activeTab === 'INVESTOR_DISCOVERY' ? '2px solid #7a5c2e' : '2px solid transparent',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '6px',
               }}
             >
-              {currentUser?.role === 'INVESTOR' ? 'Venture Matches & Mandate' : 'Verified Opportunities'}
+              <span style={{ fontSize: '12px' }}>📊</span>
+              <span>Investor Dashboard</span>
             </button>
           )}
 
@@ -172,9 +211,13 @@ export const Navbar: React.FC<NavbarProps> = ({
                   color: activeTab === 'FOUNDER_DASHBOARD' ? '#0c1826' : '#4c5262',
                   cursor: 'pointer',
                   borderBottom: activeTab === 'FOUNDER_DASHBOARD' ? '2px solid #7a5c2e' : '2px solid transparent',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '6px',
                 }}
               >
-                Dashboard
+                <span style={{ fontSize: '12px' }}>🏢</span>
+                <span>Founder Dashboard</span>
               </button>
               <button
                 onClick={() => onNavigate('FOUNDER_JOURNEY')}
@@ -189,28 +232,49 @@ export const Navbar: React.FC<NavbarProps> = ({
                   borderBottom: activeTab === 'FOUNDER_JOURNEY' ? '2px solid #7a5c2e' : '2px solid transparent',
                 }}
               >
-                Venture Story Builder
+                Story Builder
               </button>
             </>
           )}
 
           {/* Reviewer / Operator specific views */}
           {currentUser?.role === 'REVIEWER' && (
-            <button
-              onClick={() => onNavigate('PLATFORM_REVIEW')}
-              style={{
-                padding: '6px 12px',
-                border: 'none',
-                background: 'none',
-                fontSize: '13.5px',
-                fontWeight: activeTab === 'PLATFORM_REVIEW' ? 600 : 500,
-                color: activeTab === 'PLATFORM_REVIEW' ? '#0c1826' : '#4c5262',
-                cursor: 'pointer',
-                borderBottom: activeTab === 'PLATFORM_REVIEW' ? '2px solid #7a5c2e' : '2px solid transparent',
-              }}
-            >
-              Review Desk
-            </button>
+            <>
+              <button
+                onClick={() => onNavigate('PLATFORM_REVIEW')}
+                style={{
+                  padding: '6px 12px',
+                  border: 'none',
+                  background: 'none',
+                  fontSize: '13.5px',
+                  fontWeight: activeTab === 'PLATFORM_REVIEW' ? 600 : 500,
+                  color: activeTab === 'PLATFORM_REVIEW' ? '#0c1826' : '#4c5262',
+                  cursor: 'pointer',
+                  borderBottom: activeTab === 'PLATFORM_REVIEW' ? '2px solid #7a5c2e' : '2px solid transparent',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                }}
+              >
+                <span style={{ fontSize: '12px' }}>⚖️</span>
+                <span>Review Desk</span>
+              </button>
+              <button
+                onClick={() => onNavigate('INVESTOR_DISCOVERY')}
+                style={{
+                  padding: '6px 12px',
+                  border: 'none',
+                  background: 'none',
+                  fontSize: '13.5px',
+                  fontWeight: activeTab === 'INVESTOR_DISCOVERY' ? 600 : 500,
+                  color: activeTab === 'INVESTOR_DISCOVERY' ? '#0c1826' : '#4c5262',
+                  cursor: 'pointer',
+                  borderBottom: activeTab === 'INVESTOR_DISCOVERY' ? '2px solid #7a5c2e' : '2px solid transparent',
+                }}
+              >
+                All Ventures
+              </button>
+            </>
           )}
 
           {/* Authenticated Messaging */}

@@ -196,6 +196,11 @@ export function App() {
             }}
             onOpenLogin={() => handleOpenLogin('INVESTOR', false)}
             onSelectVenture={handleSelectVenture}
+            onNavigateToDashboard={() => {
+              if (currentUser?.role === 'FOUNDER') setActiveTab('FOUNDER_DASHBOARD');
+              else if (currentUser?.role === 'INVESTOR') setActiveTab('INVESTOR_DISCOVERY');
+              else if (currentUser?.role === 'REVIEWER') setActiveTab('PLATFORM_REVIEW');
+            }}
           />
         )}
 
