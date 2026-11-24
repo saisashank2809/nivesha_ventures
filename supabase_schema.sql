@@ -248,3 +248,76 @@ VALUES (
     'Managing Partner',
     'Private credit and growth capital investor focusing on cash-flow generative consumer and hospitality businesses.'
 ) ON CONFLICT (id) DO NOTHING;
+
+-- 4. Additional Venture Founders (One Account per Venture)
+INSERT INTO users (id, email, password_hash, full_name, role, firm_or_company, title, bio)
+VALUES (
+    'usr-founder-film',
+    'film.producer@nivesha.in',
+    '$2b$10$v0k49Z2mN6Pz.C7yUe3a7OUJ0X9R7qH2f61E6aK8tqQ7dJ1rN4cCe',
+    'Raghavendra Rao',
+    'FOUNDER',
+    'Vayuputra Productions',
+    'Managing Producer & Director',
+    'Producer of mythological fantasy action film Garuda.'
+) ON CONFLICT (id) DO NOTHING;
+
+INSERT INTO users (id, email, password_hash, full_name, role, firm_or_company, title, bio)
+VALUES (
+    'usr-founder-shoe',
+    'footwear.founder@nivesha.in',
+    '$2b$10$v0k49Z2mN6Pz.C7yUe3a7OUJ0X9R7qH2f61E6aK8tqQ7dJ1rN4cCe',
+    'Vikramaditya Sahni',
+    'FOUNDER',
+    'StrideCraft Footwear (Aethel Brand)',
+    'Chief Executive & Founder',
+    'Footwear manufacturer scaling celebrity D2C line.'
+) ON CONFLICT (id) DO NOTHING;
+
+INSERT INTO users (id, email, password_hash, full_name, role, firm_or_company, title, bio)
+VALUES (
+    'usr-founder-debt',
+    'debt.founder@nivesha.in',
+    '$2b$10$v0k49Z2mN6Pz.C7yUe3a7OUJ0X9R7qH2f61E6aK8tqQ7dJ1rN4cCe',
+    'Suresh Chandra Patra',
+    'FOUNDER',
+    'Apex Precision Engineering',
+    'Managing Director',
+    'Industrial CNC manufacturer seeking 18% debt backed by 3 BHK flat.'
+) ON CONFLICT (id) DO NOTHING;
+
+INSERT INTO users (id, email, password_hash, full_name, role, firm_or_company, title, bio)
+VALUES (
+    'usr-founder-logistics',
+    'logistics.founder@nivesha.in',
+    '$2b$10$v0k49Z2mN6Pz.C7yUe3a7OUJ0X9R7qH2f61E6aK8tqQ7dJ1rN4cCe',
+    'Sravani Reddy',
+    'FOUNDER',
+    'GramaBlink Hyperlocal Logistics',
+    'Founder & CEO',
+    'Rural logistics quick-commerce network via DWACRA women SHGs.'
+) ON CONFLICT (id) DO NOTHING;
+
+INSERT INTO users (id, email, password_hash, full_name, role, firm_or_company, title, bio)
+VALUES (
+    'usr-founder-healthcare',
+    'healthcare.founder@nivesha.in',
+    '$2b$10$v0k49Z2mN6Pz.C7yUe3a7OUJ0X9R7qH2f61E6aK8tqQ7dJ1rN4cCe',
+    'Dr. Hariprasad Varma',
+    'FOUNDER',
+    'Varma Multispeciality Care',
+    'Medical Director & Senior Surgeon',
+    '120-bed tertiary hospital seeking 50% equity buyout & Cath Lab capex.'
+) ON CONFLICT (id) DO NOTHING;
+
+INSERT INTO users (id, email, password_hash, full_name, role, firm_or_company, title, bio)
+VALUES (
+    'usr-founder-realestate',
+    'realestate.founder@nivesha.in',
+    '$2b$10$v0k49Z2mN6Pz.C7yUe3a7OUJ0X9R7qH2f61E6aK8tqQ7dJ1rN4cCe',
+    'Karthik Narayana',
+    'FOUNDER',
+    'Greenfield Land Developers',
+    'Managing Partner',
+    '18-acre plotted township layout developer near Hyderabad corridor.'
+) ON CONFLICT (id) DO NOTHING;

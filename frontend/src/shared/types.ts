@@ -65,6 +65,19 @@ export interface DiligenceBrief {
   questions_for_founder?: string[];
 }
 
+export interface TenSections {
+  venture_overview: string;
+  current_position: string;
+  opportunity: string;
+  capital_requirement: string;
+  use_of_capital: string;
+  investment_proposal: string;
+  execution_capability: string;
+  risks_and_dependencies: string;
+  investor_participation: string;
+  evidence_and_next_steps: string;
+}
+
 export interface VentureCard {
   id: string;
   founder_id: string;
@@ -95,7 +108,7 @@ export interface VentureCard {
   continuity_plan?: Record<string, any>;
   due_diligence_findings?: Record<string, any>;
   missing_information?: string[];
-  venture_story?: Record<string, any>;
+  venture_story?: Partial<TenSections> | Record<string, any>;
 }
 
 export interface VentureDetail extends VentureCard {

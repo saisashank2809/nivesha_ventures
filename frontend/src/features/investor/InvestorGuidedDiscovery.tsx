@@ -283,7 +283,7 @@ export const InvestorGuidedDiscovery: React.FC<InvestorGuidedDiscoveryProps> = (
 
           const trackRecord = venture.operating_track_record || {};
           const growthPlan = venture.growth_plan || {};
-          const story = venture.venture_story || {};
+          const story = (venture.venture_story || {}) as Record<string, any>;
           const findings = venture.due_diligence_findings || {};
 
           return (
@@ -335,7 +335,7 @@ export const InvestorGuidedDiscovery: React.FC<InvestorGuidedDiscoveryProps> = (
 
               {/* Tagline / Business Context */}
               <p style={{ fontSize: '14.5px', color: '#536074', lineHeight: 1.6, marginBottom: '20px' }}>
-                {story.what_business_does || venture.tag_line || venture.business_context}
+                {story.venture_overview || story.what_business_does || venture.tag_line || venture.business_context}
               </p>
 
               {/* Declarations vs Projections Comparison Box */}
@@ -354,46 +354,50 @@ export const InvestorGuidedDiscovery: React.FC<InvestorGuidedDiscoveryProps> = (
                 <div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '4px' }}>
                     <span style={{ fontSize: '11px', fontWeight: 600, color: '#856127', textTransform: 'uppercase' }}>
-                      Declared Track Record
+                      Operating Track Record
                     </span>
                     <span style={{ fontSize: '10px', padding: '1px 5px', borderRadius: '3px', background: '#fdf4e7', color: '#856127' }}>
-                      GST-Checked
+                      Declared / Audited
                     </span>
                   </div>
-                  <div style={{ fontSize: '16px', fontWeight: 700, color: '#0c1826' }}>
-                    {trackRecord.declared_monthly_revenue ? formatINR(trackRecord.declared_monthly_revenue) : '₹3.2 Lakh'}/mo
+                  <div style={{ fontSize: '15px', fontWeight: 700, color: '#0c1826' }}>
+                    {trackRecord.declared_monthly_revenue
+                      ? `${formatINR(trackRecord.declared_monthly_revenue)}/mo`
+                      : trackRecord.annual_turnover || trackRecord.factory_capacity || trackRecord.past_projects || trackRecord.operational_beds || trackRecord.phase_1_sales || trackRecord.active_orders || 'Operating Record'}
                   </div>
                   <div style={{ fontSize: '12px', color: '#536074' }}>
-                    {trackRecord.declared_operating_margin || '24% operating margin'}
+                    {trackRecord.declared_operating_margin || trackRecord.ebitda_margin || trackRecord.average_occupancy || trackRecord.repeat_order_rate || trackRecord.distribution_loi || 'Verified Baseline'}
                   </div>
                 </div>
 
                 <div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '4px' }}>
                     <span style={{ fontSize: '11px', fontWeight: 600, color: '#15803d', textTransform: 'uppercase' }}>
-                      Growth Expansion
+                      Expansion Plan
                     </span>
                     <span style={{ fontSize: '10px', padding: '1px 5px', borderRadius: '3px', background: '#edf5ee', color: '#15803d' }}>
                       Projection
                     </span>
                   </div>
-                  <div style={{ fontSize: '16px', fontWeight: 700, color: '#15803d' }}>
-                    {growthPlan.projected_monthly_revenue ? formatINR(growthPlan.projected_monthly_revenue) : '₹8.5 Lakh'}/mo
+                  <div style={{ fontSize: '15px', fontWeight: 700, color: '#15803d' }}>
+                    {growthPlan.projected_monthly_revenue
+                      ? `${formatINR(growthPlan.projected_monthly_revenue)}/mo`
+                      : growthPlan.theatrical_release_window || growthPlan.d2c_expansion_target || growthPlan.cath_lab_addition || growthPlan.geographic_expansion || growthPlan.phase_2_sales_potential || 'Growth Target'}
                   </div>
                   <div style={{ fontSize: '12px', color: '#536074' }}>
-                    Target combined turnover
+                    {growthPlan.expansion_target || growthPlan.satellite_ott_strategy || growthPlan.projected_revenue_fy26 || growthPlan.target_occupancy || 'Stated milestone'}
                   </div>
                 </div>
 
                 <div>
                   <div style={{ fontSize: '11px', fontWeight: 600, color: '#536074', textTransform: 'uppercase', marginBottom: '4px' }}>
-                    Offered Return / Terms
+                    Proposed Terms
                   </div>
                   <div style={{ fontSize: '14px', fontWeight: 600, color: '#0c1826' }}>
-                    {venture.arrangement_details?.proposed_rate_or_terms || '14% annual interest'}
+                    {venture.arrangement_details?.interest_rate || venture.arrangement_details?.structure_name || venture.arrangement_details?.proposed_equity_offered || (venture.proposed_arrangement || 'Direct').replace(/_/g, ' ')}
                   </div>
                   <div style={{ fontSize: '12px', color: '#856127' }}>
-                    {venture.arrangement_details?.collateral_offered ? '✓ Asset-Backed Security' : 'Unsecured'}
+                    {venture.arrangement_details?.collateral_offered || venture.arrangement_details?.collateral_details ? '✓ Asset-Backed Security' : 'Direct Participation'}
                   </div>
                 </div>
               </div>

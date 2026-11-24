@@ -239,40 +239,79 @@ export const LandingPageView: React.FC<LandingPageViewProps> = ({
             </button>
           </div>
 
-          {/* Quick Demo Switcher Prompt */}
-          {!currentUser && (
-            <div
-              style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '12px',
-                background: '#ffffff',
-                border: '1px solid var(--border-light)',
-                borderRadius: '10px',
-                padding: '10px 18px',
-                fontSize: '13px',
-                color: 'var(--text-muted)',
-                boxShadow: 'var(--shadow-sm)',
-              }}
-            >
-              <span style={{ fontWeight: 600, color: 'var(--accent-gold)' }}>💡 Demo Evaluator:</span>
-              <span>Test as an Investor or Founder instantly:</span>
+          {/* Dedicated Accounts & Platform Roles Guide */}
+          <div
+            style={{
+              marginTop: '32px',
+              maxWidth: '920px',
+              margin: '32px auto 0',
+              background: '#fffdf9',
+              border: '1px solid #d6c9b2',
+              padding: '20px 24px',
+              textAlign: 'left',
+              boxShadow: '0 4px 12px rgba(12, 24, 38, 0.05)',
+            }}
+          >
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <span style={{ fontSize: '12px', fontWeight: 700, color: '#7a5c2e', textTransform: 'uppercase', letterSpacing: '0.1em' }}>
+                  🔑 Seed Accounts & Authentic Logins
+                </span>
+                <span style={{ fontSize: '11px', backgroundColor: '#f5efe5', padding: '2px 8px', border: '1px solid #d6c9b2', color: '#121a29' }}>
+                  Password for all: <strong>Password123!</strong>
+                </span>
+              </div>
               <button
                 onClick={onOpenLogin}
                 style={{
-                  background: 'none',
+                  padding: '6px 14px',
+                  backgroundColor: '#0c1826',
+                  color: '#f5efe5',
                   border: 'none',
-                  color: 'var(--accent-gold)',
+                  fontSize: '12px',
                   fontWeight: 600,
-                  textDecoration: 'underline',
-                  padding: 0,
                   cursor: 'pointer',
                 }}
               >
-                Open Demo Selector &rarr;
+                Sign In Now →
               </button>
             </div>
-          )}
+
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '10px', fontSize: '12px' }}>
+              <div style={{ padding: '8px 12px', background: '#f5efe5', border: '1px solid #e3d6bf' }}>
+                <strong style={{ color: '#0c1826' }}>Investor Portal:</strong> Rohan Varma
+                <div style={{ color: '#7a5c2e', fontFamily: 'monospace', marginTop: '2px' }}>investor@peakindia.vc</div>
+              </div>
+              <div style={{ padding: '8px 12px', background: '#fff', border: '1px solid #e3d6bf' }}>
+                <strong style={{ color: '#0c1826' }}>Film Production:</strong> Raghavendra Rao (Garuda)
+                <div style={{ color: '#7a5c2e', fontFamily: 'monospace', marginTop: '2px' }}>film.producer@nivesha.in</div>
+              </div>
+              <div style={{ padding: '8px 12px', background: '#fff', border: '1px solid #e3d6bf' }}>
+                <strong style={{ color: '#0c1826' }}>Shoe D2C Brand:</strong> Vikramaditya Sahni
+                <div style={{ color: '#7a5c2e', fontFamily: 'monospace', marginTop: '2px' }}>footwear.founder@nivesha.in</div>
+              </div>
+              <div style={{ padding: '8px 12px', background: '#fff', border: '1px solid #e3d6bf' }}>
+                <strong style={{ color: '#0c1826' }}>Collateral Debt:</strong> Suresh Chandra (Apex CNC)
+                <div style={{ color: '#7a5c2e', fontFamily: 'monospace', marginTop: '2px' }}>debt.founder@nivesha.in</div>
+              </div>
+              <div style={{ padding: '8px 12px', background: '#fff', border: '1px solid #e3d6bf' }}>
+                <strong style={{ color: '#0c1826' }}>Rural Logistics:</strong> Sravani Reddy (GramaBlink)
+                <div style={{ color: '#7a5c2e', fontFamily: 'monospace', marginTop: '2px' }}>logistics.founder@nivesha.in</div>
+              </div>
+              <div style={{ padding: '8px 12px', background: '#fff', border: '1px solid #e3d6bf' }}>
+                <strong style={{ color: '#0c1826' }}>Healthcare Buyout:</strong> Dr. Hariprasad Varma
+                <div style={{ color: '#7a5c2e', fontFamily: 'monospace', marginTop: '2px' }}>healthcare.founder@nivesha.in</div>
+              </div>
+              <div style={{ padding: '8px 12px', background: '#fff', border: '1px solid #e3d6bf' }}>
+                <strong style={{ color: '#0c1826' }}>Real Estate Layout:</strong> Karthik Narayana
+                <div style={{ color: '#7a5c2e', fontFamily: 'monospace', marginTop: '2px' }}>realestate.founder@nivesha.in</div>
+              </div>
+              <div style={{ padding: '8px 12px', background: '#fff', border: '1px solid #e3d6bf' }}>
+                <strong style={{ color: '#0c1826' }}>Food & Hospitality:</strong> Arvind Nair (Malabar)
+                <div style={{ color: '#7a5c2e', fontFamily: 'monospace', marginTop: '2px' }}>founder@malabarcoast.in</div>
+              </div>
+            </div>
+          </div>
         </div>
       </section>
 
@@ -428,7 +467,7 @@ export const LandingPageView: React.FC<LandingPageViewProps> = ({
                 }}
               >
                 <div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '12px' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '12px', gap: '8px', flexWrap: 'wrap' }}>
                     <div>
                       <h3 style={{ fontSize: '20px', fontWeight: 600, color: 'var(--bg-dark)', margin: 0 }}>
                         {v.company_name}
@@ -437,18 +476,34 @@ export const LandingPageView: React.FC<LandingPageViewProps> = ({
                         {v.sector} • {v.location}
                       </div>
                     </div>
-                    <span
-                      style={{
-                        padding: '3px 8px',
-                        borderRadius: '4px',
-                        background: '#e9f5ed',
-                        color: 'var(--accent-green)',
-                        fontSize: '11px',
-                        fontWeight: 600,
-                      }}
-                    >
-                      {v.stage}
-                    </span>
+                    <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
+                      <span
+                        style={{
+                          padding: '3px 8px',
+                          borderRadius: '4px',
+                          background: '#f5efe5',
+                          border: '1px solid #d6c9b2',
+                          color: '#7a5c2e',
+                          fontSize: '10.5px',
+                          fontWeight: 600,
+                          textTransform: 'uppercase',
+                        }}
+                      >
+                        {(v.proposed_arrangement || 'Standard').replace(/_/g, ' ')}
+                      </span>
+                      <span
+                        style={{
+                          padding: '3px 8px',
+                          borderRadius: '4px',
+                          background: '#e9f5ed',
+                          color: 'var(--accent-green)',
+                          fontSize: '11px',
+                          fontWeight: 600,
+                        }}
+                      >
+                        {v.stage}
+                      </span>
+                    </div>
                   </div>
 
                   <p style={{ fontSize: '14px', color: 'var(--text-muted)', lineHeight: 1.5, marginBottom: '18px' }}>
@@ -468,7 +523,7 @@ export const LandingPageView: React.FC<LandingPageViewProps> = ({
                       gap: '10px',
                     }}
                   >
-                    {v.traction_metrics.slice(0, 2).map((m, i) => (
+                    {v.traction_metrics && v.traction_metrics.slice(0, 2).map((m, i) => (
                       <div key={i}>
                         <div style={{ fontSize: '11px', color: 'var(--text-subtle)' }}>{m.label}</div>
                         <div style={{ fontSize: '14px', fontWeight: 600, color: 'var(--bg-dark)' }}>{m.value}</div>
@@ -496,7 +551,7 @@ export const LandingPageView: React.FC<LandingPageViewProps> = ({
                     marginTop: '12px',
                   }}
                 >
-                  Inspect Diligence Brief &rarr;
+                  Inspect 10-Section Dossier & Diligence Brief &rarr;
                 </button>
               </div>
             ))}
