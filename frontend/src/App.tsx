@@ -1,6 +1,7 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { User, UserRole, VentureCard as IVentureCard, VentureDetail } from './shared/types';
 import { Api } from './shared/api';
+import { playNotificationChime, showInternetNotification } from './shared/notifications';
 import { Navbar } from './components/Navbar';
 import { LoginModal } from './components/LoginModal';
 import { VentureDetailModal } from './components/VentureDetailModal';
@@ -80,6 +81,43 @@ export function App() {
     loadData();
   }, [loadData]);
 
+  // Global background internet notification sync
+  const seenMsgIdsRef = useRef<Set<string>>(new Set());
+  useEffect(() => {
+    if (!currentUser || !Api.getToken()) return;
+
+    const checkIncomingNotifications = async () => {
+      try {
+        const unreadMsgs = await Api.getUnreadMessages();
+        setUnreadCount(unreadMsgs.length);
+
+        if (unreadMsgs.length > 0) {
+          unreadMsgs.forEach((msg) => {
+            if (!seenMsgIdsRef.current.has(msg.id)) {
+              seenMsgIdsRef.current.add(msg.id);
+              // Trigger desktop internet notification + audio chime
+              playNotificationChime();
+              showInternetNotification(`💬 New message from ${msg.sender_name}`, {
+                body: msg.content,
+                onClick: () => {
+                  setActiveChatConnectionId(msg.connection_id);
+                  setActiveTab('MESSAGES');
+                },
+              });
+              showToast(`💬 Direct text from ${msg.sender_name}: "${msg.content.slice(0, 45)}${msg.content.length > 45 ? '...' : ''}"`);
+            }
+          });
+        }
+      } catch (err) {
+        // network or background error
+      }
+    };
+
+    checkIncomingNotifications();
+    const interval = setInterval(checkIncomingNotifications, 3500);
+    return () => clearInterval(interval);
+  }, [currentUser]);
+
   // Open full detail modal
   const handleSelectVenture = async (venture: IVentureCard | string) => {
     const id = typeof venture === 'string' ? venture : venture.id;
@@ -92,7 +130,7 @@ export function App() {
     }
   };
 
-  // Investor requesting connection
+  // Investor directly messaging founder
   const handleRequestConnection = async (ventureId: string, note?: string) => {
     if (!currentUser) {
       setLoginModalRole('INVESTOR');
@@ -101,12 +139,13 @@ export function App() {
       return;
     }
     try {
-      await Api.requestConnection(ventureId, note);
-      showToast('Connection request sent! The founder will review and approve direct chat.');
+      const conn = await Api.requestConnection(ventureId, note);
+      showToast('Direct message sent! 1-on-1 direct chat channel opened.');
       setDetailModalOpen(false);
       await loadData();
+      handleOpenChat(conn.id);
     } catch (err: any) {
-      showToast(`Request failed: ${err.message}`);
+      showToast(`Direct message failed: ${err.message}`);
     }
   };
 

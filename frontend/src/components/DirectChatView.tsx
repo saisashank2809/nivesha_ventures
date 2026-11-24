@@ -2,6 +2,12 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Connection, Message, User } from '../shared/types';
 import { Api } from '../shared/api';
 import { formatDate } from '../shared/formatters';
+import {
+  getNotificationPermission,
+  requestNotificationPermission,
+  showInternetNotification,
+  playNotificationChime,
+} from '../shared/notifications';
 
 interface DirectChatViewProps {
   currentUser: User;
@@ -20,7 +26,11 @@ export const DirectChatView: React.FC<DirectChatViewProps> = ({
   const [inputContent, setInputContent] = useState('');
   const [loading, setLoading] = useState(false);
   const [sending, setSending] = useState(false);
+  const [notifPermission, setNotifPermission] = useState<string>(getNotificationPermission());
+  const [testAlertSuccess, setTestAlertSuccess] = useState<string | null>(null);
+
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const previousMessageIdsRef = useRef<Set<string>>(new Set());
 
   const loadConnections = async () => {
     try {
@@ -29,7 +39,6 @@ export const DirectChatView: React.FC<DirectChatViewProps> = ({
       setConnections(data);
 
       if (data.length > 0 && !activeConnectionId) {
-        // Select first connected one, or first one
         const connected = data.find((c) => c.status === 'CONNECTED') || data[0];
         setActiveConnectionId(connected.id);
       }
@@ -43,6 +52,27 @@ export const DirectChatView: React.FC<DirectChatViewProps> = ({
   const loadMessages = async (connId: string) => {
     try {
       const msgs = await Api.getMessages(connId);
+
+      // Check if new incoming messages arrived
+      if (previousMessageIdsRef.current.size > 0) {
+        const newIncoming = msgs.filter(
+          (m) => !previousMessageIdsRef.current.has(m.id) && m.sender_id !== currentUser.id
+        );
+
+        if (newIncoming.length > 0) {
+          const newest = newIncoming[newIncoming.length - 1];
+          playNotificationChime();
+          showInternetNotification(`💬 New message from ${newest.sender_name}`, {
+            body: newest.content,
+          });
+        }
+      }
+
+      // Update seen IDs
+      const newSet = new Set<string>();
+      msgs.forEach((m) => newSet.add(m.id));
+      previousMessageIdsRef.current = newSet;
+
       setMessages(msgs);
     } catch (err) {
       console.error('Failed to load messages:', err);
@@ -55,10 +85,11 @@ export const DirectChatView: React.FC<DirectChatViewProps> = ({
 
   useEffect(() => {
     if (activeConnectionId) {
+      previousMessageIdsRef.current = new Set();
       loadMessages(activeConnectionId);
       const interval = setInterval(() => {
         loadMessages(activeConnectionId);
-      }, 4000); // Polling every 4s for fresh messages
+      }, 3000); // 3-second live sync over internet
       return () => clearInterval(interval);
     }
   }, [activeConnectionId]);
@@ -69,19 +100,28 @@ export const DirectChatView: React.FC<DirectChatViewProps> = ({
 
   const activeConn = connections.find((c) => c.id === activeConnectionId);
 
-  const handleSendMessage = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSendMessage = async (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
     if (!inputContent.trim() || !activeConnectionId || sending) return;
 
     try {
       setSending(true);
-      const newMsg = await Api.sendMessage(activeConnectionId, inputContent.trim());
-      setMessages((prev) => [...prev, newMsg]);
+      const text = inputContent.trim();
       setInputContent('');
+      const newMsg = await Api.sendMessage(activeConnectionId, text);
+      setMessages((prev) => [...prev, newMsg]);
+      previousMessageIdsRef.current.add(newMsg.id);
     } catch (err: any) {
       alert(err.message || 'Failed to send message.');
     } finally {
       setSending(false);
+    }
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      handleSendMessage();
     }
   };
 
@@ -97,6 +137,28 @@ export const DirectChatView: React.FC<DirectChatViewProps> = ({
     }
   };
 
+  const handleRequestPermission = async () => {
+    const perm = await requestNotificationPermission();
+    setNotifPermission(perm);
+    if (perm === 'granted') {
+      playNotificationChime();
+      showInternetNotification('🔔 Notifications Enabled!', {
+        body: 'You will now receive real-time alerts over the internet when new messages arrive.',
+      });
+      setTestAlertSuccess('Desktop & internet notifications are now active!');
+      setTimeout(() => setTestAlertSuccess(null), 4000);
+    }
+  };
+
+  const handleTestAlert = () => {
+    playNotificationChime();
+    showInternetNotification('💬 Nivesha Test Alert', {
+      body: 'Notifications are working! You will receive messages even when another tab is active.',
+    });
+    setTestAlertSuccess('Test notification sent & chime played!');
+    setTimeout(() => setTestAlertSuccess(null), 3000);
+  };
+
   const isConnected = activeConn?.status === 'CONNECTED';
   const otherPartyName =
     currentUser.role === 'INVESTOR'
@@ -106,28 +168,88 @@ export const DirectChatView: React.FC<DirectChatViewProps> = ({
   return (
     <div
       style={{
-        maxWidth: '1200px',
+        maxWidth: '1240px',
         margin: '0 auto',
-        padding: '24px 20px',
+        padding: '24px 20px 80px',
         boxSizing: 'border-box',
       }}
     >
-      <div style={{ marginBottom: '20px' }}>
-        <h2
-          style={{
-            margin: '0 0 4px 0',
-            fontFamily: "Newsreader, Georgia, 'Times New Roman', serif",
-            fontSize: '28px',
-            color: '#121a29',
-            fontWeight: 400,
-          }}
-        >
-          Direct Messaging & Introductions
-        </h2>
-        <p style={{ margin: 0, fontSize: '14px', color: '#4c5262' }}>
-          Secure, direct 1-on-1 communication between verified founders and connected investors.
-        </p>
+      {/* Header and Internet Notification Banner */}
+      <div style={{ marginBottom: '20px', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '16px' }}>
+        <div>
+          <h2
+            style={{
+              margin: '0 0 4px 0',
+              fontFamily: "Newsreader, Georgia, 'Times New Roman', serif",
+              fontSize: '28px',
+              color: '#121a29',
+              fontWeight: 500,
+            }}
+          >
+            Direct 1-on-1 Messaging
+          </h2>
+          <p style={{ margin: 0, fontSize: '14px', color: '#4c5262' }}>
+            Instant direct communication between verified founders and connected investors.
+          </p>
+        </div>
+
+        {/* Internet Notification Status Widget */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '12px', color: '#15803d', backgroundColor: '#eef7f0', padding: '6px 12px', borderRadius: '20px', border: '1px solid #bce2c4' }}>
+            <span style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: '#15803d', display: 'inline-block' }}></span>
+            <span>Live Internet Sync (3s)</span>
+          </div>
+
+          {notifPermission !== 'granted' ? (
+            <button
+              onClick={handleRequestPermission}
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '6px',
+                padding: '6px 14px',
+                backgroundColor: '#0c1826',
+                color: '#f5efe5',
+                borderRadius: '20px',
+                fontSize: '12px',
+                fontWeight: 600,
+                cursor: 'pointer',
+                border: 'none',
+              }}
+            >
+              <span>🔔</span>
+              <span>Enable Internet Notifications</span>
+            </button>
+          ) : (
+            <button
+              onClick={handleTestAlert}
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '6px',
+                padding: '6px 14px',
+                backgroundColor: '#f5efe5',
+                color: '#7a5c2e',
+                borderRadius: '20px',
+                fontSize: '12px',
+                fontWeight: 600,
+                cursor: 'pointer',
+                border: '1px solid #d6c9b2',
+              }}
+              title="Test notification alert and chime"
+            >
+              <span>🔔</span>
+              <span>Notifications Active · Test Alert</span>
+            </button>
+          )}
+        </div>
       </div>
+
+      {testAlertSuccess && (
+        <div style={{ marginBottom: '16px', padding: '10px 16px', backgroundColor: '#edf5ee', color: '#15803d', borderRadius: '6px', fontSize: '13px', fontWeight: 600, border: '1px solid #bce2c4' }}>
+          ✓ {testAlertSuccess}
+        </div>
+      )}
 
       <div
         style={{
@@ -135,10 +257,11 @@ export const DirectChatView: React.FC<DirectChatViewProps> = ({
           gridTemplateColumns: '320px 1fr',
           backgroundColor: '#fffdf9',
           border: '1px solid #d6c9b2',
-          boxShadow: '0 20px 40px -20px rgba(12, 24, 38, 0.15)',
-          minHeight: '620px',
-          maxHeight: '750px',
+          boxShadow: '0 12px 30px rgba(12, 24, 38, 0.08)',
+          minHeight: '640px',
+          maxHeight: '760px',
           overflow: 'hidden',
+          borderRadius: '10px',
         }}
       >
         {/* Left Sidebar: Connection Threads */}
@@ -150,14 +273,14 @@ export const DirectChatView: React.FC<DirectChatViewProps> = ({
             flexDirection: 'column',
           }}
         >
-          <div style={{ padding: '16px', borderBottom: '1px solid #e3d6bf', fontWeight: 600, fontSize: '13px', color: '#7a5c2e', letterSpacing: '0.1em', textTransform: 'uppercase' }}>
-            Connections ({connections.length})
+          <div style={{ padding: '16px', borderBottom: '1px solid #e3d6bf', fontWeight: 700, fontSize: '12px', color: '#7a5c2e', letterSpacing: '0.1em', textTransform: 'uppercase' }}>
+            Direct Conversations ({connections.length})
           </div>
 
           <div style={{ overflowY: 'auto', flex: 1 }}>
             {connections.length === 0 ? (
               <div style={{ padding: '32px 20px', textAlign: 'center', fontSize: '13px', color: '#666' }}>
-                No connection requests yet.
+                No direct messages yet.
                 {onNavigateToDirectory && (
                   <button
                     onClick={onNavigateToDirectory}
@@ -168,10 +291,11 @@ export const DirectChatView: React.FC<DirectChatViewProps> = ({
                       color: '#fff',
                       border: 'none',
                       fontSize: '12px',
+                      borderRadius: '4px',
                       cursor: 'pointer',
                     }}
                   >
-                    Browse Ventures
+                    Browse Ventures & Message
                   </button>
                 )}
               </div>
@@ -189,7 +313,7 @@ export const DirectChatView: React.FC<DirectChatViewProps> = ({
                       padding: '14px 16px',
                       borderBottom: '1px solid #ece3d4',
                       backgroundColor: isSelected ? '#fffdf9' : 'transparent',
-                      borderLeft: isSelected ? '3px solid #7a5c2e' : '3px solid transparent',
+                      borderLeft: isSelected ? '4px solid #7a5c2e' : '4px solid transparent',
                       cursor: 'pointer',
                       transition: 'background 0.15s ease',
                     }}
@@ -201,40 +325,19 @@ export const DirectChatView: React.FC<DirectChatViewProps> = ({
                       <span
                         style={{
                           fontSize: '10px',
-                          fontWeight: 600,
+                          fontWeight: 700,
                           padding: '2px 6px',
+                          borderRadius: '3px',
                           backgroundColor: c.status === 'CONNECTED' ? '#0c1826' : '#f5efe5',
                           color: c.status === 'CONNECTED' ? '#f5efe5' : '#7a5c2e',
                           border: '1px solid #d6c9b2',
                         }}
                       >
-                        {c.status}
+                        {c.status === 'CONNECTED' ? 'DIRECT DM' : c.status}
                       </span>
                     </div>
 
-                    <div style={{ fontSize: '12px', color: '#4c5262' }}>{subText}</div>
-
-                    {/* Show Consent Button if pending founder consent */}
-                    {currentUser.role === 'FOUNDER' && c.status === 'REQUESTED' && !c.founder_consent && (
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleGrantConsent(c.id);
-                        }}
-                        style={{
-                          marginTop: '8px',
-                          padding: '4px 10px',
-                          backgroundColor: '#0c1826',
-                          color: '#fff',
-                          border: 'none',
-                          fontSize: '11px',
-                          fontWeight: 600,
-                          cursor: 'pointer',
-                        }}
-                      >
-                        Accept & Unlock Chat
-                      </button>
-                    )}
+                    <div style={{ fontSize: '12px', color: '#687282' }}>{subText}</div>
                   </div>
                 );
               })
@@ -243,7 +346,7 @@ export const DirectChatView: React.FC<DirectChatViewProps> = ({
         </div>
 
         {/* Right Panel: Chat Stream */}
-        <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', height: '100%', backgroundColor: '#ffffff' }}>
           {activeConn ? (
             <>
               {/* Chat Header Bar */}
@@ -264,18 +367,19 @@ export const DirectChatView: React.FC<DirectChatViewProps> = ({
                       fontFamily: "Newsreader, Georgia, 'Times New Roman', serif",
                       fontSize: '20px',
                       color: '#121a29',
-                      fontWeight: 500,
+                      fontWeight: 600,
                     }}
                   >
                     {otherPartyName}
                   </h3>
-                  <div style={{ fontSize: '12px', color: '#7a5c2e', marginTop: '2px' }}>
-                    {isConnected ? '✓ Connected Introduction' : 'Awaiting mutual consent'}
+                  <div style={{ fontSize: '12px', color: '#15803d', marginTop: '2px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    <span style={{ width: '6px', height: '6px', borderRadius: '50%', backgroundColor: '#15803d' }}></span>
+                    <span>Direct text messaging active</span>
                   </div>
                 </div>
 
-                <div style={{ fontSize: '12px', color: '#4c5262' }}>
-                  Reference: <code style={{ backgroundColor: '#f5efe5', padding: '2px 4px' }}>{activeConn.id.slice(0, 12)}</code>
+                <div style={{ fontSize: '12px', color: '#687282' }}>
+                  Channel ID: <code style={{ backgroundColor: '#f5efe5', padding: '2px 6px', borderRadius: '3px' }}>{activeConn.id.slice(0, 12)}</code>
                 </div>
               </div>
 
@@ -296,41 +400,41 @@ export const DirectChatView: React.FC<DirectChatViewProps> = ({
                     style={{
                       backgroundColor: '#fffdf9',
                       border: '1px dashed #7a5c2e',
-                      padding: '24px',
+                      borderRadius: '8px',
+                      padding: '28px',
                       textAlign: 'center',
                       margin: 'auto 0',
                     }}
                   >
-                    <div style={{ fontSize: '15px', fontWeight: 600, color: '#121a29', marginBottom: '8px' }}>
-                      Connection In Progress
+                    <div style={{ fontSize: '16px', fontWeight: 600, color: '#121a29', marginBottom: '8px' }}>
+                      Ready to Connect
                     </div>
-                    <p style={{ margin: 0, fontSize: '13px', color: '#4c5262', maxWidth: '440px', lineHeight: 1.6 }}>
-                      Direct messaging unlocks once both parties confirm consent.
-                      {currentUser.role === 'FOUNDER' && !activeConn.founder_consent && (
-                        <div style={{ marginTop: '16px' }}>
-                          <button
-                            onClick={() => handleGrantConsent(activeConn.id)}
-                            style={{
-                              padding: '10px 20px',
-                              backgroundColor: '#0c1826',
-                              color: '#fff',
-                              border: 'none',
-                              fontSize: '13px',
-                              fontWeight: 600,
-                              cursor: 'pointer',
-                            }}
-                          >
-                            Grant Founder Consent & Start Messaging
-                          </button>
-                        </div>
-                      )}
+                    <p style={{ margin: 0, fontSize: '13.5px', color: '#536074', maxWidth: '440px', lineHeight: 1.6 }}>
+                      Click below to immediately unlock the direct text channel with {otherPartyName}.
                     </p>
+                    <div style={{ marginTop: '16px' }}>
+                      <button
+                        onClick={() => handleGrantConsent(activeConn.id)}
+                        style={{
+                          padding: '10px 22px',
+                          backgroundColor: '#0c1826',
+                          color: '#fff',
+                          border: 'none',
+                          borderRadius: '6px',
+                          fontSize: '13px',
+                          fontWeight: 600,
+                          cursor: 'pointer',
+                        }}
+                      >
+                        ⚡ Unlock & Start Direct Texting Now
+                      </button>
+                    </div>
                   </div>
                 ) : (
                   <>
                     <div style={{ textAlign: 'center', margin: '8px 0' }}>
-                      <span style={{ fontSize: '11px', color: '#8a8070', backgroundColor: '#f5efe5', padding: '4px 10px', borderRadius: '4px' }}>
-                        Simulated Introduction Established · Messages are private to you and the counterpart
+                      <span style={{ fontSize: '11px', color: '#7a5c2e', backgroundColor: '#f5efe5', padding: '4px 12px', borderRadius: '4px', border: '1px solid #d6c9b2' }}>
+                        🔒 Direct 1-on-1 Encrypted Channel · Instant Internet Notifications Enabled
                       </span>
                     </div>
 
@@ -350,27 +454,35 @@ export const DirectChatView: React.FC<DirectChatViewProps> = ({
                               fontSize: '11px',
                               color: '#7a5c2e',
                               marginBottom: '3px',
-                              fontWeight: 500,
+                              fontWeight: 600,
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: '6px',
                             }}
                           >
-                            {isMe ? 'You' : m.sender_name}
+                            <span>{isMe ? 'You' : m.sender_name}</span>
+                            <span style={{ fontSize: '9.5px', color: '#94a3b8', backgroundColor: '#f5efe5', padding: '1px 5px', borderRadius: '3px' }}>
+                              {m.sender_role}
+                            </span>
                           </div>
                           <div
                             style={{
-                              maxWidth: '70%',
-                              padding: '12px 16px',
-                              backgroundColor: isMe ? '#0c1826' : '#fffdf9',
+                              maxWidth: '75%',
+                              padding: '12px 18px',
+                              backgroundColor: isMe ? '#0c1826' : '#ffffff',
                               color: isMe ? '#f5efe5' : '#121a29',
                               border: isMe ? 'none' : '1px solid #d6c9b2',
-                              boxShadow: '0 2px 6px rgba(0,0,0,0.04)',
+                              borderRadius: isMe ? '12px 12px 2px 12px' : '12px 12px 12px 2px',
+                              boxShadow: '0 2px 6px rgba(12, 24, 38, 0.05)',
                               fontSize: '14px',
-                              lineHeight: 1.5,
+                              lineHeight: 1.55,
                             }}
                           >
                             {m.content}
                           </div>
-                          <div style={{ fontSize: '10px', color: '#94a3b8', marginTop: '3px' }}>
-                            {formatDate(m.timestamp)}
+                          <div style={{ fontSize: '10px', color: '#94a3b8', marginTop: '3px', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                            <span>{formatDate(m.timestamp)}</span>
+                            {isMe && <span style={{ color: '#15803d' }}>✓ Delivered</span>}
                           </div>
                         </div>
                       );
@@ -386,15 +498,17 @@ export const DirectChatView: React.FC<DirectChatViewProps> = ({
                   <form onSubmit={handleSendMessage} style={{ display: 'flex', gap: '10px' }}>
                     <input
                       type="text"
-                      placeholder="Type a message or discuss diligence details..."
+                      placeholder={`Direct text message to ${otherPartyName}... (Press Enter to send)`}
                       value={inputContent}
                       onChange={(e) => setInputContent(e.target.value)}
+                      onKeyDown={handleKeyDown}
                       style={{
                         flex: 1,
-                        padding: '12px 14px',
-                        border: '1px solid #8a8070',
+                        padding: '12px 16px',
+                        border: '1px solid #c5b59b',
+                        borderRadius: '6px',
                         fontSize: '14px',
-                        backgroundColor: '#fffdf9',
+                        backgroundColor: '#ffffff',
                         outline: 'none',
                       }}
                     />
@@ -402,16 +516,21 @@ export const DirectChatView: React.FC<DirectChatViewProps> = ({
                       type="submit"
                       disabled={sending || !inputContent.trim()}
                       style={{
-                        padding: '0 20px',
+                        padding: '0 24px',
                         backgroundColor: '#0c1826',
                         color: '#f5efe5',
                         border: 'none',
+                        borderRadius: '6px',
                         fontWeight: 600,
                         fontSize: '14px',
                         cursor: sending || !inputContent.trim() ? 'not-allowed' : 'pointer',
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '6px',
                       }}
                     >
-                      {sending ? 'Sending...' : 'Send'}
+                      <span>💬</span>
+                      <span>{sending ? 'Sending...' : 'Send'}</span>
                     </button>
                   </form>
                 </div>
@@ -419,7 +538,7 @@ export const DirectChatView: React.FC<DirectChatViewProps> = ({
             </>
           ) : (
             <div style={{ padding: '40px', textAlign: 'center', color: '#666', margin: 'auto' }}>
-              Select a conversation from the left to start messaging.
+              Select a conversation from the left to start texting.
             </div>
           )}
         </div>

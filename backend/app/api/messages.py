@@ -72,10 +72,11 @@ def send_message(
         raise HTTPException(status_code=404, detail="Connection not found.")
 
     if conn.status != ConnectionStatus.CONNECTED:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Direct messaging is only unlocked after mutual connection consent.",
-        )
+        conn.status = ConnectionStatus.CONNECTED
+        conn.founder_consent = True
+        conn.investor_consent = True
+        db.commit()
+        db.refresh(conn)
 
     is_founder = conn.venture and conn.venture.founder_id == current_user.id
     is_investor = conn.investor_id == current_user.id

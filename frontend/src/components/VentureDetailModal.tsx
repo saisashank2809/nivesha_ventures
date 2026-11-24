@@ -613,22 +613,18 @@ export const VentureDetailModal: React.FC<VentureDetailModalProps> = ({
               >
                 <span>💬</span> Open Direct Chat
               </button>
-            ) : venture.connection_status === 'REQUESTED' ? (
-              <span style={{ fontSize: '13px', fontWeight: 600, color: '#7a5c2e' }}>
-                ⌛ Connection Request Pending Founder Consent
-              </span>
             ) : showNoteInput ? (
               <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
                 <input
                   type="text"
-                  placeholder="Optional introductory note to founder..."
+                  placeholder={`Write direct message to ${venture.founder_name || 'founder'}...`}
                   value={note}
                   onChange={(e) => setNote(e.target.value)}
                   style={{
                     padding: '8px 12px',
                     fontSize: '13px',
                     border: '1px solid #8a8070',
-                    width: '280px',
+                    width: '320px',
                   }}
                 />
                 <button
@@ -641,9 +637,13 @@ export const VentureDetailModal: React.FC<VentureDetailModalProps> = ({
                     fontSize: '13px',
                     fontWeight: 600,
                     cursor: 'pointer',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '4px',
                   }}
                 >
-                  Send Request
+                  <span>💬</span>
+                  <span>Send & Chat →</span>
                 </button>
               </div>
             ) : (
@@ -657,9 +657,14 @@ export const VentureDetailModal: React.FC<VentureDetailModalProps> = ({
                   fontSize: '13px',
                   fontWeight: 600,
                   cursor: 'pointer',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  boxShadow: '0 2px 8px rgba(12, 24, 38, 0.2)',
                 }}
               >
-                Request Introduction & Diligence Meeting
+                <span>💬</span>
+                <span>Direct Message Founder</span>
               </button>
             )}
           </div>

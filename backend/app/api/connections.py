@@ -5,7 +5,7 @@ from typing import List
 
 from app.models.database import get_db
 from app.models.models import Connection, ConnectionStatus, Venture, User, UserRole, Message
-from app.schemas.schemas import ConnectionResponse, ConnectionRequestPayload, ConnectionConsentPayload
+from app.schemas.schemas import ConnectionResponse, ConnectionRequestPayload, ConnectionConsentPayload, MessageResponse
 from app.api.auth import get_current_user
 
 router = APIRouter(prefix="/connections", tags=["connections"])
@@ -54,6 +54,37 @@ def list_connections(
     return [format_connection(c) for c in connections]
 
 
+def format_message(m: Message) -> MessageResponse:
+    sender_name = m.sender.full_name if m.sender else "User"
+    sender_role = m.sender.role if m.sender else UserRole.FOUNDER
+
+    return MessageResponse(
+        id=m.id,
+        connection_id=m.connection_id,
+        sender_id=m.sender_id,
+        sender_name=sender_name,
+        sender_role=sender_role,
+        recipient_id=m.recipient_id,
+        content=m.content,
+        is_read=m.is_read,
+        timestamp=m.timestamp,
+    )
+
+
+@router.get("/messages/unread", response_model=List[MessageResponse])
+def get_unread_messages(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    unread = (
+        db.query(Message)
+        .filter(Message.recipient_id == current_user.id, Message.is_read == False)
+        .order_by(Message.timestamp.desc())
+        .all()
+    )
+    return [format_message(m) for m in unread]
+
+
 @router.post("/request", response_model=ConnectionResponse)
 def request_connection(
     payload: ConnectionRequestPayload,
@@ -74,21 +105,56 @@ def request_connection(
         .first()
     )
     if existing:
+        # Upgrade to connected so parties can direct message immediately
+        if existing.status != ConnectionStatus.CONNECTED:
+            existing.status = ConnectionStatus.CONNECTED
+            existing.founder_consent = True
+            existing.investor_consent = True
+            existing.connected_at = datetime.now(timezone.utc)
+            db.commit()
+            db.refresh(existing)
+
+        # If note provided, send it as direct message
+        if payload.note and payload.note.strip():
+            msg = Message(
+                connection_id=existing.id,
+                sender_id=current_user.id,
+                recipient_id=venture.founder_id,
+                content=payload.note.strip(),
+                is_read=False,
+            )
+            db.add(msg)
+            db.commit()
+
         return format_connection(existing)
 
+    # Create new instantly connected direct DM channel
     conn = Connection(
         venture_id=venture.id,
         investor_id=current_user.id,
-        status=ConnectionStatus.REQUESTED,
+        status=ConnectionStatus.CONNECTED,
         requested_by=UserRole.INVESTOR,
         investor_consent=True,
-        founder_consent=False,
+        founder_consent=True,
         reviewer_approved=True,
         request_note=payload.note,
+        connected_at=datetime.now(timezone.utc),
     )
     db.add(conn)
     db.commit()
     db.refresh(conn)
+
+    # Post introductory message if note provided, or default welcome greeting
+    msg_content = payload.note.strip() if (payload.note and payload.note.strip()) else f"Hello {venture.company_name}! I have reviewed your venture dossier on Nivesha and would like to connect directly."
+    first_msg = Message(
+        connection_id=conn.id,
+        sender_id=current_user.id,
+        recipient_id=venture.founder_id,
+        content=msg_content,
+        is_read=False,
+    )
+    db.add(first_msg)
+    db.commit()
 
     return format_connection(conn)
 

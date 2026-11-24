@@ -98,14 +98,10 @@ export const InvestorGuidedDiscovery: React.FC<InvestorGuidedDiscoveryProps> = (
   const [submittingImage, setSubmittingImage] = useState(false);
   const [imageActionSuccess, setImageActionSuccess] = useState<string | null>(null);
 
-  // Appointment Modal State
-  const [appointmentModalVenture, setAppointmentModalVenture] = useState<VentureCard | null>(null);
-  const [meetingPurpose, setMeetingPurpose] = useState('Review expansion unit economics, collateral schedule, and location term sheet');
-  const [sharingScope, setSharingScope] = useState('Declared monthly GST returns, food cost reconciliations, and contractor quotes');
-  const [preferredTime, setPreferredTime] = useState('Thursday 3:00 PM IST');
-  const [appointmentNotes, setAppointmentNotes] = useState('');
-  const [submittingAppointment, setSubmittingAppointment] = useState(false);
-  const [appointmentSuccess, setAppointmentSuccess] = useState<string | null>(null);
+  // Direct DM Modal State
+  const [directDMModalVenture, setDirectDMModalVenture] = useState<VentureCard | null>(null);
+  const [directDMNote, setDirectDMNote] = useState('');
+  const [submittingDM, setSubmittingDM] = useState(false);
 
   // Quick Mandate Discovery Controls
   const [selectedArrangement, setSelectedArrangement] = useState<string>('LOAN');
@@ -218,38 +214,28 @@ export const InvestorGuidedDiscovery: React.FC<InvestorGuidedDiscoveryProps> = (
     }
   };
 
-  const handleOpenAppointmentModal = (v: VentureCard) => {
+  const handleOpenDirectDM = (v: VentureCard) => {
     if (!currentUser) {
       onOpenLogin();
       return;
     }
-    setAppointmentModalVenture(v);
-    setMeetingPurpose(`Review ${v.company_name} expansion unit economics, collateral schedule, and location term sheet`);
-    setAppointmentSuccess(null);
+    setDirectDMModalVenture(v);
+    setDirectDMNote(`Hi ${v.founder_name || v.company_name} team, I reviewed your venture dossier on Nivesha and would like to text directly to discuss your round.`);
   };
 
-  const handleSubmitAppointment = async () => {
-    if (!appointmentModalVenture) return;
+  const handleSendDirectDM = async () => {
+    if (!directDMModalVenture) return;
     try {
-      setSubmittingAppointment(true);
-      const linkedCase = matchCases[appointmentModalVenture.id];
-      await Api.createAppointment({
-        venture_id: appointmentModalVenture.id,
-        match_case_id: linkedCase ? linkedCase.id : null,
-        meeting_purpose: meetingPurpose,
-        sharing_scope: sharingScope,
-        preferred_times: [preferredTime],
-        notes: appointmentNotes,
-      });
-      setAppointmentSuccess(`Appointment request registered for ${appointmentModalVenture.company_name}! Context preserved.`);
-      setTimeout(() => {
-        setAppointmentModalVenture(null);
-        setAppointmentSuccess(null);
-      }, 2500);
+      setSubmittingDM(true);
+      const conn = await Api.requestConnection(directDMModalVenture.id, directDMNote.trim());
+      setDirectDMModalVenture(null);
+      if (onOpenDirectChat) {
+        onOpenDirectChat(conn.id);
+      }
     } catch (err: any) {
-      alert(`Failed to register appointment: ${err.message}`);
+      alert(`Failed to send direct message: ${err.message}`);
     } finally {
-      setSubmittingAppointment(false);
+      setSubmittingDM(false);
     }
   };
 
@@ -971,19 +957,24 @@ export const InvestorGuidedDiscovery: React.FC<InvestorGuidedDiscoveryProps> = (
                       </button>
                     ) : (
                       <button
-                        onClick={() => handleOpenAppointmentModal(venture)}
+                        onClick={() => handleOpenDirectDM(venture)}
                         style={{
                           padding: '10px 18px',
-                          backgroundColor: '#fffdf9',
-                          color: '#0c1826',
+                          backgroundColor: '#0c1826',
+                          color: '#f5efe5',
                           borderRadius: '6px',
                           fontSize: '13px',
                           fontWeight: 600,
-                          border: '1px solid #d6c9b2',
+                          border: 'none',
                           cursor: 'pointer',
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: '6px',
+                          boxShadow: '0 2px 6px rgba(12, 24, 38, 0.15)',
                         }}
                       >
-                        Set Up Appointment
+                        <span>💬</span>
+                        <span>Direct Message Founder</span>
                       </button>
                     )}
                   </div>
@@ -1167,8 +1158,8 @@ export const InvestorGuidedDiscovery: React.FC<InvestorGuidedDiscoveryProps> = (
         </div>
       )}
 
-      {/* Appointment Request Modal */}
-      {appointmentModalVenture && (
+      {/* Direct DM Modal */}
+      {directDMModalVenture && (
         <div
           style={{
             position: 'fixed',
@@ -1186,106 +1177,110 @@ export const InvestorGuidedDiscovery: React.FC<InvestorGuidedDiscoveryProps> = (
             style={{
               backgroundColor: '#ffffff',
               borderRadius: '12px',
-              maxWidth: '600px',
+              maxWidth: '560px',
               width: '100%',
-              padding: '32px',
+              padding: '30px',
               boxShadow: '0 20px 40px rgba(12, 24, 38, 0.25)',
+              border: '1px solid #d6c9b2',
             }}
           >
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
               <div>
-                <div className="eyebrow" style={{ marginBottom: '2px' }}>FACILITATED APPOINTMENT</div>
-                <h3 style={{ fontSize: '20px', color: '#0c1826', margin: 0 }}>
-                  Request Introduction with {appointmentModalVenture.company_name}
+                <div style={{ fontSize: '11px', fontWeight: 700, color: '#7a5c2e', letterSpacing: '0.1em', textTransform: 'uppercase' }}>
+                  💬 DIRECT MESSAGE FOUNDER
+                </div>
+                <h3 style={{ fontSize: '20px', color: '#0c1826', margin: '4px 0 0', fontFamily: "Newsreader, Georgia, serif" }}>
+                  Message {directDMModalVenture.company_name}
                 </h3>
               </div>
               <button
-                onClick={() => setAppointmentModalVenture(null)}
+                onClick={() => setDirectDMModalVenture(null)}
                 style={{ background: 'none', border: 'none', fontSize: '24px', color: '#536074', cursor: 'pointer' }}
               >
                 ×
               </button>
             </div>
 
-            {appointmentSuccess ? (
-              <div style={{ padding: '20px', background: '#edf5ee', color: '#15803d', borderRadius: '8px', textAlign: 'center', fontWeight: 600 }}>
-                ✓ {appointmentSuccess}
-              </div>
-            ) : (
-              <div>
-                <p style={{ fontSize: '13.5px', color: '#536074', marginBottom: '20px' }}>
-                  This request preserves the verified venture context and match case references. The platform facilitates
-                  mutual consent before introducing both parties.
-                </p>
+            <p style={{ fontSize: '13.5px', color: '#536074', marginBottom: '16px', lineHeight: 1.5 }}>
+              Directly text founder <strong>{directDMModalVenture.founder_name}</strong>. Sending this message immediately unlocks your 1-on-1 private direct chat channel.
+            </p>
 
-                <div style={{ marginBottom: '16px' }}>
-                  <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: '#0c1826', marginBottom: '6px' }}>
-                    Meeting Objective & Topics
-                  </label>
-                  <input
-                    type="text"
-                    value={meetingPurpose}
-                    onChange={(e) => setMeetingPurpose(e.target.value)}
-                    style={{ width: '100%', padding: '10px 12px', borderRadius: '6px', border: '1px solid #e6decb', fontSize: '13px' }}
-                  />
-                </div>
+            <div style={{ marginBottom: '16px' }}>
+              <label style={{ display: 'block', fontSize: '12.5px', fontWeight: 600, color: '#0c1826', marginBottom: '6px' }}>
+                Your Message
+              </label>
+              <textarea
+                rows={4}
+                value={directDMNote}
+                onChange={(e) => setDirectDMNote(e.target.value)}
+                placeholder="Write your direct message to the founder..."
+                style={{
+                  width: '100%',
+                  padding: '12px',
+                  borderRadius: '6px',
+                  border: '1px solid #d6c9b2',
+                  fontSize: '13.5px',
+                  lineHeight: 1.5,
+                  fontFamily: 'inherit',
+                  outline: 'none',
+                }}
+              />
+            </div>
 
-                <div style={{ marginBottom: '16px' }}>
-                  <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: '#0c1826', marginBottom: '6px' }}>
-                    Approved Information-Sharing Scope
-                  </label>
-                  <input
-                    type="text"
-                    value={sharingScope}
-                    onChange={(e) => setSharingScope(e.target.value)}
-                    style={{ width: '100%', padding: '10px 12px', borderRadius: '6px', border: '1px solid #e6decb', fontSize: '13px' }}
-                  />
-                </div>
+            {/* Quick Suggestions */}
+            <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', marginBottom: '20px' }}>
+              {[
+                'Discuss ticket allocation',
+                'Ask about unit economics',
+                'Request collateral inspection',
+                'Discuss repayment schedule',
+              ].map((topic, i) => (
+                <button
+                  key={i}
+                  type="button"
+                  onClick={() => setDirectDMNote((prev) => `${prev} I would particularly like to ${topic.toLowerCase()}.`)}
+                  style={{
+                    padding: '4px 10px',
+                    borderRadius: '4px',
+                    backgroundColor: '#f5efe5',
+                    border: '1px solid #d6c9b2',
+                    fontSize: '11px',
+                    color: '#7a5c2e',
+                    cursor: 'pointer',
+                  }}
+                >
+                  + {topic}
+                </button>
+              ))}
+            </div>
 
-                <div style={{ marginBottom: '20px' }}>
-                  <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: '#0c1826', marginBottom: '6px' }}>
-                    Preferred Meeting Slot
-                  </label>
-                  <select
-                    value={preferredTime}
-                    onChange={(e) => setPreferredTime(e.target.value)}
-                    style={{ width: '100%', padding: '10px 12px', borderRadius: '6px', border: '1px solid #e6decb', fontSize: '13px' }}
-                  >
-                    <option value="Thursday 3:00 PM IST">Thursday 3:00 PM IST</option>
-                    <option value="Friday 11:30 AM IST">Friday 11:30 AM IST</option>
-                    <option value="Next Monday 4:00 PM IST">Next Monday 4:00 PM IST</option>
-                  </select>
-                </div>
-
-                <div style={{ fontSize: '11.5px', color: '#856127', background: '#fdfbf7', padding: '10px 12px', borderRadius: '6px', marginBottom: '20px' }}>
-                  ℹ️ <strong>Demonstration Note:</strong> This records a simulated platform appointment request.
-                  No external calendar entries or automated emails are sent.
-                </div>
-
-                <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px' }}>
-                  <button
-                    onClick={() => setAppointmentModalVenture(null)}
-                    style={{ padding: '10px 16px', background: 'transparent', border: '1px solid #e6decb', borderRadius: '6px' }}
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    onClick={handleSubmitAppointment}
-                    disabled={submittingAppointment}
-                    style={{
-                      padding: '10px 24px',
-                      backgroundColor: '#0c1826',
-                      color: '#fff',
-                      borderRadius: '6px',
-                      fontWeight: 600,
-                      fontSize: '13.5px',
-                    }}
-                  >
-                    {submittingAppointment ? 'Registering...' : 'Confirm Appointment Request'}
-                  </button>
-                </div>
-              </div>
-            )}
+            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px' }}>
+              <button
+                onClick={() => setDirectDMModalVenture(null)}
+                style={{ padding: '10px 16px', background: 'transparent', border: '1px solid #e6decb', borderRadius: '6px', fontSize: '13px', cursor: 'pointer' }}
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleSendDirectDM}
+                disabled={submittingDM || !directDMNote.trim()}
+                style={{
+                  padding: '10px 22px',
+                  backgroundColor: '#0c1826',
+                  color: '#fff',
+                  borderRadius: '6px',
+                  fontWeight: 600,
+                  fontSize: '13.5px',
+                  cursor: submittingDM || !directDMNote.trim() ? 'not-allowed' : 'pointer',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                }}
+              >
+                <span>💬</span>
+                <span>{submittingDM ? 'Sending...' : 'Send Direct Message →'}</span>
+              </button>
+            </div>
           </div>
         </div>
       )}

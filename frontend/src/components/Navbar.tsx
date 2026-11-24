@@ -277,7 +277,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             </>
           )}
 
-          {/* Authenticated Messaging */}
+          {/* Authenticated Messaging / Direct DM */}
           {currentUser && (
             <button
               onClick={() => onNavigate('MESSAGES')}
@@ -295,17 +295,20 @@ export const Navbar: React.FC<NavbarProps> = ({
                 borderBottom: activeTab === 'MESSAGES' ? '2px solid #7a5c2e' : '2px solid transparent',
               }}
             >
-              Direct Chat
+              <span>💬</span>
+              <span>Direct DM</span>
               {unreadCount > 0 && (
                 <span
                   style={{
-                    backgroundColor: '#7a5c2e',
+                    backgroundColor: '#15803d',
                     color: '#fff',
                     borderRadius: '10px',
                     fontSize: '10px',
                     fontWeight: 700,
-                    padding: '1px 6px',
+                    padding: '1px 7px',
+                    boxShadow: '0 0 6px rgba(21, 128, 61, 0.5)',
                   }}
+                  title={`${unreadCount} unread message(s)`}
                 >
                   {unreadCount}
                 </span>

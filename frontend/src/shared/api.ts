@@ -278,6 +278,10 @@ export class Api {
     });
   }
 
+  public static async getUnreadMessages(): Promise<Message[]> {
+    return this.request<Message[]>('/connections/messages/unread');
+  }
+
   // AI Assistant Chatbot
   public static async sendAIChat(
     message: string,

@@ -229,9 +229,13 @@ export const VentureCard: React.FC<VentureCardProps> = ({
               fontSize: '12px',
               fontWeight: 600,
               cursor: 'pointer',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '4px',
             }}
           >
-            Request Connection
+            <span>💬</span>
+            <span>Direct DM</span>
           </button>
         )}
       </div>
