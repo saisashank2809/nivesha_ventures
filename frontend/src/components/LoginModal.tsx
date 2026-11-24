@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { User, UserRole } from '../shared/types';
 import { Api } from '../shared/api';
+import { DEMO_ACCOUNTS } from '../shared/demoAccounts';
 
 interface LoginModalProps {
   isOpen: boolean;
@@ -63,6 +64,20 @@ export const LoginModal: React.FC<LoginModalProps> = ({
       }
     } catch (err: any) {
       setError(err.message || 'Authentication failed. Please check your credentials.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleQuickLogin = async (targetEmail: string) => {
+    setError(null);
+    setLoading(true);
+    try {
+      const res = await Api.login(targetEmail, 'password123');
+      onLoginSuccess(res.user);
+      onClose();
+    } catch (err: any) {
+      setError(err.message || 'Quick login failed');
     } finally {
       setLoading(false);
     }
@@ -169,6 +184,120 @@ export const LoginModal: React.FC<LoginModalProps> = ({
               }}
             >
               {error}
+            </div>
+          )}
+
+          {/* Quick 1-Click Demo Accounts Switcher on top of Sign In */}
+          {!isRegister && (
+            <div
+              style={{
+                marginBottom: '20px',
+                padding: '12px',
+                backgroundColor: '#faf5ec',
+                border: '1px solid #e2d4bd',
+                borderRadius: '4px',
+              }}
+            >
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  marginBottom: '10px',
+                }}
+              >
+                <div
+                  style={{
+                    fontSize: '11px',
+                    fontWeight: 700,
+                    color: '#7a5c2e',
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.08em',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '4px',
+                  }}
+                >
+                  <span>⚡</span> Quick Login (1-Click Demo)
+                </div>
+                <span style={{ fontSize: '11px', color: '#8a8070' }}>Click to sign in instantly</span>
+              </div>
+
+              <div
+                style={{
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(3, 1fr)',
+                  gap: '6px',
+                  maxHeight: '180px',
+                  overflowY: 'auto',
+                  paddingRight: '2px',
+                }}
+              >
+                {DEMO_ACCOUNTS.map((acc) => (
+                  <button
+                    key={acc.email}
+                    type="button"
+                    onClick={() => handleQuickLogin(acc.email)}
+                    disabled={loading}
+                    style={{
+                      padding: '7px 8px',
+                      backgroundColor: '#fffdf9',
+                      border: '1px solid #d6c9b2',
+                      textAlign: 'left',
+                      cursor: loading ? 'wait' : 'pointer',
+                      borderRadius: '4px',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: '2px',
+                      transition: 'all 0.15s ease',
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.backgroundColor = '#f1e6d4';
+                      e.currentTarget.style.borderColor = '#7a5c2e';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.backgroundColor = '#fffdf9';
+                      e.currentTarget.style.borderColor = '#d6c9b2';
+                    }}
+                    title={`${acc.name} (${acc.role}) - ${acc.subtitle}`}
+                  >
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '11.5px' }}>
+                      <span>{acc.icon}</span>
+                      <span
+                        style={{
+                          fontWeight: 600,
+                          color: '#121a29',
+                          whiteSpace: 'nowrap',
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis',
+                          fontSize: '11px',
+                        }}
+                      >
+                        {acc.badge}
+                      </span>
+                    </div>
+                    <div
+                      style={{
+                        fontSize: '10px',
+                        color: '#7a5c2e',
+                        whiteSpace: 'nowrap',
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                      }}
+                    >
+                      {acc.name.split(' ')[0]}
+                    </div>
+                  </button>
+                ))}
+              </div>
+
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px', margin: '14px 0 4px' }}>
+                <div style={{ flex: 1, height: '1px', backgroundColor: '#d6c9b2' }} />
+                <span style={{ fontSize: '11px', color: '#8a8070', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+                  or enter credentials manually
+                </span>
+                <div style={{ flex: 1, height: '1px', backgroundColor: '#d6c9b2' }} />
+              </div>
             </div>
           )}
 

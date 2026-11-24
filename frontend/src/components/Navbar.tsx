@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { User, UserRole } from '../shared/types';
 import { Api } from '../shared/api';
+import { DEMO_ACCOUNTS, DemoAccount } from '../shared/demoAccounts';
 
 interface NavbarProps {
   currentUser: User | null;
@@ -19,10 +20,43 @@ export const Navbar: React.FC<NavbarProps> = ({
   onUserChanged,
   unreadCount = 0,
 }) => {
+  const [quickSwitchOpen, setQuickSwitchOpen] = useState(false);
+  const [switchingEmail, setSwitchingEmail] = useState<string | null>(null);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  // Close dropdown on outside click
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setQuickSwitchOpen(false);
+      }
+    };
+    if (quickSwitchOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [quickSwitchOpen]);
+
   const handleLogout = () => {
     Api.logout();
     onUserChanged(null);
     onNavigate('LANDING');
+  };
+
+  const handleQuickSwitch = async (acc: DemoAccount) => {
+    try {
+      setSwitchingEmail(acc.email);
+      const res = await Api.login(acc.email, 'password123');
+      onUserChanged(res.user);
+      onNavigate(acc.tab);
+      setQuickSwitchOpen(false);
+    } catch (err: any) {
+      alert(`Quick switch failed: ${err.message}`);
+    } finally {
+      setSwitchingEmail(null);
+    }
   };
 
   return (
@@ -199,8 +233,149 @@ export const Navbar: React.FC<NavbarProps> = ({
           )}
         </div>
 
-        {/* Right: Authenticated User Profile & Real Sign In */}
+        {/* Right: Quick Switcher + Authenticated User Profile / Real Sign In */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+          {/* ⚡ Quick Switch Dropdown for Demo */}
+          <div ref={dropdownRef} style={{ position: 'relative' }}>
+            <button
+              type="button"
+              onClick={() => setQuickSwitchOpen(!quickSwitchOpen)}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '6px',
+                padding: '6px 12px',
+                backgroundColor: '#f5efe5',
+                border: '1px solid #c5b59b',
+                color: '#7a5c2e',
+                fontSize: '12.5px',
+                fontWeight: 600,
+                cursor: 'pointer',
+                borderRadius: '4px',
+                transition: 'all 0.15s ease',
+              }}
+              title="1-Click Demo Persona Switcher"
+            >
+              <span>⚡</span>
+              <span>Quick Demo Switch</span>
+              <span
+                style={{
+                  fontSize: '9px',
+                  display: 'inline-block',
+                  transform: quickSwitchOpen ? 'rotate(180deg)' : 'none',
+                  transition: 'transform 0.15s ease',
+                }}
+              >
+                ▼
+              </span>
+            </button>
+
+            {quickSwitchOpen && (
+              <div
+                style={{
+                  position: 'absolute',
+                  top: '100%',
+                  right: 0,
+                  marginTop: '8px',
+                  width: '320px',
+                  backgroundColor: '#fffdf9',
+                  border: '1px solid #d6c9b2',
+                  boxShadow: '0 12px 30px rgba(12, 24, 38, 0.18)',
+                  borderRadius: '4px',
+                  zIndex: 200,
+                  maxHeight: '440px',
+                  overflowY: 'auto',
+                }}
+              >
+                <div style={{ padding: '10px 14px', borderBottom: '1px solid #eedec4', backgroundColor: '#faf4eb' }}>
+                  <div style={{ fontSize: '12px', fontWeight: 700, color: '#121a29' }}>Switch Demo Account</div>
+                  <div style={{ fontSize: '11px', color: '#685d4d' }}>Instant login to demonstrate any persona without re-typing credentials</div>
+                </div>
+                <div style={{ padding: '6px 0' }}>
+                  {DEMO_ACCOUNTS.map((acc) => {
+                    const isCurrent = currentUser?.email === acc.email;
+                    const isSwitching = switchingEmail === acc.email;
+                    return (
+                      <button
+                        key={acc.email}
+                        type="button"
+                        onClick={() => handleQuickSwitch(acc)}
+                        disabled={isSwitching}
+                        style={{
+                          width: '100%',
+                          textAlign: 'left',
+                          padding: '9px 14px',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '10px',
+                          border: 'none',
+                          background: isCurrent ? '#f5efe5' : 'transparent',
+                          cursor: isSwitching ? 'wait' : 'pointer',
+                          transition: 'background 0.1s ease',
+                        }}
+                        onMouseEnter={(e) => {
+                          if (!isCurrent) e.currentTarget.style.backgroundColor = '#faf6f0';
+                        }}
+                        onMouseLeave={(e) => {
+                          if (!isCurrent) e.currentTarget.style.backgroundColor = 'transparent';
+                        }}
+                      >
+                        <span style={{ fontSize: '16px', lineHeight: 1 }}>{acc.icon}</span>
+                        <div style={{ flex: 1, minWidth: 0 }}>
+                          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '6px' }}>
+                            <span
+                              style={{
+                                fontSize: '12.5px',
+                                fontWeight: isCurrent ? 700 : 600,
+                                color: '#121a29',
+                                whiteSpace: 'nowrap',
+                                overflow: 'hidden',
+                                textOverflow: 'ellipsis',
+                              }}
+                            >
+                              {acc.name}
+                            </span>
+                            <span
+                              style={{
+                                fontSize: '10px',
+                                padding: '1px 5px',
+                                borderRadius: '3px',
+                                backgroundColor:
+                                  acc.role === 'INVESTOR'
+                                    ? '#e0f2fe'
+                                    : acc.role === 'REVIEWER'
+                                    ? '#fef3c7'
+                                    : '#f3e8ff',
+                                color:
+                                  acc.role === 'INVESTOR'
+                                    ? '#0369a1'
+                                    : acc.role === 'REVIEWER'
+                                    ? '#b45309'
+                                    : '#6b21a8',
+                                fontWeight: 600,
+                              }}
+                            >
+                              {acc.badge}
+                            </span>
+                          </div>
+                          <div style={{ fontSize: '11px', color: '#7a5c2e', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                            {acc.subtitle}
+                          </div>
+                        </div>
+                        {isCurrent && (
+                          <span style={{ fontSize: '12px', color: '#15803d', fontWeight: 700 }}>✓</span>
+                        )}
+                        {isSwitching && (
+                          <span style={{ fontSize: '11px', color: '#7a5c2e' }}>...</span>
+                        )}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+          </div>
+
           {currentUser ? (
             <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
               <div style={{ textAlign: 'right' }}>
