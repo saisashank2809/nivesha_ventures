@@ -195,9 +195,78 @@ CREATE INDEX IF NOT EXISTS ix_messages_connection ON messages (connection_id);
 CREATE INDEX IF NOT EXISTS ix_messages_sender ON messages (sender_id);
 CREATE INDEX IF NOT EXISTS ix_messages_recipient ON messages (recipient_id);
 
+CREATE TABLE IF NOT EXISTS founder_profiles (
+    id VARCHAR(36) PRIMARY KEY,
+    founder_id VARCHAR(36) NOT NULL UNIQUE REFERENCES users (id) ON DELETE CASCADE,
+    role_archetype VARCHAR(64),
+    experience_years VARCHAR(32),
+    core_expertise JSONB NOT NULL DEFAULT '[]'::jsonb,
+    continuity_backup_plan VARCHAR(64),
+    past_resilience_verified BOOLEAN NOT NULL DEFAULT FALSE,
+    three_year_goal VARCHAR(64),
+    biggest_bottleneck VARCHAR(64),
+    investor_involvement_pref VARCHAR(64),
+    update_cadence VARCHAR(64),
+    ai_summary TEXT,
+    raw_discovery_answers JSONB NOT NULL DEFAULT '{}'::jsonb,
+    created_at TIMESTAMP WITHOUT TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP WITHOUT TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX IF NOT EXISTS ix_founder_profiles_founder ON founder_profiles (founder_id);
+
+ALTER TABLE founder_profiles ENABLE ROW LEVEL SECURITY;
+
+DO $$ BEGIN
+    CREATE POLICY founder_profiles_self_access ON founder_profiles
+        FOR ALL
+        USING (auth.uid()::text = founder_id)
+        WITH CHECK (auth.uid()::text = founder_id);
+EXCEPTION
+    WHEN duplicate_object THEN null;
+END $$;
+
+CREATE TABLE IF NOT EXISTS investor_profiles (
+    id VARCHAR(36) PRIMARY KEY,
+    investor_id VARCHAR(36) NOT NULL UNIQUE REFERENCES users (id) ON DELETE CASCADE,
+    investor_type VARCHAR(64),
+    investing_capacity_type VARCHAR(32),
+    professional_background JSONB NOT NULL DEFAULT '[]'::jsonb,
+    past_private_investments BOOLEAN,
+    experience_level VARCHAR(32),
+    prior_structures_used JSONB NOT NULL DEFAULT '[]'::jsonb,
+    evaluation_priorities JSONB NOT NULL DEFAULT '[]'::jsonb,
+    primary_objective VARCHAR(64),
+    risk_tolerance_level VARCHAR(64),
+    risk_clarifications JSONB NOT NULL DEFAULT '{}'::jsonb,
+    expected_evidence JSONB NOT NULL DEFAULT '[]'::jsonb,
+    onboarding_completed BOOLEAN NOT NULL DEFAULT FALSE,
+    ai_summary TEXT,
+    raw_discovery_answers JSONB NOT NULL DEFAULT '{}'::jsonb,
+    created_at TIMESTAMP WITHOUT TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP WITHOUT TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX IF NOT EXISTS ix_investor_profiles_investor ON investor_profiles (investor_id);
+
+ALTER TABLE investor_profiles ENABLE ROW LEVEL SECURITY;
+
+DO $$ BEGIN
+    CREATE POLICY investor_profiles_self_access ON investor_profiles
+        FOR ALL
+        USING (auth.uid()::text = investor_id)
+        WITH CHECK (auth.uid()::text = investor_id);
+EXCEPTION
+    WHEN duplicate_object THEN null;
+END $$;
+
 CREATE TABLE IF NOT EXISTS onboarding_questions (
     id VARCHAR(36) PRIMARY KEY,
     section VARCHAR(64) NOT NULL,
+    stage VARCHAR(32) NOT NULL DEFAULT 'founder_discovery',
+    category VARCHAR(32) NOT NULL DEFAULT 'background',
+    ui_control_type VARCHAR(32) NOT NULL DEFAULT 'tap_cards',
+    is_v1_essential BOOLEAN NOT NULL DEFAULT TRUE,
     question_key VARCHAR(64) NOT NULL UNIQUE,
     label VARCHAR(256) NOT NULL,
     description TEXT,

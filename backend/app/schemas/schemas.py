@@ -343,18 +343,22 @@ class MessageSendPayload(BaseModel):
     content: str
 
 
-# --- Onboarding Question Schemas ---
+# --- Onboarding Question & Founder Profile Schemas ---
 
 class OnboardingQuestionResponse(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
     id: str
     section: str
+    stage: str = "founder_discovery"
+    category: str = "background"
+    ui_control_type: str = "tap_cards"
+    is_v1_essential: bool = True
     question_key: str
     label: str
     description: Optional[str] = None
     question_type: str
-    options: Optional[List[str]] = None
+    options: Optional[List[Any]] = None
     placeholder: Optional[str] = None
     is_mandatory: bool
     order: int
@@ -362,6 +366,128 @@ class OnboardingQuestionResponse(BaseModel):
 
 class OnboardingAnswerSubmission(BaseModel):
     answers: Dict[str, Any]
+    ai_summary: Optional[str] = None
+
+
+class FounderProfileResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: str
+    founder_id: str
+    full_name: Optional[str] = None
+    email: Optional[str] = None
+    title: Optional[str] = None
+    firm_or_company: Optional[str] = None
+    bio: Optional[str] = None
+    avatar_url: Optional[str] = None
+    role_archetype: Optional[str] = None
+    experience_years: Optional[str] = None
+    core_expertise: List[str] = Field(default_factory=list)
+    continuity_backup_plan: Optional[str] = None
+    past_resilience_verified: bool = False
+    three_year_goal: Optional[str] = None
+    biggest_bottleneck: Optional[str] = None
+    investor_involvement_pref: Optional[str] = None
+    update_cadence: Optional[str] = None
+    ai_summary: Optional[str] = None
+    raw_discovery_answers: Dict[str, Any] = Field(default_factory=dict)
+
+
+class FounderProfileUpdateRequest(BaseModel):
+    full_name: Optional[str] = None
+    title: Optional[str] = None
+    firm_or_company: Optional[str] = None
+    bio: Optional[str] = None
+    avatar_url: Optional[str] = None
+    role_archetype: Optional[str] = None
+    experience_years: Optional[str] = None
+    core_expertise: Optional[List[str]] = None
+    continuity_backup_plan: Optional[str] = None
+    three_year_goal: Optional[str] = None
+    biggest_bottleneck: Optional[str] = None
+    investor_involvement_pref: Optional[str] = None
+    update_cadence: Optional[str] = None
+    ai_summary: Optional[str] = None
+
+
+class OnboardingAnalyzeRequest(BaseModel):
+    answers: Dict[str, Any]
+
+
+class OnboardingAnalyzeResponse(BaseModel):
+    founder_summary: str
+    ticket_guardrail: Optional[Dict[str, Any]] = None
+    value_discovery_tips: List[str] = Field(default_factory=list)
+    reality_check_chips: List[str] = Field(default_factory=list)
+    detected_conflicts: List[str] = Field(default_factory=list)
+    prefilled_story_blocks: Dict[str, Any] = Field(default_factory=dict)
+
+
+# --- Investor Onboarding & Profile Schemas ---
+
+class InvestorProfileResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: str
+    investor_id: str
+    full_name: Optional[str] = None
+    email: Optional[str] = None
+    title: Optional[str] = None
+    firm_or_company: Optional[str] = None
+    bio: Optional[str] = None
+    investor_type: Optional[str] = None
+    investing_capacity_type: Optional[str] = None
+    professional_background: List[str] = Field(default_factory=list)
+    past_private_investments: Optional[bool] = None
+    experience_level: Optional[str] = None
+    prior_structures_used: List[str] = Field(default_factory=list)
+    evaluation_priorities: List[str] = Field(default_factory=list)
+    primary_objective: Optional[str] = None
+    risk_tolerance_level: Optional[str] = None
+    risk_clarifications: Dict[str, Any] = Field(default_factory=dict)
+    expected_evidence: List[str] = Field(default_factory=list)
+    onboarding_completed: bool = False
+    ai_summary: Optional[str] = None
+    raw_discovery_answers: Dict[str, Any] = Field(default_factory=dict)
+
+
+class InvestorProfileUpdateRequest(BaseModel):
+    full_name: Optional[str] = None
+    title: Optional[str] = None
+    firm_or_company: Optional[str] = None
+    bio: Optional[str] = None
+    investor_type: Optional[str] = None
+    investing_capacity_type: Optional[str] = None
+    professional_background: Optional[List[str]] = None
+    past_private_investments: Optional[bool] = None
+    experience_level: Optional[str] = None
+    prior_structures_used: Optional[List[str]] = None
+    evaluation_priorities: Optional[List[str]] = None
+    primary_objective: Optional[str] = None
+    risk_tolerance_level: Optional[str] = None
+    expected_evidence: Optional[List[str]] = None
+    ai_summary: Optional[str] = None
+
+
+class InvestorAnalyzeRequest(BaseModel):
+    answers: Dict[str, Any] = Field(default_factory=dict)
+    natural_language_note: Optional[str] = None
+
+
+class InvestorAnalyzeResponse(BaseModel):
+    investor_summary: str
+    extracted_preferences: Dict[str, Any] = Field(default_factory=dict)
+    detected_conflicts: List[str] = Field(default_factory=list)
+    follow_up_questions: List[str] = Field(default_factory=list)
+    terminology_notes: List[str] = Field(default_factory=list)
+    proposed_mandate: Dict[str, Any] = Field(default_factory=dict)
+    suitability_disclaimer: str
+
+
+class InvestorOnboardingSubmitRequest(BaseModel):
+    answers: Dict[str, Any]
+    confirmed_mandate: Dict[str, Any] = Field(default_factory=dict)
+    ai_summary: Optional[str] = None
 
 
 # --- AI Chat Assistant Schemas ---

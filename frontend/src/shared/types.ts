@@ -220,17 +220,128 @@ export interface Message {
   timestamp: string;
 }
 
+export interface OnboardingOption {
+  value: string;
+  label: string;
+  hint?: string;
+}
+
 export interface OnboardingQuestion {
   id: string;
   section: string;
+  stage: 'founder_discovery' | 'venture_story' | string;
+  category: 'background' | 'experience' | 'vision' | 'funding_intent' | 'expectations' | string;
+  ui_control_type:
+    | 'tap_cards'
+    | 'multi_tap_cards'
+    | 'ab_binary'
+    | 'numeric_presets'
+    | 'conditional_collateral_slider'
+    | string;
+  is_v1_essential: boolean;
   question_key: string;
   label: string;
   description?: string | null;
-  question_type: 'TEXT' | 'TEXTAREA' | 'NUMBER' | 'SELECT' | 'MULTISELECT' | 'CURRENCY' | string;
-  options?: string[] | null;
+  question_type: string;
+  options?: Array<OnboardingOption | string> | null;
   placeholder?: string | null;
   is_mandatory: boolean;
   order: number;
+}
+
+export interface FounderProfile {
+  id: string;
+  founder_id: string;
+  full_name?: string | null;
+  email?: string | null;
+  title?: string | null;
+  firm_or_company?: string | null;
+  bio?: string | null;
+  avatar_url?: string | null;
+  role_archetype?: string | null;
+  experience_years?: string | null;
+  core_expertise: string[];
+  continuity_backup_plan?: string | null;
+  past_resilience_verified: boolean;
+  three_year_goal?: string | null;
+  biggest_bottleneck?: string | null;
+  investor_involvement_pref?: string | null;
+  update_cadence?: string | null;
+  ai_summary?: string | null;
+  raw_discovery_answers: Record<string, any>;
+}
+
+export interface OnboardingAnalysisResult {
+  founder_summary: string;
+  ticket_guardrail?: {
+    triggered: boolean;
+    min_amount: number;
+    entered_amount: number;
+    title: string;
+    message: string;
+  } | null;
+  value_discovery_tips: string[];
+  reality_check_chips: string[];
+  detected_conflicts: string[];
+  prefilled_story_blocks: {
+    capital_target?: number;
+    proposed_arrangement?: string;
+    use_of_funds_summary?: string;
+    founder_bio_summary?: string;
+    continuity_note?: string;
+    collateral_type?: string;
+    offered_return_rate?: number;
+    investor_involvement?: string;
+    update_cadence?: string;
+    three_year_goal?: string;
+  };
+}
+
+export interface InvestorProfile {
+  id: string;
+  investor_id: string;
+  full_name?: string | null;
+  email?: string | null;
+  title?: string | null;
+  firm_or_company?: string | null;
+  bio?: string | null;
+  investor_type?: string | null;
+  investing_capacity_type?: string | null;
+  professional_background: string[];
+  past_private_investments?: boolean | null;
+  experience_level?: string | null;
+  prior_structures_used: string[];
+  evaluation_priorities: string[];
+  primary_objective?: string | null;
+  risk_tolerance_level?: string | null;
+  risk_clarifications: Record<string, any>;
+  expected_evidence: string[];
+  onboarding_completed: boolean;
+  ai_summary?: string | null;
+  raw_discovery_answers: Record<string, any>;
+}
+
+export interface InvestorAnalysisResult {
+  investor_summary: string;
+  extracted_preferences: Record<string, any>;
+  detected_conflicts: string[];
+  follow_up_questions: string[];
+  terminology_notes: string[];
+  proposed_mandate: {
+    target_sectors?: string[];
+    mandatory_sectors?: string[];
+    target_stages?: string[];
+    locations?: string[];
+    ticket_min?: number;
+    ticket_max?: number;
+    accepted_arrangements?: string[];
+    mandatory_arrangements?: string[];
+    time_horizon?: string;
+    desired_involvement?: string;
+    willing_to_follow_up?: string;
+    thesis_summary?: string;
+  };
+  suitability_disclaimer: string;
 }
 
 export interface AIChatMessage {

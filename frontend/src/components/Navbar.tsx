@@ -169,6 +169,14 @@ export const Navbar: React.FC<NavbarProps> = ({
 
             <button
               type="button"
+              onClick={() => onNavigate('INVESTOR_ONBOARDING')}
+              className={`nv-nav-link nv-nav-focus ${activeTab === 'INVESTOR_ONBOARDING' ? 'active' : ''}`}
+            >
+              Investor Discovery
+            </button>
+
+            <button
+              type="button"
               onClick={() => onNavigate('MESSAGES')}
               className={`nv-nav-link nv-nav-focus ${activeTab === 'MESSAGES' ? 'active' : ''}`}
             >
@@ -457,8 +465,35 @@ export const Navbar: React.FC<NavbarProps> = ({
                     </div>
                   </div>
 
-                  {/* Sign Out Action */}
+                  {/* Profile & Sign Out Actions */}
                   <div style={{ padding: '6px' }}>
+                    <button
+                      type="button"
+                      role="menuitem"
+                      onClick={() => {
+                        setAccountMenuOpen(false);
+                        onNavigate('INVESTOR_PROFILE');
+                      }}
+                      className="nv-nav-focus"
+                      style={{
+                        width: '100%',
+                        textAlign: 'left',
+                        padding: '9px 12px',
+                        background: 'none',
+                        border: 'none',
+                        fontSize: '13px',
+                        fontWeight: 600,
+                        color: '#121a29',
+                        cursor: 'pointer',
+                        borderRadius: '4px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '8px',
+                      }}
+                    >
+                      <span>👤</span>
+                      <span>Investor Profile</span>
+                    </button>
                     <button
                       type="button"
                       role="menuitem"
@@ -788,13 +823,13 @@ export const Navbar: React.FC<NavbarProps> = ({
     >
       <div
         style={{
-          maxWidth: '1240px',
+          maxWidth: '1360px',
           margin: '0 auto',
-          padding: '12px 24px',
+          padding: '10px 20px',
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center',
-          gap: '16px',
+          gap: '12px',
           flexWrap: 'wrap',
         }}
       >
@@ -915,32 +950,50 @@ export const Navbar: React.FC<NavbarProps> = ({
               <button
                 onClick={() => onNavigate('FOUNDER_DASHBOARD')}
                 style={{
-                  padding: '6px 12px',
+                  padding: '6px 10px',
                   border: 'none',
                   background: 'none',
-                  fontSize: '13.5px',
+                  fontSize: '13px',
                   fontWeight: activeTab === 'FOUNDER_DASHBOARD' ? 600 : 500,
                   color: activeTab === 'FOUNDER_DASHBOARD' ? '#0c1826' : '#4c5262',
                   cursor: 'pointer',
+                  whiteSpace: 'nowrap',
                   borderBottom: activeTab === 'FOUNDER_DASHBOARD' ? '2px solid #7a5c2e' : '2px solid transparent',
                   display: 'flex',
                   alignItems: 'center',
-                  gap: '6px',
+                  gap: '5px',
                 }}
               >
                 <span style={{ fontSize: '12px' }}>🏢</span>
-                <span>Founder Dashboard</span>
+                <span>Dashboard</span>
+              </button>
+              <button
+                onClick={() => onNavigate('ONBOARDING')}
+                style={{
+                  padding: '6px 10px',
+                  border: 'none',
+                  background: 'none',
+                  fontSize: '13px',
+                  fontWeight: activeTab === 'ONBOARDING' ? 600 : 500,
+                  color: activeTab === 'ONBOARDING' ? '#0c1826' : '#4c5262',
+                  cursor: 'pointer',
+                  whiteSpace: 'nowrap',
+                  borderBottom: activeTab === 'ONBOARDING' ? '2px solid #7a5c2e' : '2px solid transparent',
+                }}
+              >
+                Discovery Onboarding
               </button>
               <button
                 onClick={() => onNavigate('FOUNDER_JOURNEY')}
                 style={{
-                  padding: '6px 12px',
+                  padding: '6px 10px',
                   border: 'none',
                   background: 'none',
-                  fontSize: '13.5px',
+                  fontSize: '13px',
                   fontWeight: activeTab === 'FOUNDER_JOURNEY' ? 600 : 500,
                   color: activeTab === 'FOUNDER_JOURNEY' ? '#0c1826' : '#4c5262',
                   cursor: 'pointer',
+                  whiteSpace: 'nowrap',
                   borderBottom: activeTab === 'FOUNDER_JOURNEY' ? '2px solid #7a5c2e' : '2px solid transparent',
                 }}
               >
@@ -1172,12 +1225,33 @@ export const Navbar: React.FC<NavbarProps> = ({
           </div>
 
           {currentUser ? (
-            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-              <div style={{ textAlign: 'right' }}>
-                <div style={{ fontSize: '13px', fontWeight: 600, color: '#121a29' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexShrink: 0 }}>
+              <button
+                type="button"
+                onClick={() => {
+                  if (currentUser.role === 'FOUNDER') {
+                    onNavigate('FOUNDER_PROFILE');
+                  } else if (currentUser.role === 'INVESTOR') {
+                    onNavigate('INVESTOR_DISCOVERY');
+                  } else if (currentUser.role === 'REVIEWER') {
+                    onNavigate('PLATFORM_REVIEW');
+                  }
+                }}
+                title={currentUser.role === 'FOUNDER' ? 'Open Founder Profile' : 'Open Dashboard'}
+                style={{
+                  textAlign: 'right',
+                  background: activeTab === 'FOUNDER_PROFILE' ? '#f5efe5' : 'transparent',
+                  border: activeTab === 'FOUNDER_PROFILE' ? '1px solid #c5b59b' : '1px solid transparent',
+                  borderRadius: '6px',
+                  padding: '4px 10px',
+                  cursor: 'pointer',
+                  transition: 'background-color 0.15s ease',
+                }}
+              >
+                <div style={{ fontSize: '13px', fontWeight: 600, color: '#121a29', whiteSpace: 'nowrap' }}>
                   {currentUser.full_name}
                 </div>
-                <div style={{ fontSize: '11px', color: '#7a5c2e', display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '4px' }}>
+                <div style={{ fontSize: '11px', color: '#7a5c2e', display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '4px', whiteSpace: 'nowrap' }}>
                   <span
                     style={{
                       display: 'inline-block',
@@ -1190,7 +1264,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                   {currentUser.role.charAt(0) + currentUser.role.slice(1).toLowerCase()}
                   {currentUser.firm_or_company ? ` • ${currentUser.firm_or_company}` : ''}
                 </div>
-              </div>
+              </button>
 
               <button
                 onClick={handleLogout}

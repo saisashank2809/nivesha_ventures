@@ -7,6 +7,10 @@ import {
   Connection,
   Message,
   OnboardingQuestion,
+  FounderProfile,
+  OnboardingAnalysisResult,
+  InvestorProfile,
+  InvestorAnalysisResult,
   AIChatResponse,
   AIChatMessage,
   MatchCase,
@@ -323,15 +327,78 @@ export class Api {
     });
   }
 
-  // Onboarding Questions
-  public static async getOnboardingQuestions(): Promise<OnboardingQuestion[]> {
-    return this.request<OnboardingQuestion[]>('/onboarding/questions');
+  // Onboarding Questions & Founder Discovery
+  public static async getOnboardingQuestions(
+    v1Only: boolean = true,
+    stage: 'founder_discovery' | 'investor_discovery' = 'founder_discovery'
+  ): Promise<OnboardingQuestion[]> {
+    return this.request<OnboardingQuestion[]>(`/onboarding/questions?v1_only=${v1Only}&stage=${stage}`);
   }
 
-  public static async submitOnboardingAnswers(answers: Record<string, any>): Promise<any> {
-    return this.request<any>('/onboarding/submit', {
+  // Investor Onboarding & Profile
+  public static async analyzeInvestorOnboarding(
+    answers: Record<string, any>,
+    naturalLanguageNote?: string
+  ): Promise<InvestorAnalysisResult> {
+    return this.request<InvestorAnalysisResult>('/mandates/onboarding/analyze', {
+      method: 'POST',
+      body: JSON.stringify({ answers, natural_language_note: naturalLanguageNote }),
+    });
+  }
+
+  public static async submitInvestorOnboarding(
+    answers: Record<string, any>,
+    confirmedMandate: Record<string, any>,
+    aiSummary?: string
+  ): Promise<{ status: string; investor_profile: InvestorProfile; mandate: InvestorMandate }> {
+    return this.request('/mandates/onboarding/submit', {
+      method: 'POST',
+      body: JSON.stringify({ answers, confirmed_mandate: confirmedMandate, ai_summary: aiSummary }),
+    });
+  }
+
+  public static async getInvestorProfile(): Promise<InvestorProfile> {
+    return this.request<InvestorProfile>('/mandates/investor-profile');
+  }
+
+  public static async updateInvestorProfile(
+    data: Partial<InvestorProfile>
+  ): Promise<InvestorProfile> {
+    return this.request<InvestorProfile>('/mandates/investor-profile', {
+      method: 'PATCH',
+      body: JSON.stringify(data),
+    });
+  }
+
+  public static async getFounderProfile(): Promise<FounderProfile> {
+    return this.request<FounderProfile>('/onboarding/founder-profile');
+  }
+
+  public static async updateFounderProfile(
+    data: Partial<FounderProfile>
+  ): Promise<FounderProfile> {
+    return this.request<FounderProfile>('/onboarding/founder-profile', {
+      method: 'PATCH',
+      body: JSON.stringify(data),
+    });
+  }
+
+  public static async analyzeOnboardingAnswers(
+    answers: Record<string, any>
+  ): Promise<OnboardingAnalysisResult> {
+    return this.request<OnboardingAnalysisResult>('/onboarding/analyze', {
       method: 'POST',
       body: JSON.stringify({ answers }),
+    });
+  }
+
+  public static async submitOnboardingAnswers(
+    answers: Record<string, any>,
+    aiSummary?: string
+  ): Promise<any> {
+    return this.request<any>('/onboarding/submit', {
+      method: 'POST',
+      body: JSON.stringify({ answers, ai_summary: aiSummary }),
     });
   }
 

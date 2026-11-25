@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { VentureDetail, User, TenSections, VentureCard as IVentureCard } from '../../shared/types';
+import { VentureDetail, User, TenSections, VentureCard as IVentureCard, OnboardingAnalysisResult } from '../../shared/types';
 import { Api } from '../../shared/api';
 import { formatINR } from '../../shared/formatters';
 import { VentureDetailModal } from '../../components/VentureDetailModal';
@@ -7,6 +7,10 @@ import { VentureCard } from '../../components/VentureCard';
 
 interface FounderGuidedJourneyProps {
   currentUser: User | null;
+  initialDiscovery?: {
+    answers: Record<string, any>;
+    analysis: OnboardingAnalysisResult;
+  } | null;
   onComplete: () => void;
   onCancel: () => void;
   onOpenLogin: () => void;
@@ -42,6 +46,7 @@ export type ArrangementType =
 
 export const FounderGuidedJourney: React.FC<FounderGuidedJourneyProps> = ({
   currentUser,
+  initialDiscovery,
   onComplete,
   onCancel,
   onOpenLogin,
@@ -247,7 +252,29 @@ export const FounderGuidedJourney: React.FC<FounderGuidedJourneyProps> = ({
   };
 
   useEffect(() => {
+    const applyPrefill = (prefilled: OnboardingAnalysisResult['prefilled_story_blocks'] | undefined) => {
+      if (!prefilled) return;
+      if (prefilled.capital_target) {
+        setCapitalTarget(prefilled.capital_target);
+        setTicketMin(Math.max(1000000, Math.round(prefilled.capital_target * 0.25)));
+        setTicketMax(prefilled.capital_target);
+      }
+      if (prefilled.proposed_arrangement) {
+        setProposedArrangement(prefilled.proposed_arrangement as ArrangementType);
+      }
+      if (prefilled.use_of_funds_summary) {
+        setItemizedBudget(prefilled.use_of_funds_summary);
+      }
+      if (prefilled.collateral_type && prefilled.offered_return_rate) {
+        setDebtInterestRate(`${prefilled.offered_return_rate}% annual target yield`);
+        setCollateralDetails(`Backed by ${prefilled.collateral_type}. ${prefilled.continuity_note || ''}`);
+      }
+    };
+
     const loadCurrentVenture = async () => {
+      if (initialDiscovery?.analysis?.prefilled_story_blocks) {
+        applyPrefill(initialDiscovery.analysis.prefilled_story_blocks);
+      }
       if (!currentUser) {
         setLoading(false);
         return;
@@ -262,6 +289,10 @@ export const FounderGuidedJourney: React.FC<FounderGuidedJourneyProps> = ({
           if (v.ticket_min) setTicketMin(v.ticket_min);
           if (v.ticket_max) setTicketMax(v.ticket_max);
           if (v.hero_image_url) setHeroImageUrl(v.hero_image_url);
+          if (v.proposed_arrangement) setProposedArrangement(v.proposed_arrangement as ArrangementType);
+          if (v.growth_plan?.use_of_funds && Array.isArray(v.growth_plan.use_of_funds) && v.growth_plan.use_of_funds.length > 0) {
+            setItemizedBudget(`Primary allocation: ${v.growth_plan.use_of_funds.join(', ')}`);
+          }
         }
       } catch {
         // First-time founder or no venture saved yet
@@ -270,7 +301,7 @@ export const FounderGuidedJourney: React.FC<FounderGuidedJourneyProps> = ({
       }
     };
     loadCurrentVenture();
-  }, [currentUser]);
+  }, [currentUser, initialDiscovery]);
 
   // Generate the unified 10 standardized presentation sections
   const assembleTenSections = (): TenSections => {

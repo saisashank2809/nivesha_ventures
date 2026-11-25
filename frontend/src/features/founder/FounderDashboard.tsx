@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import { VentureDetail, User, Connection } from '../../shared/types';
+import { VentureDetail, User, Connection, FounderProfile } from '../../shared/types';
 import { Api } from '../../shared/api';
 import { formatINR } from '../../shared/formatters';
 import { VentureDetailModal } from '../../components/VentureDetailModal';
 
 interface FounderDashboardProps {
   currentUser: User | null;
+  initialTab?: 'SECTIONS' | 'PROFILE' | 'CONNECTIONS' | 'EVIDENCE' | 'DISCOVERY' | 'FOUNDER_PROFILE';
   onOpenBuilder: () => void;
+  onOpenOnboarding?: () => void;
   onOpenChat: (connectionId: string) => void;
   onOpenLogin: () => void;
   onSelectVenture?: (ventureId: string) => void;
@@ -22,17 +24,36 @@ interface CustomSectionItem {
 
 export const FounderDashboard: React.FC<FounderDashboardProps> = ({
   currentUser,
+  initialTab,
   onOpenBuilder,
+  onOpenOnboarding,
   onOpenChat,
   onOpenLogin,
 }) => {
   const [venture, setVenture] = useState<VentureDetail | null>(null);
+  const [founderProfile, setFounderProfile] = useState<FounderProfile | null>(null);
   const [connections, setConnections] = useState<Connection[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [toastMsg, setToastMsg] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState<'SECTIONS' | 'PROFILE' | 'CONNECTIONS' | 'EVIDENCE'>('SECTIONS');
+  const [activeTab, setActiveTab] = useState<'SECTIONS' | 'PROFILE' | 'CONNECTIONS' | 'EVIDENCE' | 'DISCOVERY' | 'FOUNDER_PROFILE'>(initialTab || 'SECTIONS');
   const [previewModalOpen, setPreviewModalOpen] = useState(false);
+
+  // Founder Profile Edit State
+  const [fpFullName, setFpFullName] = useState(currentUser?.full_name || '');
+  const [fpTitle, setFpTitle] = useState(currentUser?.title || '');
+  const [fpFirm, setFpFirm] = useState(currentUser?.firm_or_company || '');
+  const [fpBio, setFpBio] = useState(currentUser?.bio || '');
+  const [fpAvatarUrl, setFpAvatarUrl] = useState(currentUser?.avatar_url || '');
+  const [fpRoleArchetype, setFpRoleArchetype] = useState('');
+  const [fpExperienceYears, setFpExperienceYears] = useState('');
+  const [fpCoreExpertise, setFpCoreExpertise] = useState('');
+  const [fpContinuityPlan, setFpContinuityPlan] = useState('');
+  const [fpThreeYearGoal, setFpThreeYearGoal] = useState('');
+  const [fpBottleneck, setFpBottleneck] = useState('');
+  const [fpInvestorStyle, setFpInvestorStyle] = useState('');
+  const [fpUpdateCadence, setFpUpdateCadence] = useState('');
+  const [fpAiSummary, setFpAiSummary] = useState('');
 
   // Edit Venture Deal Terms State
   const [companyName, setCompanyName] = useState('');
@@ -89,12 +110,29 @@ export const FounderDashboard: React.FC<FounderDashboardProps> = ({
   const loadData = async () => {
     try {
       setLoading(true);
-      const [v, conns] = await Promise.all([
+      const [v, conns, fp] = await Promise.all([
         Api.getMyVenture(),
         Api.getConnections().catch(() => []),
+        Api.getFounderProfile().catch(() => null),
       ]);
       setVenture(v);
       setConnections(conns);
+      setFounderProfile(fp);
+
+      setFpFullName(fp?.full_name || currentUser?.full_name || '');
+      setFpTitle(fp?.title ?? currentUser?.title ?? '');
+      setFpFirm(fp?.firm_or_company ?? currentUser?.firm_or_company ?? '');
+      setFpBio(fp?.bio ?? currentUser?.bio ?? '');
+      setFpAvatarUrl(fp?.avatar_url ?? currentUser?.avatar_url ?? '');
+      setFpRoleArchetype(fp?.role_archetype || '');
+      setFpExperienceYears(fp?.experience_years || '');
+      setFpCoreExpertise((fp?.core_expertise || []).join(', '));
+      setFpContinuityPlan(fp?.continuity_backup_plan || '');
+      setFpThreeYearGoal(fp?.three_year_goal || '');
+      setFpBottleneck(fp?.biggest_bottleneck || '');
+      setFpInvestorStyle(fp?.investor_involvement_pref || '');
+      setFpUpdateCadence(fp?.update_cadence || '');
+      setFpAiSummary(fp?.ai_summary || '');
 
       if (v) {
         setCompanyName(v.company_name || '');
@@ -144,6 +182,12 @@ export const FounderDashboard: React.FC<FounderDashboardProps> = ({
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    if (initialTab) {
+      setActiveTab(initialTab);
+    }
+  }, [initialTab]);
 
   useEffect(() => {
     if (currentUser?.role === 'FOUNDER') {
@@ -336,20 +380,38 @@ export const FounderDashboard: React.FC<FounderDashboardProps> = ({
         <p style={{ fontSize: '14.5px', color: '#4c5262', marginBottom: '24px' }}>
           Your founder account is ready. Build your complete 10-section dossier using our guided builder.
         </p>
-        <button
-          onClick={onOpenBuilder}
-          style={{
-            padding: '12px 26px',
-            backgroundColor: '#0c1826',
-            color: '#f5efe5',
-            fontWeight: 600,
-            fontSize: '14.5px',
-            border: 'none',
-            cursor: 'pointer',
-          }}
-        >
-          🚀 Launch Venture Story Builder →
-        </button>
+        <div style={{ display: 'flex', gap: '12px', justifyContent: 'center', flexWrap: 'wrap' }}>
+          {onOpenOnboarding && (
+            <button
+              onClick={onOpenOnboarding}
+              style={{
+                padding: '12px 26px',
+                backgroundColor: '#7a5c2e',
+                color: '#ffffff',
+                fontWeight: 600,
+                fontSize: '14.5px',
+                border: 'none',
+                cursor: 'pointer',
+              }}
+            >
+              12-Step Discovery Onboarding &rarr;
+            </button>
+          )}
+          <button
+            onClick={onOpenBuilder}
+            style={{
+              padding: '12px 26px',
+              backgroundColor: '#0c1826',
+              color: '#f5efe5',
+              fontWeight: 600,
+              fontSize: '14.5px',
+              border: 'none',
+              cursor: 'pointer',
+            }}
+          >
+            🚀 Launch Venture Story Builder →
+          </button>
+        </div>
       </div>
     );
   }
@@ -467,6 +529,27 @@ export const FounderDashboard: React.FC<FounderDashboardProps> = ({
           >
             <span>👁️</span> Live Investor Preview
           </button>
+
+          {onOpenOnboarding && (
+            <button
+              type="button"
+              onClick={onOpenOnboarding}
+              style={{
+                padding: '9px 16px',
+                backgroundColor: '#7a5c2e',
+                color: '#ffffff',
+                border: 'none',
+                fontSize: '13px',
+                fontWeight: 600,
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '6px',
+              }}
+            >
+              Discovery Onboarding
+            </button>
+          )}
 
           <button
             type="button"
@@ -614,6 +697,46 @@ export const FounderDashboard: React.FC<FounderDashboardProps> = ({
           }}
         >
           <span>📑</span> Evidence Checklist ({evidenceItems.length})
+        </button>
+
+        <button
+          type="button"
+          onClick={() => setActiveTab('DISCOVERY')}
+          style={{
+            padding: '12px 20px',
+            border: 'none',
+            background: 'none',
+            fontSize: '14px',
+            fontWeight: activeTab === 'DISCOVERY' ? 700 : 500,
+            color: activeTab === 'DISCOVERY' ? '#0c1826' : '#4c5262',
+            cursor: 'pointer',
+            borderBottom: activeTab === 'DISCOVERY' ? '3px solid #7a5c2e' : '3px solid transparent',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px',
+          }}
+        >
+          <span>🧭</span> Discovery Answers (12)
+        </button>
+
+        <button
+          type="button"
+          onClick={() => setActiveTab('FOUNDER_PROFILE')}
+          style={{
+            padding: '12px 20px',
+            border: 'none',
+            background: 'none',
+            fontSize: '14px',
+            fontWeight: activeTab === 'FOUNDER_PROFILE' ? 700 : 500,
+            color: activeTab === 'FOUNDER_PROFILE' ? '#0c1826' : '#4c5262',
+            cursor: 'pointer',
+            borderBottom: activeTab === 'FOUNDER_PROFILE' ? '3px solid #7a5c2e' : '3px solid transparent',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px',
+          }}
+        >
+          <span>👤</span> Founder Profile
         </button>
       </div>
 
@@ -1485,6 +1608,212 @@ export const FounderDashboard: React.FC<FounderDashboardProps> = ({
             ))}
           </div>
         </div>
+      )}
+
+      {/* TAB 5: FOUNDER DISCOVERY (12 QUESTIONS ANSWERS) */}
+      {activeTab === 'DISCOVERY' && (() => {
+        const rawAnswers = {
+          ...(venture.custom_answers || {}),
+          ...(founderProfile?.raw_discovery_answers || {}),
+        };
+        const discoveryRows = [
+          { num: '01', category: 'Background', question: 'What best describes your current role?', value: rawAnswers.role_archetype || founderProfile?.role_archetype },
+          { num: '02', category: 'Background', question: 'Years of hands-on experience in this domain?', value: rawAnswers.experience_years || founderProfile?.experience_years },
+          { num: '03', category: 'Experience', question: 'What is your strongest execution capability?', value: Array.isArray(rawAnswers.core_expertise) ? rawAnswers.core_expertise.join(', ') : (founderProfile?.core_expertise?.join(', ') || rawAnswers.core_expertise) },
+          { num: '04', category: 'Experience · Risk Check', question: 'Who takes over operations if you are unavailable for 3–6 months?', value: rawAnswers.continuity_backup_plan || founderProfile?.continuity_backup_plan },
+          { num: '05', category: 'Vision', question: 'Primary goal for the next 3 years?', value: rawAnswers.three_year_goal || founderProfile?.three_year_goal },
+          { num: '06', category: 'Vision', question: 'What is your biggest current bottleneck?', value: rawAnswers.biggest_bottleneck || founderProfile?.biggest_bottleneck },
+          { num: '07', category: 'Funding', question: 'How much capital are you seeking?', value: rawAnswers.capital_target ? formatINR(Number(rawAnswers.capital_target)) : formatINR(venture.capital_target) },
+          { num: '08', category: 'Funding', question: 'Primary use of this capital?', value: Array.isArray(rawAnswers.capital_use) ? rawAnswers.capital_use.join(', ') : rawAnswers.capital_use },
+          { num: '09', category: 'Deal Structure', question: 'Which funding arrangement do you prefer?', value: rawAnswers.proposed_arrangement || venture.proposed_arrangement },
+          { num: '10', category: 'Value Check', question: 'Collateral & target annual return offered', value: `${rawAnswers.collateral_type || venture.arrangement_details?.collateral_type || 'Unsecured'} · ${rawAnswers.offered_return_rate ?? venture.arrangement_details?.offered_return_rate ?? 14}% p.a.` },
+          { num: '11', category: 'Expectations', question: 'What investor style fits you best?', value: rawAnswers.investor_involvement_pref || founderProfile?.investor_involvement_pref },
+          { num: '12', category: 'Expectations', question: 'How often can you share updates/payouts?', value: rawAnswers.update_cadence || founderProfile?.update_cadence },
+        ];
+
+        return (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', backgroundColor: '#fffdf9', border: '1px solid #d6c9b2', padding: '18px 22px', flexWrap: 'wrap', gap: '12px' }}>
+              <div>
+                <h3 style={{ margin: 0, fontSize: '18px', color: '#121a29' }}>Saved Founder Discovery Profile (12 Questions)</h3>
+                <p style={{ margin: '4px 0 0', fontSize: '13px', color: '#4c5262' }}>
+                  These founder-level and deal-intent answers are saved to your profile and reused across your ventures.
+                </p>
+              </div>
+              {onOpenOnboarding && (
+                <button
+                  type="button"
+                  onClick={onOpenOnboarding}
+                  style={{
+                    padding: '9px 18px',
+                    backgroundColor: '#7a5c2e',
+                    color: '#ffffff',
+                    border: 'none',
+                    fontSize: '13px',
+                    fontWeight: 600,
+                    cursor: 'pointer',
+                  }}
+                >
+                  Edit 12-Step Answers &rarr;
+                </button>
+              )}
+            </div>
+
+            {founderProfile?.ai_summary && (
+              <div style={{ backgroundColor: '#f8fafc', border: '1px solid #cbd5e1', borderLeft: '4px solid #7a5c2e', padding: '16px 20px', fontSize: '14px', color: '#121a29', lineHeight: 1.6 }}>
+                <div style={{ fontSize: '11px', fontWeight: 700, color: '#7a5c2e', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '6px' }}>
+                  AI Co-Pilot Profile Synthesis
+                </div>
+                {founderProfile.ai_summary}
+              </div>
+            )}
+
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(340px, 1fr))', gap: '14px' }}>
+              {discoveryRows.map((row) => (
+                <div key={row.num} style={{ backgroundColor: '#fffdf9', border: '1px solid #d6c9b2', padding: '16px 18px' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
+                    <span style={{ fontSize: '11px', fontWeight: 700, color: '#7a5c2e', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+                      {row.num} · {row.category}
+                    </span>
+                  </div>
+                  <div style={{ fontSize: '13px', color: '#4c5262', marginBottom: '8px' }}>{row.question}</div>
+                  <div style={{ fontSize: '15px', fontWeight: 600, color: '#121a29' }}>
+                    {row.value ? String(row.value) : <span style={{ color: '#9ca3af', fontWeight: 400 }}>Not answered yet</span>}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        );
+      })()}
+
+      {/* TAB 6: FOUNDER PROFILE EDIT SECTION */}
+      {activeTab === 'FOUNDER_PROFILE' && (
+        <form
+          onSubmit={async (e) => {
+            e.preventDefault();
+            try {
+              setSaving(true);
+              const updated = await Api.updateFounderProfile({
+                full_name: fpFullName,
+                title: fpTitle,
+                firm_or_company: fpFirm,
+                bio: fpBio,
+                avatar_url: fpAvatarUrl,
+                role_archetype: fpRoleArchetype,
+                experience_years: fpExperienceYears,
+                core_expertise: fpCoreExpertise
+                  .split(',')
+                  .map((s) => s.trim())
+                  .filter(Boolean),
+                continuity_backup_plan: fpContinuityPlan,
+                three_year_goal: fpThreeYearGoal,
+                biggest_bottleneck: fpBottleneck,
+                investor_involvement_pref: fpInvestorStyle,
+                update_cadence: fpUpdateCadence,
+              });
+              setFounderProfile(updated);
+              if (currentUser) {
+                Api.setCurrentUser({
+                  ...currentUser,
+                  full_name: updated.full_name || currentUser.full_name,
+                  title: updated.title ?? currentUser.title,
+                  firm_or_company: updated.firm_or_company ?? currentUser.firm_or_company,
+                  bio: updated.bio ?? currentUser.bio,
+                  avatar_url: updated.avatar_url ?? currentUser.avatar_url,
+                });
+              }
+              showToast('Founder profile updated successfully!');
+            } catch (err: any) {
+              alert(`Failed to update founder profile: ${err.message}`);
+            } finally {
+              setSaving(false);
+            }
+          }}
+          style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}
+        >
+          {/* Section A: Founder Identity & Bio */}
+          <div style={{ backgroundColor: '#fffdf9', border: '1px solid #d6c9b2', padding: '28px' }}>
+            <h3 style={{ margin: '0 0 18px', fontSize: '18px', color: '#121a29' }}>1. Basic Details</h3>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '16px', marginBottom: '16px' }}>
+              <div>
+                <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, color: '#4c5262', marginBottom: '6px' }}>Full Name</label>
+                <input type="text" value={fpFullName} onChange={(e) => setFpFullName(e.target.value)} required style={{ width: '100%', padding: '10px 12px', border: '1px solid #cbd5e1', borderRadius: '4px', boxSizing: 'border-box' }} />
+              </div>
+              <div>
+                <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, color: '#4c5262', marginBottom: '6px' }}>Title / Designation</label>
+                <input type="text" value={fpTitle} onChange={(e) => setFpTitle(e.target.value)} placeholder="e.g., Founder & Managing Director" style={{ width: '100%', padding: '10px 12px', border: '1px solid #cbd5e1', borderRadius: '4px', boxSizing: 'border-box' }} />
+              </div>
+              <div>
+                <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, color: '#4c5262', marginBottom: '6px' }}>Company / Firm</label>
+                <input type="text" value={fpFirm} onChange={(e) => setFpFirm(e.target.value)} style={{ width: '100%', padding: '10px 12px', border: '1px solid #cbd5e1', borderRadius: '4px', boxSizing: 'border-box' }} />
+              </div>
+              <div>
+                <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, color: '#4c5262', marginBottom: '6px' }}>Account Email (Read-Only)</label>
+                <input type="text" value={currentUser?.email || ''} disabled style={{ width: '100%', padding: '10px 12px', border: '1px solid #e2e8f0', backgroundColor: '#f1f5f9', color: '#64748b', borderRadius: '4px', boxSizing: 'border-box' }} />
+              </div>
+            </div>
+            <div>
+              <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, color: '#4c5262', marginBottom: '6px' }}>Founder Bio</label>
+              <textarea rows={3} value={fpBio} onChange={(e) => setFpBio(e.target.value)} placeholder="Summarize your operating background and track record..." style={{ width: '100%', padding: '10px 12px', border: '1px solid #cbd5e1', borderRadius: '4px', boxSizing: 'border-box' }} />
+            </div>
+          </div>
+
+          {/* Section B: Discovery & Continuity Profile */}
+          <div style={{ backgroundColor: '#fffdf9', border: '1px solid #d6c9b2', padding: '28px' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '18px', flexWrap: 'wrap', gap: '10px' }}>
+              <h3 style={{ margin: 0, fontSize: '18px', color: '#121a29' }}>2. Background &amp; Preferences</h3>
+              {onOpenOnboarding && (
+                <button type="button" onClick={onOpenOnboarding} style={{ padding: '7px 14px', backgroundColor: '#f5efe5', border: '1px solid #7a5c2e', color: '#7a5c2e', fontSize: '12.5px', fontWeight: 600, cursor: 'pointer' }}>
+                  Re-run 12-Step Kiosk &rarr;
+                </button>
+              )}
+            </div>
+
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '16px', marginBottom: '16px' }}>
+              <div>
+                <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, color: '#4c5262', marginBottom: '6px' }}>Current Role Archetype</label>
+                <input type="text" value={fpRoleArchetype} onChange={(e) => setFpRoleArchetype(e.target.value)} placeholder="e.g., Business owner" style={{ width: '100%', padding: '10px 12px', border: '1px solid #cbd5e1', borderRadius: '4px', boxSizing: 'border-box' }} />
+              </div>
+              <div>
+                <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, color: '#4c5262', marginBottom: '6px' }}>Domain Experience</label>
+                <input type="text" value={fpExperienceYears} onChange={(e) => setFpExperienceYears(e.target.value)} placeholder="e.g., 6-10 yrs" style={{ width: '100%', padding: '10px 12px', border: '1px solid #cbd5e1', borderRadius: '4px', boxSizing: 'border-box' }} />
+              </div>
+              <div>
+                <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, color: '#4c5262', marginBottom: '6px' }}>Core Expertise (comma-separated)</label>
+                <input type="text" value={fpCoreExpertise} onChange={(e) => setFpCoreExpertise(e.target.value)} placeholder="Operations, Sales/Distribution" style={{ width: '100%', padding: '10px 12px', border: '1px solid #cbd5e1', borderRadius: '4px', boxSizing: 'border-box' }} />
+              </div>
+              <div>
+                <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, color: '#4c5262', marginBottom: '6px' }}>3–6 Month Continuity Backup Plan</label>
+                <input type="text" value={fpContinuityPlan} onChange={(e) => setFpContinuityPlan(e.target.value)} placeholder="e.g., Trained Manager / Co-founder" style={{ width: '100%', padding: '10px 12px', border: '1px solid #cbd5e1', borderRadius: '4px', boxSizing: 'border-box' }} />
+              </div>
+              <div>
+                <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, color: '#4c5262', marginBottom: '6px' }}>3-Year Primary Goal</label>
+                <input type="text" value={fpThreeYearGoal} onChange={(e) => setFpThreeYearGoal(e.target.value)} placeholder="e.g., Scale capacity" style={{ width: '100%', padding: '10px 12px', border: '1px solid #cbd5e1', borderRadius: '4px', boxSizing: 'border-box' }} />
+              </div>
+              <div>
+                <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, color: '#4c5262', marginBottom: '6px' }}>Biggest Current Bottleneck</label>
+                <input type="text" value={fpBottleneck} onChange={(e) => setFpBottleneck(e.target.value)} placeholder="e.g., Insufficient capital" style={{ width: '100%', padding: '10px 12px', border: '1px solid #cbd5e1', borderRadius: '4px', boxSizing: 'border-box' }} />
+              </div>
+              <div>
+                <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, color: '#4c5262', marginBottom: '6px' }}>Preferred Investor Style</label>
+                <input type="text" value={fpInvestorStyle} onChange={(e) => setFpInvestorStyle(e.target.value)} placeholder="Silent Financial Partner / Active Mentor" style={{ width: '100%', padding: '10px 12px', border: '1px solid #cbd5e1', borderRadius: '4px', boxSizing: 'border-box' }} />
+              </div>
+              <div>
+                <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, color: '#4c5262', marginBottom: '6px' }}>Update / Payout Cadence</label>
+                <input type="text" value={fpUpdateCadence} onChange={(e) => setFpUpdateCadence(e.target.value)} placeholder="Monthly / Quarterly" style={{ width: '100%', padding: '10px 12px', border: '1px solid #cbd5e1', borderRadius: '4px', boxSizing: 'border-box' }} />
+              </div>
+            </div>
+
+            <button
+              type="submit"
+              disabled={saving}
+              style={{ padding: '12px 26px', backgroundColor: '#0c1826', color: '#f5efe5', border: 'none', fontSize: '14px', fontWeight: 600, cursor: saving ? 'not-allowed' : 'pointer' }}
+            >
+              {saving ? 'Saving Founder Profile...' : 'Save Founder Profile Changes'}
+            </button>
+          </div>
+        </form>
       )}
 
       {/* Full-Screen Interactive Preview Modal */}
