@@ -358,7 +358,7 @@ export const InvestorGuidedDiscovery: React.FC<InvestorGuidedDiscoveryProps> = (
         <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px' }}>
           <div>
             <div className="eyebrow" style={{ marginBottom: '6px' }}>
-              VERIFIED OPPORTUNITIES
+              EXPLORE VENTURES
             </div>
             <h1
               style={{
@@ -640,10 +640,10 @@ export const InvestorGuidedDiscovery: React.FC<InvestorGuidedDiscoveryProps> = (
 
           const outcomeColor =
             outcome === 'POTENTIALLY_SUITABLE'
-              ? { bg: '#edf5ee', text: '#15803d', border: '#b8deb9', label: 'Potentially Suitable', icon: '●' }
+              ? { bg: '#edf5ee', text: '#15803d', border: '#b8deb9', label: 'Good Fit', icon: '●' }
               : outcome === 'UNSUITABLE'
-              ? { bg: '#fef2f2', text: '#b91c1c', border: '#fecaca', label: 'Mandatory Mismatch', icon: '✕' }
-              : { bg: '#fdf4e7', text: '#856127', border: '#ebd5b3', label: 'Needs Information', icon: '▲' };
+              ? { bg: '#fef2f2', text: '#b91c1c', border: '#fecaca', label: 'Not a Match', icon: '✕' }
+              : { bg: '#fdf4e7', text: '#856127', border: '#ebd5b3', label: 'Needs Info', icon: '▲' };
 
           const arrDetails = venture.arrangement_details || {};
           const tenSecs = getTenSections(venture);
@@ -833,8 +833,8 @@ export const InvestorGuidedDiscovery: React.FC<InvestorGuidedDiscoveryProps> = (
                       <p
                         style={{
                           fontSize: '13px',
-                          color: 'rgba(245, 245, 247, 0.85)',
-                          lineHeight: 1.45,
+                          color: 'rgba(245, 245, 247, 0.88)',
+                          lineHeight: 1.5,
                           margin: 0,
                           display: '-webkit-box',
                           WebkitLineClamp: 3,
@@ -845,71 +845,41 @@ export const InvestorGuidedDiscovery: React.FC<InvestorGuidedDiscoveryProps> = (
                         {venture.tag_line || venture.business_context}
                       </p>
                     </div>
-
-                    {/* Bottom Row: Stage & Arrangement Metadata */}
-                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
-                      <span
-                        style={{
-                          fontSize: '11px',
-                          fontWeight: 600,
-                          padding: '3px 9px',
-                          borderRadius: '6px',
-                          backgroundColor: 'rgba(255, 255, 255, 0.14)',
-                          border: '1px solid rgba(255, 255, 255, 0.2)',
-                          color: '#ffffff',
-                        }}
-                      >
-                        {venture.stage || 'Operating'}
-                      </span>
-                      <span
-                        style={{
-                          fontSize: '11px',
-                          fontWeight: 600,
-                          padding: '3px 9px',
-                          borderRadius: '6px',
-                          backgroundColor: 'rgba(0, 102, 204, 0.35)',
-                          border: '1px solid rgba(96, 165, 250, 0.4)',
-                          color: '#ffffff',
-                        }}
-                      >
-                        {formatReadableEnum(venture.proposed_arrangement)}
-                      </span>
-                    </div>
                   </div>
                 </div>
 
-                {/* 2. RIGHT FINANCIAL DECISION COCKPIT */}
+                {/* 2. RIGHT SIMPLE DEAL SUMMARY */}
                 <div className="nv-venture-cockpit">
-                  {/* Row 1: Deal Vitals (3 Columns) */}
+                  {/* Row 1: 3 Key Numbers in Plain Language */}
                   <div className="nv-vitals-grid">
                     <div>
-                      <div className="nv-vitals-label">Total Raise</div>
+                      <div className="nv-vitals-label">Money Needed</div>
                       <div className="nv-vitals-value">{totalRaise}</div>
-                      <div className="nv-vitals-subtext">Stage: {venture.stage || 'Operating'}</div>
+                      <div className="nv-vitals-subtext">{venture.stage || 'Operating'}</div>
                     </div>
                     <div className="nv-vitals-divider">
-                      <div className="nv-vitals-label">Ticket / Unit Size</div>
+                      <div className="nv-vitals-label">Min to Invest</div>
                       <div className="nv-vitals-value">{ticketOrUnit}</div>
-                      <div className="nv-vitals-subtext">Venture allocation per participant</div>
+                      <div className="nv-vitals-subtext">Per investor</div>
                     </div>
                     <div className="nv-vitals-divider">
-                      <div className="nv-vitals-label">Proposed Arrangement</div>
+                      <div className="nv-vitals-label">How You Earn</div>
                       <div className="nv-vitals-value">{arrangementName}</div>
                       <div
                         className="nv-vitals-subtext"
-                        style={{ color: rateOrReturn ? '#15803d' : '#685d4d', fontWeight: rateOrReturn ? 600 : 400 }}
+                        style={{ color: rateOrReturn ? '#15803d' : '#475569', fontWeight: rateOrReturn ? 600 : 400 }}
                       >
-                        {rateOrReturn ? `Terms: ${rateOrReturn}` : 'Terms disclosed in dossier'}
+                        {rateOrReturn ? `Return: ${rateOrReturn}` : 'See details for terms'}
                       </div>
                     </div>
                   </div>
 
-                  {/* Row 2: Comparative Operating Baseline & Expansion Target */}
+                  {/* Row 2: What They Earn Now vs What's Next */}
                   <div className="nv-comparative-strip">
                     <div>
                       <div className="nv-comparative-label-row">
                         <span style={{ fontSize: '10.5px', fontWeight: 700, color: '#0066cc', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                          Operating Baseline
+                          What They Earn Now
                         </span>
                         <span
                           style={{
@@ -933,20 +903,7 @@ export const InvestorGuidedDiscovery: React.FC<InvestorGuidedDiscoveryProps> = (
                     <div>
                       <div className="nv-comparative-label-row">
                         <span style={{ fontSize: '10.5px', fontWeight: 700, color: '#16a34a', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                          Expansion Target
-                        </span>
-                        <span
-                          style={{
-                            fontSize: '10px',
-                            fontWeight: 600,
-                            padding: '2px 7px',
-                            borderRadius: '5px',
-                            backgroundColor: '#ecfdf5',
-                            color: '#16a34a',
-                            border: '1px solid rgba(22, 163, 74, 0.2)',
-                          }}
-                        >
-                          Projection
+                          Growth Plan
                         </span>
                       </div>
                       <div style={{ fontSize: '13px', color: '#0f172a', lineHeight: 1.45 }}>
@@ -955,24 +912,23 @@ export const InvestorGuidedDiscovery: React.FC<InvestorGuidedDiscoveryProps> = (
                     </div>
                   </div>
 
-                  {/* Row 3: Mandate Alignment Strip */}
+                  {/* Row 3: Simple Fit Note */}
                   <div
                     style={{
                       backgroundColor: '#f5f5f7',
                       padding: '10px 14px',
                       borderRadius: '10px',
-                      border: '1px solid rgba(0, 0, 0, 0.05)',
                       fontSize: '12.5px',
                       lineHeight: 1.45,
                     }}
                   >
                     <div style={{ color: '#16a34a', fontWeight: 600 }}>
-                      Alignment: <span style={{ color: '#0f172a', fontWeight: 400 }}>{fitReason}</span>
+                      Why it fits: <span style={{ color: '#0f172a', fontWeight: 400 }}>{fitReason}</span>
                     </div>
 
                     {materialConcern && (
                       <div style={{ marginTop: '4px', color: hasMismatch ? '#dc2626' : '#b45309', fontWeight: 600 }}>
-                        {hasMismatch ? 'Mandatory Mismatch: ' : 'Consideration: '}
+                        {hasMismatch ? 'Mismatch: ' : 'Heads up: '}
                         <span style={{ color: hasMismatch ? '#dc2626' : '#475569', fontWeight: 400 }}>
                           {materialConcern}
                         </span>
@@ -994,7 +950,7 @@ export const InvestorGuidedDiscovery: React.FC<InvestorGuidedDiscoveryProps> = (
                             padding: 0,
                           }}
                         >
-                          {isReasonsOpen ? 'Hide full matching breakdown' : `View all ${matchCase.rule_results?.length || 7} matching factors`}
+                          {isReasonsOpen ? 'Hide match checks' : `See ${matchCase.rule_results?.length || 7} match checks`}
                         </button>
 
                         {isReasonsOpen && (
@@ -1067,7 +1023,7 @@ export const InvestorGuidedDiscovery: React.FC<InvestorGuidedDiscoveryProps> = (
                           padding: 0,
                         }}
                       >
-                        {isDossierOpen ? 'Hide Dossier' : '10-Pt Dossier'}
+                        {isDossierOpen ? 'Hide Summary' : '10-Point Summary'}
                       </button>
 
                       <button
@@ -1083,7 +1039,7 @@ export const InvestorGuidedDiscovery: React.FC<InvestorGuidedDiscoveryProps> = (
                           padding: 0,
                         }}
                       >
-                        {isDiligenceOpen ? 'Hide Audit' : 'Diligence Audit'}
+                        {isDiligenceOpen ? 'Hide Checks' : 'Document Checks'}
                       </button>
 
                       {gallery.length > 1 && (
@@ -1100,7 +1056,7 @@ export const InvestorGuidedDiscovery: React.FC<InvestorGuidedDiscoveryProps> = (
                             padding: 0,
                           }}
                         >
-                          {isGalleryOpen ? 'Hide Media' : `Gallery (${gallery.length})`}
+                          {isGalleryOpen ? 'Hide Photos' : `Photos (${gallery.length})`}
                         </button>
                       )}
                     </div>
@@ -1122,21 +1078,21 @@ export const InvestorGuidedDiscovery: React.FC<InvestorGuidedDiscoveryProps> = (
                             cursor: 'pointer',
                           }}
                         >
-                          Direct Messages
+                          Open Chat
                         </button>
                       ) : (
                         <button
                           type="button"
                           onClick={() => handleOpenDirectDM(venture)}
                           className="nv-link-chevron"
-                          style={{ fontSize: '13px' }}
+                          style={{ fontSize: '13px', color: '#0f172a', fontWeight: 600 }}
                         >
-                          <span>Direct Message</span>
+                          <span>Message Owner</span>
                           <span aria-hidden="true" style={{ fontSize: '15px', lineHeight: 1 }}>&rsaquo;</span>
                         </button>
                       )}
 
-                      {/* Primary Button: Review dossier */}
+                      {/* Primary Button: See Full Details */}
                       <button
                         type="button"
                         onClick={() => onSelectVenture?.(venture.id)}
@@ -1147,7 +1103,7 @@ export const InvestorGuidedDiscovery: React.FC<InvestorGuidedDiscoveryProps> = (
                           borderRadius: '980px',
                         }}
                       >
-                        Review dossier
+                        See Full Details
                       </button>
                     </div>
                   </div>

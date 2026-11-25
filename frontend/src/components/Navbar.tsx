@@ -880,7 +880,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                 onClick={() => onNavigate('INVESTOR_DISCOVERY')}
                 className={`nv-nav-link nv-nav-focus ${activeTab === 'INVESTOR_DISCOVERY' ? 'active' : ''}`}
               >
-                Verified Opportunities
+                Explore Ventures
               </button>
               <button
                 onClick={() => onOpenLogin('FOUNDER', true)}
@@ -897,7 +897,7 @@ export const Navbar: React.FC<NavbarProps> = ({
               onClick={() => onNavigate('INVESTOR_DISCOVERY')}
               className={`nv-nav-link nv-nav-focus ${activeTab === 'INVESTOR_DISCOVERY' ? 'active' : ''}`}
             >
-              Verified Opportunities
+              Explore Ventures
             </button>
           )}
 
