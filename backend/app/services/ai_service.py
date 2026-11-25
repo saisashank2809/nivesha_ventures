@@ -99,6 +99,336 @@ class AIAssistantService:
         )
 
     @classmethod
+    def analyze_founder_onboarding(cls, answers: Dict[str, Any]) -> Dict[str, Any]:
+        """
+        Analyzes the 12 click-first founder onboarding responses:
+        - Enforces ₹10 Lakh ticket-size guardrail
+        - Runs collateral + experience vs offered return value-discovery check
+        - Generates scaling reality-check warning chips
+        - Synthesizes founder summary & prefilled Story Builder blocks
+        """
+        role_archetype = str(answers.get("role_archetype") or "Founder")
+        experience_years = str(answers.get("experience_years") or "0-2 yrs")
+        core_expertise = answers.get("core_expertise") or []
+        if isinstance(core_expertise, str):
+            core_expertise = [core_expertise]
+        continuity_backup = str(answers.get("continuity_backup_plan") or "No backup yet")
+        three_year_goal = str(answers.get("three_year_goal") or "Scale capacity")
+        bottleneck = str(answers.get("biggest_bottleneck") or "Insufficient capital")
+
+        try:
+            capital_target = float(answers.get("capital_target") or 1000000.0)
+        except (ValueError, TypeError):
+            capital_target = 1000000.0
+
+        capital_use = answers.get("capital_use") or []
+        if isinstance(capital_use, str):
+            capital_use = [capital_use]
+        arrangement = str(answers.get("proposed_arrangement") or "Secured Loan")
+        collateral_type = str(answers.get("collateral_type") or "Unsecured")
+
+        try:
+            offered_return_rate = float(answers.get("offered_return_rate") or 14.0)
+        except (ValueError, TypeError):
+            offered_return_rate = 14.0
+
+        equity_dilution = str(answers.get("equity_dilution_willingness") or "Open to dilution")
+        investor_style = str(answers.get("investor_involvement_pref") or "Silent Financial Partner")
+        update_cadence = str(answers.get("update_cadence") or "Quarterly")
+
+        # 1. Ticket-Size Guardrail (< ₹10 Lakhs)
+        ticket_guardrail = None
+        if capital_target < 1000000.0:
+            ticket_guardrail = {
+                "triggered": True,
+                "min_amount": 1000000.0,
+                "entered_amount": capital_target,
+                "title": "₹10 Lakh Baseline Notice",
+                "message": (
+                    f"You entered ₹{capital_target:,.0f}. Nivesha Ventures specializes in high-ticket "
+                    "opportunities starting at ₹10 Lakhs (₹10,00,000). You can adjust your expansion scope "
+                    "to ₹10L+ or continue to join our early-stage waitlist."
+                ),
+            }
+
+        # 2. Value-Discovery & Over-Offering Check
+        value_discovery_tips: List[str] = []
+        detected_conflicts: List[str] = []
+
+        is_secured = collateral_type in ("Clean-Title Land", "Factory/Assets")
+        is_experienced = experience_years in ("6-10 yrs", "10+ yrs")
+
+        if is_secured and offered_return_rate > 16.0:
+            exp_note = f" and {experience_years} of operations" if is_experienced else ""
+            value_discovery_tips.append(
+                f"Since you are backing this with {collateral_type.lower()}{exp_note}, offering "
+                f"{offered_return_rate:.0f}% interest may give away too much value. Comparable secured deals "
+                "close at 12–14%. Consider lowering your offered rate."
+            )
+
+        if arrangement == "Pure Equity / Dividend" and equity_dilution == "Zero Dilution":
+            detected_conflicts.append(
+                "Trade-off alert: You selected Pure Equity / Dividend with zero ownership dilution. "
+                "Investors will expect either measurable equity dilution or a structured revenue-share/dividend waterfall."
+            )
+
+        if arrangement == "Pure Equity / Dividend" and is_secured:
+            value_discovery_tips.append(
+                f"You offered {collateral_type} alongside Pure Equity. Usually collateral is reserved for Secured Loans — "
+                "you can keep your assets unencumbered if raising pure equity."
+            )
+
+        if continuity_backup == "No backup yet":
+            detected_conflicts.append(
+                "Continuity risk flagged: Investors require a clear 3–6 month operational backup plan. "
+                "We will highlight this as an action item in your Story Builder."
+            )
+
+        # 3. Scaling Reality Check (Hidden Costs Flag)
+        reality_check_chips: List[str] = []
+        if "New Location Setup" in capital_use or three_year_goal in ("Scale capacity", "Expand to new cities"):
+            reality_check_chips = [
+                "Have you factored in commercial rent deposits (6–10 months)?",
+                "Include licensing, fire/hygiene & statutory compliance costs",
+                "Keep a 15% working-capital margin buffer for ramp-up months",
+            ]
+        elif "Machinery/Equipment" in capital_use:
+            reality_check_chips = [
+                "Account for installation, GST, and freight on machinery",
+                "Budget 10–15% working capital for initial raw-material cycles",
+            ]
+
+        # 4. Structured Profile Synthesis
+        expertise_str = ", ".join(core_expertise) if core_expertise else "General Operations"
+        use_str = ", ".join(capital_use) if capital_use else "Growth & Working Capital"
+        lakhs = capital_target / 100000.0
+        capital_display = f"₹{lakhs / 100:.2f} Cr" if lakhs >= 100 else f"₹{lakhs:.1f} L"
+
+        founder_summary = (
+            f"{role_archetype} with {experience_years} domain experience (strengths: {expertise_str}). "
+            f"Seeking {capital_display} via {arrangement} ({collateral_type}, {offered_return_rate:.0f}% target yield) "
+            f"for {use_str}. 3-year goal: {three_year_goal}. Continuity plan: {continuity_backup}. "
+            f"Prefers {investor_style} with {update_cadence} updates."
+        )
+
+        # Map arrangement to Story Builder enum
+        arrangement_map = {
+            "Secured Loan": "SECURED_COLLATERAL_DEBT",
+            "Loan + Equity Fallback": "SECURED_COLLATERAL_DEBT",
+            "Pure Equity / Dividend": "GROWTH_EQUITY_WITH_REV_SHARE",
+        }
+        mapped_arrangement = arrangement_map.get(arrangement, "LOAN")
+
+        prefilled_story_blocks = {
+            "capital_target": capital_target,
+            "proposed_arrangement": mapped_arrangement,
+            "use_of_funds_summary": f"Primary allocation toward {use_str} to address {bottleneck.lower()} and {three_year_goal.lower()}.",
+            "founder_bio_summary": f"{role_archetype} with {experience_years} experience specializing in {expertise_str}.",
+            "continuity_note": f"Operational continuity covered by: {continuity_backup}.",
+            "collateral_type": collateral_type,
+            "offered_return_rate": offered_return_rate,
+            "investor_involvement": investor_style,
+            "update_cadence": update_cadence,
+            "three_year_goal": three_year_goal,
+        }
+
+        return {
+            "founder_summary": founder_summary,
+            "ticket_guardrail": ticket_guardrail,
+            "value_discovery_tips": value_discovery_tips,
+            "reality_check_chips": reality_check_chips,
+            "detected_conflicts": detected_conflicts,
+            "prefilled_story_blocks": prefilled_story_blocks,
+        }
+
+    @classmethod
+    def analyze_investor_onboarding(
+        cls,
+        answers: Dict[str, Any],
+        natural_language_note: Optional[str] = None,
+    ) -> Dict[str, Any]:
+        """
+        AI-native investor discovery analyzer:
+        - Extracts structured preferences from optional natural-language notes without inventing unstated structures
+        - Detects conflicts between objective, risk tolerance, stage, and horizon
+        - Provides plain-language terminology notes for beginners / 'Not sure' selections
+        - Proposes InvestorMandate fields (never auto-locking mandatory rules without confirmation)
+        """
+        extracted_preferences: Dict[str, Any] = {}
+        follow_up_questions: List[str] = []
+        terminology_notes: List[str] = []
+        detected_conflicts: List[str] = []
+
+        note = (natural_language_note or "").strip()
+        note_lower = note.lower()
+
+        # 1. Extract explicit signals from natural-language note (no hallucinated assumptions)
+        if note:
+            if "crore" in note_lower or "cr" in note_lower:
+                cr_match = re.search(r"(\d+(?:\.\d+)?)\s*(?:crore|cr)", note_lower)
+                if cr_match:
+                    extracted_preferences["ticket_max"] = float(cr_match.group(1)) * 10000000.0
+            elif "lakh" in note_lower:
+                l_match = re.search(r"(\d+(?:\.\d+)?)\s*(?:lakh|lakhs|l)", note_lower)
+                if l_match:
+                    extracted_preferences["ticket_max"] = float(l_match.group(1)) * 100000.0
+
+            sector_keywords = {
+                "manufacturing": "Manufacturing",
+                "healthcare": "Healthcare",
+                "hospital": "Healthcare",
+                "food": "Food & Beverage",
+                "restaurant": "Food & Beverage",
+                "logistics": "Logistics",
+                "real estate": "Real Estate",
+                "film": "Film / Entertainment",
+                "tech": "Technology",
+                "saas": "Technology",
+            }
+            found_sectors = [v for k, v in sector_keywords.items() if k in note_lower]
+            if found_sectors:
+                extracted_preferences["target_sectors"] = list(dict.fromkeys(found_sectors))
+
+            if "profitable" in note_lower or "established" in note_lower:
+                extracted_preferences["target_stages"] = ["Established", "Growing / Expansion"]
+            if "not" in note_lower and ("daily" in note_lower or "manage" in note_lower):
+                extracted_preferences["desired_involvement"] = "MONTHLY_ADVISORY"
+            if "passive" in note_lower:
+                extracted_preferences["desired_involvement"] = "PASSIVE"
+
+        # 2. Merge structured answers with extracted proposals
+        investor_type = str(answers.get("investor_type") or "Individual investor")
+        capacity_type = str(answers.get("investing_capacity_type") or "Personally")
+        experience_level = str(answers.get("experience_level") or "Some experience")
+        primary_objective = str(answers.get("primary_objective") or "Long-term capital growth")
+        time_horizon = str(answers.get("time_horizon") or "3_TO_5_YEARS")
+        desired_involvement = str(
+            answers.get("desired_involvement")
+            or extracted_preferences.get("desired_involvement")
+            or "MONTHLY_ADVISORY"
+        )
+        risk_level = str(answers.get("risk_tolerance_level") or "Can tolerate some loss")
+
+        raw_arrs = answers.get("accepted_arrangements") or []
+        if isinstance(raw_arrs, str):
+            raw_arrs = [raw_arrs]
+        if not raw_arrs and not any(w in note_lower for w in ("debt", "loan", "equity", "revenue")):
+            follow_up_questions.append(
+                "Would you prefer to provide a repayable business loan (Debt), take Equity ownership, or explore Revenue Sharing?"
+            )
+
+        raw_sectors = answers.get("target_sectors") or extracted_preferences.get("target_sectors") or []
+        if isinstance(raw_sectors, str):
+            raw_sectors = [raw_sectors]
+
+        raw_stages = answers.get("target_stages") or extracted_preferences.get("target_stages") or []
+        if isinstance(raw_stages, str):
+            raw_stages = [raw_stages]
+
+        raw_locs = answers.get("locations") or ["India"]
+        if isinstance(raw_locs, str):
+            raw_locs = [l.strip() for l in raw_locs.split(",") if l.strip()]
+
+        try:
+            ticket_min = float(answers.get("ticket_min") or 1000000.0)
+        except (ValueError, TypeError):
+            ticket_min = 1000000.0
+
+        try:
+            ticket_max = float(
+                answers.get("ticket_max")
+                or extracted_preferences.get("ticket_max")
+                or max(ticket_min, 5000000.0)
+            )
+        except (ValueError, TypeError):
+            ticket_max = max(ticket_min, 5000000.0)
+
+        # 3. Conflict & Coherence Checks
+        if primary_objective == "Regular income" and "Pre-Revenue / Idea" in raw_stages:
+            detected_conflicts.append(
+                "Objective vs. Stage conflict: Regular income typically requires cash-flow-positive operating businesses, whereas Idea-stage ventures rarely generate immediate payouts."
+            )
+        if risk_level == "Prefer capital preservation" and ("EQUITY" in raw_arrs or "Turnaround" in raw_stages):
+            detected_conflicts.append(
+                "Risk vs. Structure conflict: Capital preservation aligns more closely with asset-backed Secured Debt than pure Equity or Turnaround ventures."
+            )
+        if time_horizon == "UNDER_1_YEAR" and "EQUITY" in raw_arrs:
+            detected_conflicts.append(
+                "Horizon vs. Structure conflict: Equity investments generally require a 3–5+ year horizon for exit or liquidity."
+            )
+
+        # 4. Beginner / Uncertain Terminology Notes
+        if experience_level == "Beginner" or "Not sure" in raw_arrs or risk_level == "Not sure":
+            terminology_notes.append(
+                "Debt / Secured Loan: Fixed repayment schedule with interest (lower upside, stronger downside protection when backed by collateral)."
+            )
+            terminology_notes.append(
+                "Equity Ownership: Share in company ownership and long-term exit value (higher upside, but capital is locked longer and exposed to business loss)."
+            )
+            terminology_notes.append(
+                "Revenue Sharing: Regular percentage payout from monthly/quarterly sales until a target return cap is reached."
+            )
+
+        if risk_level == "Not sure":
+            follow_up_questions.append(
+                "Could you tolerate locking funds for 3+ years or losing part of your principal on a single venture if returns are higher?"
+            )
+
+        clean_arrs = [a for a in raw_arrs if a != "Not sure"]
+        if not clean_arrs:
+            clean_arrs = ["LOAN", "REVENUE_SHARE", "EQUITY"]
+
+        mandatory_sectors = answers.get("mandatory_sectors") or []
+        mandatory_arrs = answers.get("mandatory_arrangements") or []
+        if isinstance(mandatory_sectors, str):
+            mandatory_sectors = [mandatory_sectors]
+        if isinstance(mandatory_arrs, str):
+            mandatory_arrs = [mandatory_arrs]
+
+        follow_up_cadence = "MONTHLY_OPERATIONAL_REVIEWS" if desired_involvement in ("MONTHLY_ADVISORY", "ACTIVE_ADVISORY", "ACTIVE_HANDS_ON") else "PERIODIC_CHECK_IN"
+
+        proposed_mandate = {
+            "target_sectors": raw_sectors or ["Manufacturing", "Food & Beverage", "Healthcare"],
+            "mandatory_sectors": mandatory_sectors,
+            "target_stages": raw_stages or ["Growing / Expansion", "Established"],
+            "locations": raw_locs,
+            "ticket_min": ticket_min,
+            "ticket_max": ticket_max,
+            "accepted_arrangements": clean_arrs,
+            "acceptable_structures": clean_arrs,
+            "mandatory_arrangements": mandatory_arrs,
+            "time_horizon": time_horizon,
+            "desired_involvement": desired_involvement,
+            "willing_to_follow_up": follow_up_cadence,
+            "thesis_summary": (
+                f"{investor_type} ({capacity_type}) seeking {primary_objective.lower()} over {time_horizon.replace('_', ' ').lower()} "
+                f"across {', '.join(raw_sectors) if raw_sectors else 'multiple sectors'}."
+            ),
+        }
+
+        lakhs_min = ticket_min / 100000.0
+        lakhs_max = ticket_max / 100000.0
+        investor_summary = (
+            f"{investor_type} investing {capacity_type.lower()} ({experience_level} in private deals). "
+            f"Primary objective: {primary_objective} with ₹{lakhs_min:.0f}L–₹{lakhs_max:.0f}L ticket size, "
+            f"{time_horizon.replace('_', ' ').lower()} horizon, and {desired_involvement.replace('_', ' ').lower()} involvement. "
+            f"Self-reported risk stance: {risk_level}."
+        )
+
+        return {
+            "investor_summary": investor_summary,
+            "extracted_preferences": extracted_preferences,
+            "detected_conflicts": detected_conflicts,
+            "follow_up_questions": follow_up_questions,
+            "terminology_notes": terminology_notes,
+            "proposed_mandate": proposed_mandate,
+            "suitability_disclaimer": (
+                "These answers are self-reported preferences used for venture matching and do not constitute "
+                "a formal or certified financial suitability or accreditation assessment."
+            ),
+        }
+
+    @classmethod
     def _call_gemini(
         cls,
         api_key: str,

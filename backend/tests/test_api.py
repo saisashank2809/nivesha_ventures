@@ -211,3 +211,197 @@ def test_direct_messaging_unlocked_when_connected():
     new_msg = send_resp.json()
     assert new_msg["sender_name"] == "Arvind Nair"
     assert "Thursday at 3 PM" in new_msg["content"]
+
+
+def test_v1_onboarding_questions_and_ai_copilot():
+    """Verify 12 V1 click-first questions, AI guardrails (<₹10L, over-offering, scaling), and profile persistence."""
+    founder_token = get_auth_token("founder@malabarcoast.in")
+
+    # 1. Fetch 12 V1 essential questions
+    q_resp = client.get("/api/onboarding/questions?v1_only=true&stage=founder_discovery")
+    assert q_resp.status_code == 200
+    questions = q_resp.json()
+    assert len(questions) == 12
+    assert all(q["is_v1_essential"] is True for q in questions)
+
+    # 2. Analyze with < ₹10L + Secured Collateral @ 18% + New Location Setup
+    analyze_resp = client.post(
+        "/api/onboarding/analyze",
+        json={
+            "answers": {
+                "role_archetype": "Business owner",
+                "experience_years": "6-10 yrs",
+                "core_expertise": ["Operations", "Finance"],
+                "continuity_backup_plan": "No backup yet",
+                "three_year_goal": "Scale capacity",
+                "biggest_bottleneck": "Insufficient capital",
+                "capital_target": 500000,
+                "capital_use": ["New Location Setup"],
+                "proposed_arrangement": "Secured Loan",
+                "collateral_type": "Clean-Title Land",
+                "offered_return_rate": 18,
+                "investor_involvement_pref": "Silent Financial Partner",
+                "update_cadence": "Quarterly",
+            }
+        },
+        headers={"Authorization": f"Bearer {founder_token}"},
+    )
+    assert analyze_resp.status_code == 200
+    analysis = analyze_resp.json()
+    assert analysis["ticket_guardrail"]["triggered"] is True
+    assert any("12–14%" in tip for tip in analysis["value_discovery_tips"])
+    assert len(analysis["reality_check_chips"]) >= 2
+    assert any("Continuity risk" in c for c in analysis["detected_conflicts"])
+
+    # 3. Submit onboarding and verify founder_profile persistence
+    submit_resp = client.post(
+        "/api/onboarding/submit",
+        json={
+            "answers": {
+                "role_archetype": "Business owner",
+                "experience_years": "6-10 yrs",
+                "core_expertise": ["Operations"],
+                "continuity_backup_plan": "Trained Manager",
+                "three_year_goal": "Scale capacity",
+                "biggest_bottleneck": "Insufficient capital",
+                "capital_target": 2500000,
+                "capital_use": ["Machinery/Equipment"],
+                "proposed_arrangement": "Secured Loan",
+                "collateral_type": "Clean-Title Land",
+                "offered_return_rate": 14,
+                "investor_involvement_pref": "Silent Financial Partner",
+                "update_cadence": "Quarterly",
+            }
+        },
+        headers={"Authorization": f"Bearer {founder_token}"},
+    )
+    assert submit_resp.status_code == 200
+    assert submit_resp.json()["status"] == "SUCCESS"
+
+    profile_resp = client.get(
+        "/api/onboarding/founder-profile",
+        headers={"Authorization": f"Bearer {founder_token}"},
+    )
+    assert profile_resp.status_code == 200
+    profile = profile_resp.json()
+    assert profile["role_archetype"] == "Business owner"
+    assert profile["continuity_backup_plan"] == "Trained Manager"
+
+    # 4. Update Founder Profile via PATCH and verify identity + discovery updates
+    patch_resp = client.patch(
+        "/api/onboarding/founder-profile",
+        json={
+            "full_name": "Arvind Nair Updated",
+            "title": "Managing Founder",
+            "bio": "10+ years scaling coastal hospitality.",
+            "three_year_goal": "Expand to new cities",
+            "core_expertise": ["Operations", "Finance"],
+        },
+        headers={"Authorization": f"Bearer {founder_token}"},
+    )
+    assert patch_resp.status_code == 200
+    updated = patch_resp.json()
+    assert updated["full_name"] == "Arvind Nair Updated"
+    assert updated["title"] == "Managing Founder"
+    assert updated["three_year_goal"] == "Expand to new cities"
+    assert updated["core_expertise"] == ["Operations", "Finance"]
+
+
+def test_investor_onboarding_and_profile_flow():
+    """Verify 15 investor discovery questions, AI natural-language/conflict analysis, mandate confirmation, and profile edit."""
+    investor_token = get_auth_token("investor@peakindia.vc")
+    founder_token = get_auth_token("founder@malabarcoast.in")
+
+    # 1. Fetch 15 investor discovery questions
+    q_resp = client.get("/api/onboarding/questions?v1_only=true&stage=investor_discovery")
+    assert q_resp.status_code == 200
+    questions = q_resp.json()
+    assert len(questions) == 15
+
+    # 2. Analyze natural language + conflicting answers
+    analyze_resp = client.post(
+        "/api/mandates/onboarding/analyze",
+        json={
+            "natural_language_note": "I have ₹1 crore available for profitable manufacturing companies, no daily ops.",
+            "answers": {
+                "investor_type": "Angel investor",
+                "experience_level": "Beginner",
+                "primary_objective": "Regular income",
+                "risk_tolerance_level": "Prefer capital preservation",
+                "accepted_arrangements": ["EQUITY"],
+                "target_stages": ["Pre-Revenue / Idea"],
+            },
+        },
+    )
+    assert analyze_resp.status_code == 200
+    analysis = analyze_resp.json()
+    assert analysis["extracted_preferences"]["ticket_max"] == 10000000.0
+    assert "Manufacturing" in analysis["extracted_preferences"]["target_sectors"]
+    assert len(analysis["detected_conflicts"]) >= 2
+    assert len(analysis["terminology_notes"]) >= 2
+    assert "suitability_disclaimer" in analysis
+
+    # 3. Submit confirmed mandate & investor profile
+    submit_resp = client.post(
+        "/api/mandates/onboarding/submit",
+        json={
+            "answers": {
+                "investor_type": "Family office",
+                "investing_capacity_type": "Organization",
+                "professional_background": ["Manufacturing", "Finance"],
+                "past_private_investments": "Yes",
+                "experience_level": "Experienced",
+                "prior_structures_used": ["Debt", "Revenue sharing"],
+                "evaluation_priorities": ["Financial performance", "Asset security"],
+                "primary_objective": "Regular income",
+                "time_horizon": "1_TO_3_YEARS",
+                "desired_involvement": "MONTHLY_ADVISORY",
+                "ticket_min": 1000000,
+                "ticket_max": 5000000,
+                "risk_tolerance_level": "Can tolerate some loss",
+                "accepted_arrangements": ["LOAN", "SECURED_COLLATERAL_DEBT"],
+                "target_sectors": ["Food & Beverage", "Manufacturing"],
+                "target_stages": ["Established", "Growing / Expansion"],
+                "locations": ["Bengaluru", "India"],
+                "expected_evidence": ["Financial records", "Asset information"],
+            },
+            "confirmed_mandate": {
+                "mandatory_sectors": ["Food & Beverage"],
+                "mandatory_arrangements": ["LOAN"],
+                "target_sectors": ["Food & Beverage", "Manufacturing"],
+                "accepted_arrangements": ["LOAN", "SECURED_COLLATERAL_DEBT"],
+                "ticket_min": 1000000,
+                "ticket_max": 5000000,
+                "locations": ["Bengaluru", "India"],
+            },
+        },
+        headers={"Authorization": f"Bearer {investor_token}"},
+    )
+    assert submit_resp.status_code == 200
+    sub_data = submit_resp.json()
+    assert sub_data["investor_profile"]["onboarding_completed"] is True
+    assert sub_data["mandate"]["mandatory_sectors"] == ["Food & Beverage"]
+
+    # 4. Verify 7-point Matching Engine still works with updated mandate
+    match_resp = client.post(
+        "/api/matches/run",
+        json={"venture_id": "ven-malabar-01"},
+        headers={"Authorization": f"Bearer {investor_token}"},
+    )
+    assert match_resp.status_code == 200
+    assert match_resp.json()["outcome"] == "POTENTIALLY_SUITABLE"
+
+    # 5. Update investor profile & verify founder cannot access investor profile (403)
+    patch_resp = client.patch(
+        "/api/mandates/investor-profile",
+        json={"title": "Managing Partner", "primary_objective": "Portfolio diversification"},
+        headers={"Authorization": f"Bearer {investor_token}"},
+    )
+    assert patch_resp.status_code == 200
+    assert patch_resp.json()["primary_objective"] == "Portfolio diversification"
+
+    forbidden_resp = client.get(
+        "/api/mandates/investor-profile",
+        headers={"Authorization": f"Bearer {founder_token}"},
+    )
+    assert forbidden_resp.status_code == 403

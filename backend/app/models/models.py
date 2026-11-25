@@ -75,6 +75,8 @@ class User(Base):
 
     # Relationships
     ventures = relationship("Venture", back_populates="founder", cascade="all, delete-orphan")
+    founder_profile = relationship("FounderProfile", back_populates="founder", uselist=False, cascade="all, delete-orphan")
+    investor_profile = relationship("InvestorProfile", back_populates="investor", uselist=False, cascade="all, delete-orphan")
     mandate = relationship("InvestorMandate", back_populates="investor", uselist=False, cascade="all, delete-orphan")
     sent_messages = relationship("Message", foreign_keys="Message.sender_id", back_populates="sender")
     received_messages = relationship("Message", foreign_keys="Message.recipient_id", back_populates="recipient")
@@ -259,15 +261,66 @@ class Message(Base):
     recipient = relationship("User", foreign_keys=[recipient_id], back_populates="received_messages")
 
 
+class FounderProfile(Base):
+    __tablename__ = "founder_profiles"
+
+    id = Column(String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
+    founder_id = Column(String(36), ForeignKey("users.id"), nullable=False, unique=True, index=True)
+    role_archetype = Column(String(64), nullable=True)
+    experience_years = Column(String(32), nullable=True)
+    core_expertise = Column(JSON, nullable=False, default=list)
+    continuity_backup_plan = Column(String(64), nullable=True)
+    past_resilience_verified = Column(Boolean, nullable=False, default=False)
+    three_year_goal = Column(String(64), nullable=True)
+    biggest_bottleneck = Column(String(64), nullable=True)
+    investor_involvement_pref = Column(String(64), nullable=True)
+    update_cadence = Column(String(64), nullable=True)
+    ai_summary = Column(Text, nullable=True)
+    raw_discovery_answers = Column(JSON, nullable=False, default=dict)
+    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
+    updated_at = Column(DateTime, default=lambda: datetime.now(timezone.utc), onupdate=lambda: datetime.now(timezone.utc))
+
+    founder = relationship("User", back_populates="founder_profile")
+
+
+class InvestorProfile(Base):
+    __tablename__ = "investor_profiles"
+
+    id = Column(String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
+    investor_id = Column(String(36), ForeignKey("users.id"), nullable=False, unique=True, index=True)
+    investor_type = Column(String(64), nullable=True)  # Individual, Angel, Family Office, Investment Firm, Corporate, Other
+    investing_capacity_type = Column(String(32), nullable=True)  # Personally / Organization
+    professional_background = Column(JSON, nullable=False, default=list)
+    past_private_investments = Column(Boolean, nullable=True)
+    experience_level = Column(String(32), nullable=True)  # Beginner, Some experience, Experienced
+    prior_structures_used = Column(JSON, nullable=False, default=list)
+    evaluation_priorities = Column(JSON, nullable=False, default=list)
+    primary_objective = Column(String(64), nullable=True)
+    risk_tolerance_level = Column(String(64), nullable=True)
+    risk_clarifications = Column(JSON, nullable=False, default=dict)
+    expected_evidence = Column(JSON, nullable=False, default=list)
+    onboarding_completed = Column(Boolean, nullable=False, default=False)
+    ai_summary = Column(Text, nullable=True)
+    raw_discovery_answers = Column(JSON, nullable=False, default=dict)
+    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
+    updated_at = Column(DateTime, default=lambda: datetime.now(timezone.utc), onupdate=lambda: datetime.now(timezone.utc))
+
+    investor = relationship("User", back_populates="investor_profile")
+
+
 class OnboardingQuestion(Base):
     __tablename__ = "onboarding_questions"
 
     id = Column(String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
     section = Column(String(64), nullable=False)  # e.g., "BASICS", "ARRANGEMENT", "TRACK_RECORD", "EXPANSION", "RISKS"
+    stage = Column(String(32), nullable=False, default="founder_discovery")  # founder_discovery vs venture_story
+    category = Column(String(32), nullable=False, default="background")  # background, experience, vision, funding_intent, expectations
+    ui_control_type = Column(String(32), nullable=False, default="tap_cards")  # tap_cards, multi_tap_cards, ab_binary, numeric_presets, conditional_collateral_slider
+    is_v1_essential = Column(Boolean, nullable=False, default=True)
     question_key = Column(String(64), unique=True, nullable=False)
     label = Column(String(256), nullable=False)
     description = Column(Text, nullable=True)
-    question_type = Column(String(32), nullable=False)  # TEXT, TEXTAREA, NUMBER, SELECT, MULTISELECT, CURRENCY
+    question_type = Column(String(32), nullable=False)  # SELECT, MULTISELECT, NUMBER, CURRENCY, SLIDER
     options = Column(JSON, nullable=True, default=list)
     placeholder = Column(String(128), nullable=True)
     is_mandatory = Column(Boolean, nullable=False, default=True)

@@ -9,7 +9,10 @@ import { DirectChatView } from './components/DirectChatView';
 import { ChatbotWidget } from './components/ChatbotWidget';
 import { LandingPageView } from './features/landing/LandingPageView';
 import { InvestorGuidedDiscovery } from './features/investor/InvestorGuidedDiscovery';
+import { InvestorOnboarding } from './features/investor/InvestorOnboarding';
+import { InvestorProfileView } from './features/investor/InvestorProfileView';
 import { FounderGuidedJourney } from './features/founder/FounderGuidedJourney';
+import { FounderOnboarding, OnboardingCompletionPayload } from './features/founder/FounderOnboarding';
 import { FounderDashboard } from './features/founder/FounderDashboard';
 import { PlatformReviewView } from './features/platform/PlatformReviewView';
 
@@ -30,6 +33,7 @@ export function App() {
   const [activeChatConnectionId, setActiveChatConnectionId] = useState<string | null>(null);
   const [unreadCount, setUnreadCount] = useState<number>(0);
   const [notification, setNotification] = useState<string | null>(null);
+  const [onboardingPayload, setOnboardingPayload] = useState<OnboardingCompletionPayload | null>(null);
 
   const showToast = (msg: string) => {
     setNotification(msg);
@@ -235,7 +239,7 @@ export function App() {
             onExploreVentures={() => setActiveTab('INVESTOR_DISCOVERY')}
             onStartOnboarding={() => {
               if (currentUser?.role === 'FOUNDER') {
-                setActiveTab('FOUNDER_JOURNEY');
+                setActiveTab('ONBOARDING');
               } else {
                 handleOpenLogin('FOUNDER', true);
               }
@@ -259,19 +263,56 @@ export function App() {
           />
         )}
 
-        {(activeTab === 'FOUNDER_DASHBOARD' || activeTab === 'FOUNDER_PORTAL') && (
+        {activeTab === 'INVESTOR_ONBOARDING' && (
+          <InvestorOnboarding
+            currentUser={currentUser}
+            onComplete={() => {
+              showToast('Investor mandate confirmed! Venture matches updated.');
+              loadData();
+              setActiveTab('INVESTOR_DISCOVERY');
+            }}
+            onCancel={() => setActiveTab('INVESTOR_DISCOVERY')}
+            onOpenLogin={() => handleOpenLogin('INVESTOR', false)}
+          />
+        )}
+
+        {activeTab === 'INVESTOR_PROFILE' && (
+          <InvestorProfileView
+            currentUser={currentUser}
+            onOpenOnboarding={() => setActiveTab('INVESTOR_ONBOARDING')}
+            onBackToMatches={() => setActiveTab('INVESTOR_DISCOVERY')}
+          />
+        )}
+
+        {(activeTab === 'FOUNDER_DASHBOARD' || activeTab === 'FOUNDER_PORTAL' || activeTab === 'FOUNDER_PROFILE') && (
           <FounderDashboard
             currentUser={currentUser}
+            initialTab={activeTab === 'FOUNDER_PROFILE' ? 'FOUNDER_PROFILE' : 'SECTIONS'}
             onOpenBuilder={() => setActiveTab('FOUNDER_JOURNEY')}
+            onOpenOnboarding={() => setActiveTab('ONBOARDING')}
             onOpenChat={handleOpenChat}
             onOpenLogin={() => handleOpenLogin('FOUNDER', false)}
             onSelectVenture={handleSelectVenture}
           />
         )}
 
-        {(activeTab === 'FOUNDER_JOURNEY' || activeTab === 'ONBOARDING') && (
+        {activeTab === 'ONBOARDING' && (
+          <FounderOnboarding
+            currentUser={currentUser}
+            onComplete={(payload) => {
+              setOnboardingPayload(payload);
+              showToast('Founder discovery saved! Pre-populating your Story Builder.');
+              setActiveTab('FOUNDER_JOURNEY');
+            }}
+            onCancel={() => setActiveTab('FOUNDER_DASHBOARD')}
+            onOpenLogin={() => handleOpenLogin('FOUNDER', false)}
+          />
+        )}
+
+        {activeTab === 'FOUNDER_JOURNEY' && (
           <FounderGuidedJourney
             currentUser={currentUser}
+            initialDiscovery={onboardingPayload}
             onComplete={() => {
               showToast('Venture profile and story saved successfully!');
               setActiveTab('FOUNDER_DASHBOARD');

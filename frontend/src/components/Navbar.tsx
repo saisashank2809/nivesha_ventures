@@ -169,6 +169,14 @@ export const Navbar: React.FC<NavbarProps> = ({
 
             <button
               type="button"
+              onClick={() => onNavigate('INVESTOR_ONBOARDING')}
+              className={`nv-nav-link nv-nav-focus ${activeTab === 'INVESTOR_ONBOARDING' ? 'active' : ''}`}
+            >
+              Investor Discovery
+            </button>
+
+            <button
+              type="button"
               onClick={() => onNavigate('MESSAGES')}
               className={`nv-nav-link nv-nav-focus ${activeTab === 'MESSAGES' ? 'active' : ''}`}
             >
@@ -457,8 +465,35 @@ export const Navbar: React.FC<NavbarProps> = ({
                     </div>
                   </div>
 
-                  {/* Sign Out Action */}
+                  {/* Profile & Sign Out Actions */}
                   <div style={{ padding: '6px' }}>
+                    <button
+                      type="button"
+                      role="menuitem"
+                      onClick={() => {
+                        setAccountMenuOpen(false);
+                        onNavigate('INVESTOR_PROFILE');
+                      }}
+                      className="nv-nav-focus"
+                      style={{
+                        width: '100%',
+                        textAlign: 'left',
+                        padding: '9px 12px',
+                        background: 'none',
+                        border: 'none',
+                        fontSize: '13px',
+                        fontWeight: 600,
+                        color: '#121a29',
+                        cursor: 'pointer',
+                        borderRadius: '4px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '8px',
+                      }}
+                    >
+                      <span>👤</span>
+                      <span>Investor Profile</span>
+                    </button>
                     <button
                       type="button"
                       role="menuitem"
@@ -781,11 +816,11 @@ export const Navbar: React.FC<NavbarProps> = ({
         style={{
           maxWidth: '1200px',
           margin: '0 auto',
-          padding: '12px 24px',
+          padding: '10px 20px',
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center',
-          gap: '16px',
+          gap: '12px',
           flexWrap: 'wrap',
         }}
       >
