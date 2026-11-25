@@ -88,8 +88,9 @@ export const LoginModal: React.FC<LoginModalProps> = ({
       style={{
         position: 'fixed',
         inset: 0,
-        backgroundColor: 'rgba(12, 24, 38, 0.65)',
-        backdropFilter: 'blur(3px)',
+        backgroundColor: 'rgba(29, 29, 31, 0.48)',
+        backdropFilter: 'blur(14px)',
+        WebkitBackdropFilter: 'blur(14px)',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
@@ -102,16 +103,17 @@ export const LoginModal: React.FC<LoginModalProps> = ({
         style={{
           width: '100%',
           maxWidth: '460px',
-          backgroundColor: '#fffdf9',
-          border: '1px solid #d6c9b2',
-          boxShadow: '0 30px 60px -20px rgba(12, 24, 38, 0.4)',
+          backgroundColor: '#ffffff',
+          border: '1px solid rgba(0, 0, 0, 0.08)',
+          borderRadius: '22px',
+          boxShadow: '0 30px 60px -15px rgba(0, 0, 0, 0.25)',
           boxSizing: 'border-box',
           overflow: 'hidden',
         }}
         onClick={(e) => e.stopPropagation()}
       >
         {/* Modal Header Tabs: Sign In vs Create Account */}
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', borderBottom: '1px solid #d6c9b2' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', borderBottom: '1px solid rgba(0, 0, 0, 0.1)' }}>
           <button
             type="button"
             onClick={() => {
@@ -121,12 +123,12 @@ export const LoginModal: React.FC<LoginModalProps> = ({
             style={{
               padding: '16px',
               border: 'none',
-              backgroundColor: !isRegister ? '#fffdf9' : '#f5efe5',
-              color: !isRegister ? '#121a29' : '#4c5262',
+              backgroundColor: !isRegister ? '#ffffff' : '#f5f5f7',
+              color: !isRegister ? '#0f172a' : '#4c5262',
               fontWeight: 600,
               fontSize: '14px',
               cursor: 'pointer',
-              borderBottom: !isRegister ? '2px solid #7a5c2e' : 'none',
+              borderBottom: !isRegister ? '2px solid #0066cc' : 'none',
             }}
           >
             Sign In
@@ -140,12 +142,12 @@ export const LoginModal: React.FC<LoginModalProps> = ({
             style={{
               padding: '16px',
               border: 'none',
-              backgroundColor: isRegister ? '#fffdf9' : '#f5efe5',
-              color: isRegister ? '#121a29' : '#4c5262',
+              backgroundColor: isRegister ? '#ffffff' : '#f5f5f7',
+              color: isRegister ? '#0f172a' : '#4c5262',
               fontWeight: 600,
               fontSize: '14px',
               cursor: 'pointer',
-              borderBottom: isRegister ? '2px solid #7a5c2e' : 'none',
+              borderBottom: isRegister ? '2px solid #0066cc' : 'none',
             }}
           >
             Create Account
@@ -157,9 +159,9 @@ export const LoginModal: React.FC<LoginModalProps> = ({
             <h3
               style={{
                 margin: 0,
-                fontFamily: "Newsreader, Georgia, 'Times New Roman', serif",
+                fontFamily: "var(--font-sans)",
                 fontSize: '26px',
-                color: '#121a29',
+                color: '#0f172a',
                 fontWeight: 400,
               }}
             >
@@ -210,7 +212,7 @@ export const LoginModal: React.FC<LoginModalProps> = ({
                   style={{
                     fontSize: '11px',
                     fontWeight: 700,
-                    color: '#7a5c2e',
+                    color: '#0066cc',
                     textTransform: 'uppercase',
                     letterSpacing: '0.08em',
                     display: 'flex',
@@ -241,8 +243,8 @@ export const LoginModal: React.FC<LoginModalProps> = ({
                     disabled={loading}
                     style={{
                       padding: '7px 8px',
-                      backgroundColor: '#fffdf9',
-                      border: '1px solid #d6c9b2',
+                      backgroundColor: '#ffffff',
+                      border: '1px solid rgba(0, 0, 0, 0.1)',
                       textAlign: 'left',
                       cursor: loading ? 'wait' : 'pointer',
                       borderRadius: '4px',
@@ -253,11 +255,11 @@ export const LoginModal: React.FC<LoginModalProps> = ({
                     }}
                     onMouseEnter={(e) => {
                       e.currentTarget.style.backgroundColor = '#f1e6d4';
-                      e.currentTarget.style.borderColor = '#7a5c2e';
+                      e.currentTarget.style.borderColor = '#0066cc';
                     }}
                     onMouseLeave={(e) => {
-                      e.currentTarget.style.backgroundColor = '#fffdf9';
-                      e.currentTarget.style.borderColor = '#d6c9b2';
+                      e.currentTarget.style.backgroundColor = '#ffffff';
+                      e.currentTarget.style.borderColor = 'rgba(0, 0, 0, 0.1)';
                     }}
                     title={`${acc.name} (${acc.role}) - ${acc.subtitle}`}
                   >
@@ -266,7 +268,7 @@ export const LoginModal: React.FC<LoginModalProps> = ({
                       <span
                         style={{
                           fontWeight: 600,
-                          color: '#121a29',
+                          color: '#0f172a',
                           whiteSpace: 'nowrap',
                           overflow: 'hidden',
                           textOverflow: 'ellipsis',
@@ -279,7 +281,7 @@ export const LoginModal: React.FC<LoginModalProps> = ({
                     <div
                       style={{
                         fontSize: '10px',
-                        color: '#7a5c2e',
+                        color: '#0066cc',
                         whiteSpace: 'nowrap',
                         overflow: 'hidden',
                         textOverflow: 'ellipsis',
@@ -292,11 +294,11 @@ export const LoginModal: React.FC<LoginModalProps> = ({
               </div>
 
               <div style={{ display: 'flex', alignItems: 'center', gap: '12px', margin: '14px 0 4px' }}>
-                <div style={{ flex: 1, height: '1px', backgroundColor: '#d6c9b2' }} />
+                <div style={{ flex: 1, height: '1px', backgroundColor: 'rgba(0, 0, 0, 0.1)' }} />
                 <span style={{ fontSize: '11px', color: '#8a8070', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
                   or enter credentials manually
                 </span>
-                <div style={{ flex: 1, height: '1px', backgroundColor: '#d6c9b2' }} />
+                <div style={{ flex: 1, height: '1px', backgroundColor: 'rgba(0, 0, 0, 0.1)' }} />
               </div>
             </div>
           )}
@@ -306,7 +308,7 @@ export const LoginModal: React.FC<LoginModalProps> = ({
               <>
                 {/* Persona selector for registration */}
                 <div>
-                  <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, color: '#7a5c2e', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '8px' }}>
+                  <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, color: '#0066cc', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '8px' }}>
                     Select Your Role
                   </label>
                   <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
@@ -315,10 +317,10 @@ export const LoginModal: React.FC<LoginModalProps> = ({
                       onClick={() => setRole('INVESTOR')}
                       style={{
                         padding: '10px',
-                        border: role === 'INVESTOR' ? '2px solid #0c1826' : '1px solid #d6c9b2',
-                        backgroundColor: role === 'INVESTOR' ? '#f5efe5' : '#fff',
+                        border: role === 'INVESTOR' ? '2px solid #0f172a' : '1px solid rgba(0, 0, 0, 0.1)',
+                        backgroundColor: role === 'INVESTOR' ? '#f5f5f7' : '#fff',
                         fontWeight: role === 'INVESTOR' ? 600 : 400,
-                        color: '#121a29',
+                        color: '#0f172a',
                         fontSize: '13px',
                         cursor: 'pointer',
                         textAlign: 'center',
@@ -331,10 +333,10 @@ export const LoginModal: React.FC<LoginModalProps> = ({
                       onClick={() => setRole('FOUNDER')}
                       style={{
                         padding: '10px',
-                        border: role === 'FOUNDER' ? '2px solid #0c1826' : '1px solid #d6c9b2',
-                        backgroundColor: role === 'FOUNDER' ? '#f5efe5' : '#fff',
+                        border: role === 'FOUNDER' ? '2px solid #0f172a' : '1px solid rgba(0, 0, 0, 0.1)',
+                        backgroundColor: role === 'FOUNDER' ? '#f5f5f7' : '#fff',
                         fontWeight: role === 'FOUNDER' ? 600 : 400,
-                        color: '#121a29',
+                        color: '#0f172a',
                         fontSize: '13px',
                         cursor: 'pointer',
                         textAlign: 'center',
@@ -346,7 +348,7 @@ export const LoginModal: React.FC<LoginModalProps> = ({
                 </div>
 
                 <div>
-                  <label style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#121a29', marginBottom: '6px' }}>
+                  <label style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#0f172a', marginBottom: '6px' }}>
                     Full Name
                   </label>
                   <input
@@ -359,7 +361,7 @@ export const LoginModal: React.FC<LoginModalProps> = ({
                       width: '100%',
                       padding: '10px 12px',
                       border: '1px solid #8a8070',
-                      background: '#fffdf9',
+                      background: '#ffffff',
                       fontSize: '14px',
                       boxSizing: 'border-box',
                     }}
@@ -367,7 +369,7 @@ export const LoginModal: React.FC<LoginModalProps> = ({
                 </div>
 
                 <div>
-                  <label style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#121a29', marginBottom: '6px' }}>
+                  <label style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#0f172a', marginBottom: '6px' }}>
                     {role === 'INVESTOR' ? 'Firm / Fund Name (or Individual)' : 'Company / Venture Name'}
                   </label>
                   <input
@@ -379,7 +381,7 @@ export const LoginModal: React.FC<LoginModalProps> = ({
                       width: '100%',
                       padding: '10px 12px',
                       border: '1px solid #8a8070',
-                      background: '#fffdf9',
+                      background: '#ffffff',
                       fontSize: '14px',
                       boxSizing: 'border-box',
                     }}
@@ -389,7 +391,7 @@ export const LoginModal: React.FC<LoginModalProps> = ({
             )}
 
             <div>
-              <label style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#121a29', marginBottom: '6px' }}>
+              <label style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#0f172a', marginBottom: '6px' }}>
                 Email Address
               </label>
               <input
@@ -402,7 +404,7 @@ export const LoginModal: React.FC<LoginModalProps> = ({
                   width: '100%',
                   padding: '10px 12px',
                   border: '1px solid #8a8070',
-                  background: '#fffdf9',
+                  background: '#ffffff',
                   fontSize: '14px',
                   boxSizing: 'border-box',
                 }}
@@ -410,8 +412,8 @@ export const LoginModal: React.FC<LoginModalProps> = ({
             </div>
 
             <div>
-              <label style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#121a29', marginBottom: '6px' }}>
-                Password {isRegister && <span style={{ fontSize: '11px', color: '#7a5c2e' }}>(min. 8 characters)</span>}
+              <label style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#0f172a', marginBottom: '6px' }}>
+                Password {isRegister && <span style={{ fontSize: '11px', color: '#0066cc' }}>(min. 8 characters)</span>}
               </label>
               <input
                 type="password"
@@ -423,7 +425,7 @@ export const LoginModal: React.FC<LoginModalProps> = ({
                   width: '100%',
                   padding: '10px 12px',
                   border: '1px solid #8a8070',
-                  background: '#fffdf9',
+                  background: '#ffffff',
                   fontSize: '14px',
                   boxSizing: 'border-box',
                 }}
@@ -436,8 +438,8 @@ export const LoginModal: React.FC<LoginModalProps> = ({
               style={{
                 width: '100%',
                 padding: '12px',
-                backgroundColor: '#0c1826',
-                color: '#f5efe5',
+                backgroundColor: '#0f172a',
+                color: '#f5f5f7',
                 border: 'none',
                 fontSize: '14px',
                 fontWeight: 600,
@@ -462,7 +464,7 @@ export const LoginModal: React.FC<LoginModalProps> = ({
                     setIsRegister(false);
                     setError(null);
                   }}
-                  style={{ background: 'none', border: 'none', color: '#7a5c2e', fontWeight: 600, cursor: 'pointer', padding: 0 }}
+                  style={{ background: 'none', border: 'none', color: '#0066cc', fontWeight: 600, cursor: 'pointer', padding: 0 }}
                 >
                   Sign In
                 </button>
@@ -476,7 +478,7 @@ export const LoginModal: React.FC<LoginModalProps> = ({
                     setIsRegister(true);
                     setError(null);
                   }}
-                  style={{ background: 'none', border: 'none', color: '#7a5c2e', fontWeight: 600, cursor: 'pointer', padding: 0 }}
+                  style={{ background: 'none', border: 'none', color: '#0066cc', fontWeight: 600, cursor: 'pointer', padding: 0 }}
                 >
                   Create an account
                 </button>

@@ -180,9 +180,9 @@ export const DirectChatView: React.FC<DirectChatViewProps> = ({
           <h2
             style={{
               margin: '0 0 4px 0',
-              fontFamily: "Newsreader, Georgia, 'Times New Roman', serif",
+              fontFamily: "var(--font-sans)",
               fontSize: '28px',
-              color: '#121a29',
+              color: '#0f172a',
               fontWeight: 500,
             }}
           >
@@ -208,8 +208,8 @@ export const DirectChatView: React.FC<DirectChatViewProps> = ({
                 alignItems: 'center',
                 gap: '6px',
                 padding: '6px 14px',
-                backgroundColor: '#0c1826',
-                color: '#f5efe5',
+                backgroundColor: '#0f172a',
+                color: '#f5f5f7',
                 borderRadius: '20px',
                 fontSize: '12px',
                 fontWeight: 600,
@@ -228,13 +228,13 @@ export const DirectChatView: React.FC<DirectChatViewProps> = ({
                 alignItems: 'center',
                 gap: '6px',
                 padding: '6px 14px',
-                backgroundColor: '#f5efe5',
-                color: '#7a5c2e',
+                backgroundColor: '#f5f5f7',
+                color: '#0066cc',
                 borderRadius: '20px',
                 fontSize: '12px',
                 fontWeight: 600,
                 cursor: 'pointer',
-                border: '1px solid #d6c9b2',
+                border: '1px solid rgba(0, 0, 0, 0.1)',
               }}
               title="Test notification alert and chime"
             >
@@ -255,8 +255,8 @@ export const DirectChatView: React.FC<DirectChatViewProps> = ({
         style={{
           display: 'grid',
           gridTemplateColumns: '320px 1fr',
-          backgroundColor: '#fffdf9',
-          border: '1px solid #d6c9b2',
+          backgroundColor: '#ffffff',
+          border: '1px solid rgba(0, 0, 0, 0.1)',
           boxShadow: '0 12px 30px rgba(12, 24, 38, 0.08)',
           minHeight: '640px',
           maxHeight: '760px',
@@ -267,13 +267,13 @@ export const DirectChatView: React.FC<DirectChatViewProps> = ({
         {/* Left Sidebar: Connection Threads */}
         <div
           style={{
-            borderRight: '1px solid #e3d6bf',
-            backgroundColor: '#fbf8f2',
+            borderRight: '1px solid rgba(0, 0, 0, 0.08)',
+            backgroundColor: '#fbfbfd',
             display: 'flex',
             flexDirection: 'column',
           }}
         >
-          <div style={{ padding: '16px', borderBottom: '1px solid #e3d6bf', fontWeight: 700, fontSize: '12px', color: '#7a5c2e', letterSpacing: '0.1em', textTransform: 'uppercase' }}>
+          <div style={{ padding: '16px', borderBottom: '1px solid rgba(0, 0, 0, 0.08)', fontWeight: 700, fontSize: '12px', color: '#0066cc', letterSpacing: '0.1em', textTransform: 'uppercase' }}>
             Direct Conversations ({connections.length})
           </div>
 
@@ -287,7 +287,7 @@ export const DirectChatView: React.FC<DirectChatViewProps> = ({
                     style={{
                       marginTop: '12px',
                       padding: '8px 14px',
-                      backgroundColor: '#121a29',
+                      backgroundColor: '#0f172a',
                       color: '#fff',
                       border: 'none',
                       fontSize: '12px',
@@ -312,14 +312,14 @@ export const DirectChatView: React.FC<DirectChatViewProps> = ({
                     style={{
                       padding: '14px 16px',
                       borderBottom: '1px solid #ece3d4',
-                      backgroundColor: isSelected ? '#fffdf9' : 'transparent',
-                      borderLeft: isSelected ? '4px solid #7a5c2e' : '4px solid transparent',
+                      backgroundColor: isSelected ? '#ffffff' : 'transparent',
+                      borderLeft: isSelected ? '4px solid #0066cc' : '4px solid transparent',
                       cursor: 'pointer',
                       transition: 'background 0.15s ease',
                     }}
                   >
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
-                      <span style={{ fontWeight: 600, fontSize: '14px', color: '#121a29' }}>
+                      <span style={{ fontWeight: 600, fontSize: '14px', color: '#0f172a' }}>
                         {displayName}
                       </span>
                       <span
@@ -328,9 +328,9 @@ export const DirectChatView: React.FC<DirectChatViewProps> = ({
                           fontWeight: 700,
                           padding: '2px 6px',
                           borderRadius: '3px',
-                          backgroundColor: c.status === 'CONNECTED' ? '#0c1826' : '#f5efe5',
-                          color: c.status === 'CONNECTED' ? '#f5efe5' : '#7a5c2e',
-                          border: '1px solid #d6c9b2',
+                          backgroundColor: c.status === 'CONNECTED' ? '#0f172a' : '#f5f5f7',
+                          color: c.status === 'CONNECTED' ? '#f5f5f7' : '#0066cc',
+                          border: '1px solid rgba(0, 0, 0, 0.1)',
                         }}
                       >
                         {c.status === 'CONNECTED' ? 'DIRECT DM' : c.status}
@@ -353,8 +353,8 @@ export const DirectChatView: React.FC<DirectChatViewProps> = ({
               <div
                 style={{
                   padding: '14px 24px',
-                  borderBottom: '1px solid #e3d6bf',
-                  backgroundColor: '#fffdf9',
+                  borderBottom: '1px solid rgba(0, 0, 0, 0.08)',
+                  backgroundColor: '#ffffff',
                   display: 'flex',
                   justifyContent: 'space-between',
                   alignItems: 'center',
@@ -364,9 +364,9 @@ export const DirectChatView: React.FC<DirectChatViewProps> = ({
                   <h3
                     style={{
                       margin: 0,
-                      fontFamily: "Newsreader, Georgia, 'Times New Roman', serif",
+                      fontFamily: "var(--font-sans)",
                       fontSize: '20px',
-                      color: '#121a29',
+                      color: '#0f172a',
                       fontWeight: 600,
                     }}
                   >
@@ -379,7 +379,7 @@ export const DirectChatView: React.FC<DirectChatViewProps> = ({
                 </div>
 
                 <div style={{ fontSize: '12px', color: '#687282' }}>
-                  Channel ID: <code style={{ backgroundColor: '#f5efe5', padding: '2px 6px', borderRadius: '3px' }}>{activeConn.id.slice(0, 12)}</code>
+                  Channel ID: <code style={{ backgroundColor: '#f5f5f7', padding: '2px 6px', borderRadius: '3px' }}>{activeConn.id.slice(0, 12)}</code>
                 </div>
               </div>
 
@@ -392,21 +392,21 @@ export const DirectChatView: React.FC<DirectChatViewProps> = ({
                   display: 'flex',
                   flexDirection: 'column',
                   gap: '14px',
-                  backgroundColor: '#faf9f5',
+                  backgroundColor: '#f5f5f7',
                 }}
               >
                 {!isConnected ? (
                   <div
                     style={{
-                      backgroundColor: '#fffdf9',
-                      border: '1px dashed #7a5c2e',
-                      borderRadius: '8px',
+                      backgroundColor: '#ffffff',
+                      border: '1px solid rgba(0, 0, 0, 0.08)',
+                      borderRadius: '16px',
                       padding: '28px',
                       textAlign: 'center',
                       margin: 'auto 0',
                     }}
                   >
-                    <div style={{ fontSize: '16px', fontWeight: 600, color: '#121a29', marginBottom: '8px' }}>
+                    <div style={{ fontSize: '16px', fontWeight: 600, color: '#0f172a', marginBottom: '8px' }}>
                       Ready to Connect
                     </div>
                     <p style={{ margin: 0, fontSize: '13.5px', color: '#536074', maxWidth: '440px', lineHeight: 1.6 }}>
@@ -417,7 +417,7 @@ export const DirectChatView: React.FC<DirectChatViewProps> = ({
                         onClick={() => handleGrantConsent(activeConn.id)}
                         style={{
                           padding: '10px 22px',
-                          backgroundColor: '#0c1826',
+                          backgroundColor: '#0f172a',
                           color: '#fff',
                           border: 'none',
                           borderRadius: '6px',
@@ -433,7 +433,7 @@ export const DirectChatView: React.FC<DirectChatViewProps> = ({
                 ) : (
                   <>
                     <div style={{ textAlign: 'center', margin: '8px 0' }}>
-                      <span style={{ fontSize: '11px', color: '#7a5c2e', backgroundColor: '#f5efe5', padding: '4px 12px', borderRadius: '4px', border: '1px solid #d6c9b2' }}>
+                      <span style={{ fontSize: '11px', color: '#0066cc', backgroundColor: '#f5f5f7', padding: '4px 12px', borderRadius: '4px', border: '1px solid rgba(0, 0, 0, 0.1)' }}>
                         🔒 Direct 1-on-1 Encrypted Channel · Instant Internet Notifications Enabled
                       </span>
                     </div>
@@ -452,7 +452,7 @@ export const DirectChatView: React.FC<DirectChatViewProps> = ({
                           <div
                             style={{
                               fontSize: '11px',
-                              color: '#7a5c2e',
+                              color: '#0066cc',
                               marginBottom: '3px',
                               fontWeight: 600,
                               display: 'flex',
@@ -461,7 +461,7 @@ export const DirectChatView: React.FC<DirectChatViewProps> = ({
                             }}
                           >
                             <span>{isMe ? 'You' : m.sender_name}</span>
-                            <span style={{ fontSize: '9.5px', color: '#94a3b8', backgroundColor: '#f5efe5', padding: '1px 5px', borderRadius: '3px' }}>
+                            <span style={{ fontSize: '9.5px', color: '#94a3b8', backgroundColor: '#f5f5f7', padding: '1px 5px', borderRadius: '3px' }}>
                               {m.sender_role}
                             </span>
                           </div>
@@ -469,9 +469,9 @@ export const DirectChatView: React.FC<DirectChatViewProps> = ({
                             style={{
                               maxWidth: '75%',
                               padding: '12px 18px',
-                              backgroundColor: isMe ? '#0c1826' : '#ffffff',
-                              color: isMe ? '#f5efe5' : '#121a29',
-                              border: isMe ? 'none' : '1px solid #d6c9b2',
+                              backgroundColor: isMe ? '#0f172a' : '#ffffff',
+                              color: isMe ? '#f5f5f7' : '#0f172a',
+                              border: isMe ? 'none' : '1px solid rgba(0, 0, 0, 0.1)',
                               borderRadius: isMe ? '12px 12px 2px 12px' : '12px 12px 12px 2px',
                               boxShadow: '0 2px 6px rgba(12, 24, 38, 0.05)',
                               fontSize: '14px',
@@ -494,7 +494,7 @@ export const DirectChatView: React.FC<DirectChatViewProps> = ({
 
               {/* Message Input Box */}
               {isConnected && (
-                <div style={{ padding: '16px 20px', borderTop: '1px solid #e3d6bf', backgroundColor: '#fffdf9' }}>
+                <div style={{ padding: '16px 20px', borderTop: '1px solid rgba(0, 0, 0, 0.08)', backgroundColor: '#ffffff' }}>
                   <form onSubmit={handleSendMessage} style={{ display: 'flex', gap: '10px' }}>
                     <input
                       type="text"
@@ -505,7 +505,7 @@ export const DirectChatView: React.FC<DirectChatViewProps> = ({
                       style={{
                         flex: 1,
                         padding: '12px 16px',
-                        border: '1px solid #c5b59b',
+                        border: '1px solid rgba(0, 0, 0, 0.16)',
                         borderRadius: '6px',
                         fontSize: '14px',
                         backgroundColor: '#ffffff',
@@ -517,8 +517,8 @@ export const DirectChatView: React.FC<DirectChatViewProps> = ({
                       disabled={sending || !inputContent.trim()}
                       style={{
                         padding: '0 24px',
-                        backgroundColor: '#0c1826',
-                        color: '#f5efe5',
+                        backgroundColor: '#0f172a',
+                        color: '#f5f5f7',
                         border: 'none',
                         borderRadius: '6px',
                         fontWeight: 600,

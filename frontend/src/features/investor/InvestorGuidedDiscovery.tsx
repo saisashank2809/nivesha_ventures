@@ -352,71 +352,86 @@ export const InvestorGuidedDiscovery: React.FC<InvestorGuidedDiscoveryProps> = (
   }
 
   return (
-    <div style={{ maxWidth: '1180px', margin: '0 auto', padding: '24px 24px 120px' }}>
-      {/* 1. SHORTENED TOP OF PAGE */}
-      <div style={{ marginBottom: '18px' }}>
-        <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', flexWrap: 'wrap', gap: '8px' }}>
+    <div style={{ maxWidth: '1180px', margin: '0 auto', padding: '36px 24px 120px' }}>
+      {/* 1. PAGE HEADER */}
+      <div style={{ marginBottom: '22px' }}>
+        <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px' }}>
           <div>
+            <div className="eyebrow" style={{ marginBottom: '6px' }}>
+              VERIFIED OPPORTUNITIES
+            </div>
             <h1
               style={{
-                fontSize: '26px',
-                color: '#0c1826',
-                fontFamily: "Newsreader, Georgia, 'Times New Roman', serif",
-                fontWeight: 600,
-                letterSpacing: '-0.01em',
+                fontSize: 'clamp(1.75rem, 3vw, 2.25rem)',
+                color: '#0f172a',
+                fontFamily: 'var(--font-sans)',
+                fontWeight: 700,
+                letterSpacing: '-0.03em',
                 margin: 0,
               }}
             >
-              Venture matches
+              Businesses Matched to Your Preferences
             </h1>
-            <p style={{ fontSize: '13px', color: '#685d4d', margin: '3px 0 0 0' }}>
-              Standardized evaluation comparing founder declarations, audited operating baselines, and projections against your mandate.
+            <p style={{ fontSize: '14.5px', color: '#475569', margin: '6px 0 0 0', maxWidth: '700px' }}>
+              Every business below has been checked against tax, bank, and property records—with both the upside and the risks shown clearly.
             </p>
           </div>
-          <span style={{ fontSize: '12px', fontWeight: 600, color: '#7a5c2e', backgroundColor: '#f5efe5', padding: '3px 8px', borderRadius: '4px' }}>
-            {ventures.length} Curated Deals
+          <span
+            className="mono-label"
+            style={{
+              fontSize: '12px',
+              fontWeight: 600,
+              color: '#0f172a',
+              backgroundColor: '#ffffff',
+              border: '1px solid rgba(15, 23, 42, 0.08)',
+              padding: '6px 14px',
+              borderRadius: '8px',
+              boxShadow: 'var(--shadow-sm)',
+            }}
+          >
+            {ventures.length} Checked Deals
           </span>
         </div>
       </div>
 
-      {/* COMPACT APPLIED MANDATE SUMMARY BAR */}
+      {/* COMPACT APPLIED PREFERENCES BAR */}
       <div
         style={{
           backgroundColor: '#ffffff',
-          border: '1px solid #e6decb',
-          borderRadius: '8px',
-          padding: '12px 18px',
-          marginBottom: '24px',
-          boxShadow: '0 1px 3px rgba(12, 24, 38, 0.04)',
+          border: '1px solid rgba(15, 23, 42, 0.08)',
+          borderRadius: '20px',
+          padding: '16px 22px',
+          marginBottom: '28px',
+          boxShadow: 'var(--shadow-sm)',
         }}
       >
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px' }}>
           {/* Summary Elements */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap', flex: 1 }}>
             <span
+              className="mono-label"
               style={{
-                fontSize: '10.5px',
+                fontSize: '11px',
                 fontWeight: 700,
-                color: '#7a5c2e',
-                letterSpacing: '0.08em',
+                color: '#b48a3e',
+                letterSpacing: '0.06em',
                 textTransform: 'uppercase',
                 marginRight: '4px',
               }}
             >
-              Applied Mandate:
+              Your Preferences:
             </span>
 
             <span
               style={{
                 fontSize: '12px',
                 fontWeight: 600,
-                color: '#121a29',
-                backgroundColor: '#faf6ee',
-                border: '1px solid #d6c9b2',
-                padding: '2px 8px',
-                borderRadius: '4px',
+                color: '#0f172a',
+                backgroundColor: '#f5f5f7',
+                padding: '4px 10px',
+                borderRadius: '8px',
               }}
-              title="Applied arrangement"
+              title="Applied deal type"
             >
               {formatReadableEnum(appliedArrangement)}
             </span>
@@ -424,11 +439,10 @@ export const InvestorGuidedDiscovery: React.FC<InvestorGuidedDiscoveryProps> = (
             <span
               style={{
                 fontSize: '12px',
-                color: '#121a29',
-                backgroundColor: '#faf6ee',
-                border: '1px solid #d6c9b2',
-                padding: '2px 8px',
-                borderRadius: '4px',
+                color: '#475569',
+                backgroundColor: '#f5f5f7',
+                padding: '4px 10px',
+                borderRadius: '8px',
               }}
               title="Involvement level"
             >
@@ -438,11 +452,10 @@ export const InvestorGuidedDiscovery: React.FC<InvestorGuidedDiscoveryProps> = (
             <span
               style={{
                 fontSize: '12px',
-                color: '#121a29',
-                backgroundColor: '#faf6ee',
-                border: '1px solid #d6c9b2',
-                padding: '2px 8px',
-                borderRadius: '4px',
+                color: '#475569',
+                backgroundColor: '#f5f5f7',
+                padding: '4px 10px',
+                borderRadius: '8px',
               }}
               title="Follow-up commitment"
             >
@@ -453,13 +466,12 @@ export const InvestorGuidedDiscovery: React.FC<InvestorGuidedDiscoveryProps> = (
               style={{
                 fontSize: '12px',
                 fontWeight: 600,
-                color: '#121a29',
-                backgroundColor: '#faf6ee',
-                border: '1px solid #d6c9b2',
-                padding: '2px 8px',
-                borderRadius: '4px',
+                color: '#0f172a',
+                backgroundColor: '#f5f5f7',
+                padding: '4px 10px',
+                borderRadius: '8px',
               }}
-              title="Your investment ticket budget"
+              title="Your investment budget"
             >
               Budget: {formatINR(appliedMin)} – {formatINR(appliedMax)}
             </span>
@@ -470,63 +482,51 @@ export const InvestorGuidedDiscovery: React.FC<InvestorGuidedDiscoveryProps> = (
                   fontSize: '11px',
                   fontWeight: 600,
                   color: '#b45309',
-                  backgroundColor: '#fef3c7',
+                  backgroundColor: '#fffbeb',
                   border: '1px solid #fde68a',
-                  padding: '2px 8px',
-                  borderRadius: '4px',
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: '4px',
+                  padding: '4px 10px',
+                  borderRadius: '8px',
                 }}
               >
-                ● Unsaved criteria (matches below reflect applied mandate)
+                Unsaved changes
               </span>
             )}
           </div>
 
-          {/* Edit Mandate Toggle */}
+          {/* Edit Preferences Toggle */}
           <button
             type="button"
             onClick={() => setIsEditingMandate(!isEditingMandate)}
+            className="nv-btn-secondary"
             style={{
-              padding: '6px 14px',
-              backgroundColor: isEditingMandate ? '#f5efe5' : '#ffffff',
-              border: '1px solid #c5b59b',
-              color: '#121a29',
-              borderRadius: '4px',
+              padding: '8px 16px',
               fontSize: '12.5px',
-              fontWeight: 600,
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '6px',
               whiteSpace: 'nowrap',
             }}
           >
-            <span>⚙</span>
-            <span>{isEditingMandate ? 'Close editor ▴' : 'Edit mandate ▾'}</span>
+            {isEditingMandate ? 'Close Editor' : 'Edit Preferences'}
           </button>
         </div>
 
-        {/* INLINE EXPANDABLE MANDATE FORM */}
+        {/* INLINE EXPANDABLE PREFERENCES FORM */}
         {isEditingMandate && (
           <div
             style={{
-              marginTop: '16px',
-              paddingTop: '16px',
-              borderTop: '1px dashed #d6c9b2',
+              marginTop: '18px',
+              paddingTop: '18px',
+              borderTop: '1px solid rgba(15, 23, 42, 0.08)',
             }}
           >
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(210px, 1fr))', gap: '14px', marginBottom: '14px' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(210px, 1fr))', gap: '14px', marginBottom: '16px' }}>
               {/* Arrangement */}
               <div>
-                <label style={{ display: 'block', fontSize: '11px', fontWeight: 600, color: '#7a5c2e', textTransform: 'uppercase', marginBottom: '4px' }}>
-                  Accepted Arrangement
+                <label style={{ display: 'block', fontSize: '11px', fontWeight: 600, color: '#475569', textTransform: 'uppercase', marginBottom: '6px' }}>
+                  Deal Type
                 </label>
                 <select
                   value={selectedArrangement}
                   onChange={(e) => setSelectedArrangement(e.target.value)}
-                  style={{ width: '100%', padding: '6px 10px', borderRadius: '4px', border: '1px solid #c5b59b', background: '#faf6ee', fontSize: '13px' }}
+                  style={{ width: '100%', padding: '9px 12px', borderRadius: '10px', border: '1px solid rgba(15, 23, 42, 0.12)', background: '#f5f5f7', fontSize: '13px', color: '#0f172a' }}
                 >
                   <option value="LOAN">Loan / Fixed Debt</option>
                   <option value="SECURED_COLLATERAL_DEBT">Secured Collateral Debt</option>
@@ -539,13 +539,13 @@ export const InvestorGuidedDiscovery: React.FC<InvestorGuidedDiscoveryProps> = (
 
               {/* Desired Involvement */}
               <div>
-                <label style={{ display: 'block', fontSize: '11px', fontWeight: 600, color: '#7a5c2e', textTransform: 'uppercase', marginBottom: '4px' }}>
-                  Desired Involvement
+                <label style={{ display: 'block', fontSize: '11px', fontWeight: 600, color: '#475569', textTransform: 'uppercase', marginBottom: '6px' }}>
+                  Your Involvement
                 </label>
                 <select
                   value={selectedInvolvement}
                   onChange={(e) => setSelectedInvolvement(e.target.value)}
-                  style={{ width: '100%', padding: '6px 10px', borderRadius: '4px', border: '1px solid #c5b59b', background: '#faf6ee', fontSize: '13px' }}
+                  style={{ width: '100%', padding: '9px 12px', borderRadius: '10px', border: '1px solid rgba(15, 23, 42, 0.12)', background: '#f5f5f7', fontSize: '13px', color: '#0f172a' }}
                 >
                   <option value="ACTIVE_ADVISORY">Active Advisory</option>
                   <option value="MONTHLY_ADVISORY">Monthly Advisory</option>
@@ -557,13 +557,13 @@ export const InvestorGuidedDiscovery: React.FC<InvestorGuidedDiscoveryProps> = (
 
               {/* Follow-up Commitment */}
               <div>
-                <label style={{ display: 'block', fontSize: '11px', fontWeight: 600, color: '#7a5c2e', textTransform: 'uppercase', marginBottom: '4px' }}>
-                  Follow-up Commitment
+                <label style={{ display: 'block', fontSize: '11px', fontWeight: 600, color: '#475569', textTransform: 'uppercase', marginBottom: '6px' }}>
+                  Check-In Frequency
                 </label>
                 <select
                   value={selectedFollowUp}
                   onChange={(e) => setSelectedFollowUp(e.target.value)}
-                  style={{ width: '100%', padding: '6px 10px', borderRadius: '4px', border: '1px solid #c5b59b', background: '#faf6ee', fontSize: '13px' }}
+                  style={{ width: '100%', padding: '9px 12px', borderRadius: '10px', border: '1px solid rgba(15, 23, 42, 0.12)', background: '#f5f5f7', fontSize: '13px', color: '#0f172a' }}
                 >
                   <option value="MONTHLY_CHECK_IN">Monthly Check-In</option>
                   <option value="MONTHLY_OPERATIONAL_REVIEWS">Monthly Operational Reviews</option>
@@ -574,14 +574,14 @@ export const InvestorGuidedDiscovery: React.FC<InvestorGuidedDiscoveryProps> = (
 
               {/* Target Contribution Range */}
               <div>
-                <label style={{ display: 'block', fontSize: '11px', fontWeight: 600, color: '#7a5c2e', textTransform: 'uppercase', marginBottom: '4px' }}>
+                <label style={{ display: 'block', fontSize: '11px', fontWeight: 600, color: '#475569', textTransform: 'uppercase', marginBottom: '6px' }}>
                   Your Budget Range
                 </label>
                 <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
                   <select
                     value={minContribution}
                     onChange={(e) => setMinContribution(Number(e.target.value))}
-                    style={{ flex: 1, padding: '6px 8px', borderRadius: '4px', border: '1px solid #c5b59b', background: '#faf6ee', fontSize: '12.5px' }}
+                    style={{ flex: 1, padding: '9px 10px', borderRadius: '10px', border: '1px solid rgba(15, 23, 42, 0.12)', background: '#f5f5f7', fontSize: '12.5px', color: '#0f172a' }}
                   >
                     <option value={250000}>₹2.5 Lakh</option>
                     <option value={500000}>₹5 Lakh</option>
@@ -589,11 +589,11 @@ export const InvestorGuidedDiscovery: React.FC<InvestorGuidedDiscoveryProps> = (
                     <option value={2000000}>₹20 Lakh</option>
                     <option value={5000000}>₹50 Lakh</option>
                   </select>
-                  <span style={{ fontSize: '11px', color: '#685d4d' }}>to</span>
+                  <span style={{ fontSize: '11px', color: '#64748b' }}>to</span>
                   <select
                     value={maxContribution}
                     onChange={(e) => setMaxContribution(Number(e.target.value))}
-                    style={{ flex: 1, padding: '6px 8px', borderRadius: '4px', border: '1px solid #c5b59b', background: '#faf6ee', fontSize: '12.5px' }}
+                    style={{ flex: 1, padding: '9px 10px', borderRadius: '10px', border: '1px solid rgba(15, 23, 42, 0.12)', background: '#f5f5f7', fontSize: '12.5px', color: '#0f172a' }}
                   >
                     <option value={2000000}>₹20 Lakh</option>
                     <option value={5000000}>₹50 Lakh</option>
@@ -605,37 +605,27 @@ export const InvestorGuidedDiscovery: React.FC<InvestorGuidedDiscoveryProps> = (
             </div>
 
             {/* Actions: Apply vs Reset */}
-            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px', alignItems: 'center' }}>
+            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px', alignItems: 'center' }}>
               <button
                 type="button"
                 onClick={handleResetDraft}
-                style={{
-                  padding: '6px 14px',
-                  background: 'none',
-                  border: '1px solid #d6c9b2',
-                  borderRadius: '4px',
-                  fontSize: '12.5px',
-                  color: '#536074',
-                }}
+                className="nv-link-chevron"
+                style={{ fontSize: '12.5px', color: '#475569' }}
               >
-                Reset to Applied
+                Reset
               </button>
               <button
                 type="button"
                 onClick={handleUpdatePreferences}
                 disabled={savingMandate}
+                className="nv-btn-dark"
                 style={{
-                  padding: '6px 18px',
-                  backgroundColor: '#0c1826',
-                  color: '#ffffff',
-                  borderRadius: '4px',
+                  padding: '8px 20px',
                   fontSize: '12.5px',
-                  fontWeight: 600,
                   cursor: savingMandate ? 'wait' : 'pointer',
-                  boxShadow: '0 2px 4px rgba(12, 24, 38, 0.15)',
                 }}
               >
-                {savingMandate ? 'Updating & Evaluating...' : 'Apply & Re-evaluate Matches'}
+                {savingMandate ? 'Updating Matches...' : 'Apply & Update Matches'}
               </button>
             </div>
           </div>
@@ -747,7 +737,7 @@ export const InvestorGuidedDiscovery: React.FC<InvestorGuidedDiscoveryProps> = (
                         alignItems: 'center',
                         justifyContent: 'center',
                         fontSize: '96px',
-                        fontFamily: 'Newsreader, Georgia, serif',
+                        fontFamily: 'var(--font-sans)',
                         fontWeight: 700,
                         color: 'rgba(255, 255, 255, 0.06)',
                         userSelect: 'none',
@@ -760,24 +750,21 @@ export const InvestorGuidedDiscovery: React.FC<InvestorGuidedDiscoveryProps> = (
 
                   {/* Hero Foreground Content */}
                   <div className="nv-venture-hero-content">
-                    {/* Top Row: Match Outcome Pill + Media Count Button */}
+                    {/* Top Row: Match Outcome Label + Media Count */}
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
                       <div
                         style={{
                           display: 'inline-flex',
                           alignItems: 'center',
-                          gap: '5px',
                           padding: '4px 10px',
-                          borderRadius: '4px',
+                          borderRadius: '6px',
                           backgroundColor: outcomeColor.bg,
                           color: outcomeColor.text,
                           border: `1px solid ${outcomeColor.border}`,
                           fontSize: '11px',
                           fontWeight: 700,
-                          backdropFilter: 'blur(4px)',
                         }}
                       >
-                        <span>{outcomeColor.icon}</span>
                         <span>{outcomeColor.label}</span>
                       </div>
 
@@ -786,23 +773,20 @@ export const InvestorGuidedDiscovery: React.FC<InvestorGuidedDiscoveryProps> = (
                           type="button"
                           onClick={() => setActiveGalleryVentureId(isGalleryOpen ? null : venture.id)}
                           style={{
-                            background: 'rgba(12, 24, 38, 0.65)',
-                            backdropFilter: 'blur(6px)',
-                            border: '1px solid rgba(255, 255, 255, 0.25)',
+                            background: 'rgba(29, 29, 31, 0.65)',
+                            backdropFilter: 'blur(12px)',
+                            WebkitBackdropFilter: 'blur(12px)',
+                            border: '1px solid rgba(255, 255, 255, 0.22)',
                             color: '#ffffff',
-                            borderRadius: '4px',
-                            padding: '3px 9px',
+                            borderRadius: '6px',
+                            padding: '4px 10px',
                             fontSize: '11px',
                             fontWeight: 600,
                             cursor: 'pointer',
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: '5px',
                           }}
                           title="Click to toggle photo showcase"
                         >
-                          <span>📸</span>
-                          <span>{gallery.length} photos</span>
+                          {gallery.length} photos
                         </button>
                       )}
                     </div>
@@ -810,20 +794,22 @@ export const InvestorGuidedDiscovery: React.FC<InvestorGuidedDiscoveryProps> = (
                     {/* Middle Block: Sector, Company Name, Tagline */}
                     <div>
                       <div
+                        className="mono-label"
                         style={{
-                          fontSize: '11px',
-                          fontWeight: 700,
-                          color: '#e2caa1',
+                          fontSize: '10.5px',
+                          fontWeight: 600,
+                          color: 'rgba(255, 255, 255, 0.78)',
                           textTransform: 'uppercase',
-                          letterSpacing: '0.08em',
-                          marginBottom: '4px',
+                          letterSpacing: '0.06em',
+                          marginBottom: '5px',
                           display: 'flex',
                           alignItems: 'center',
                           gap: '6px',
+                          flexWrap: 'wrap',
                         }}
                       >
                         <span>{venture.sector}</span>
-                        <span>•</span>
+                        <span>&bull;</span>
                         <span>{venture.location}</span>
                       </div>
 
@@ -831,13 +817,13 @@ export const InvestorGuidedDiscovery: React.FC<InvestorGuidedDiscoveryProps> = (
                         onClick={() => onSelectVenture?.(venture.id)}
                         style={{
                           fontSize: '22px',
-                          fontWeight: 600,
+                          fontWeight: 700,
                           color: '#ffffff',
-                          fontFamily: 'Newsreader, Georgia, serif',
+                          fontFamily: 'var(--font-sans)',
+                          letterSpacing: '-0.02em',
                           margin: '0 0 6px 0',
                           cursor: 'pointer',
-                          lineHeight: 1.25,
-                          textShadow: '0 2px 4px rgba(0,0,0,0.4)',
+                          lineHeight: 1.2,
                         }}
                         title="Click to review full venture dossier"
                       >
@@ -846,47 +832,44 @@ export const InvestorGuidedDiscovery: React.FC<InvestorGuidedDiscoveryProps> = (
 
                       <p
                         style={{
-                          fontSize: '12.5px',
-                          color: '#cbd5e1',
+                          fontSize: '13px',
+                          color: 'rgba(245, 245, 247, 0.85)',
                           lineHeight: 1.45,
                           margin: 0,
                           display: '-webkit-box',
                           WebkitLineClamp: 3,
                           WebkitBoxOrient: 'vertical',
                           overflow: 'hidden',
-                          textShadow: '0 1px 2px rgba(0,0,0,0.3)',
                         }}
                       >
                         {venture.tag_line || venture.business_context}
                       </p>
                     </div>
 
-                    {/* Bottom Row: Stage & Arrangement Badges */}
+                    {/* Bottom Row: Stage & Arrangement Metadata */}
                     <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
                       <span
                         style={{
-                          fontSize: '10.5px',
+                          fontSize: '11px',
                           fontWeight: 600,
-                          padding: '2px 8px',
-                          borderRadius: '3px',
-                          backgroundColor: 'rgba(255, 255, 255, 0.12)',
-                          border: '1px solid rgba(255, 255, 255, 0.22)',
-                          color: '#f8fafc',
-                          backdropFilter: 'blur(4px)',
+                          padding: '3px 9px',
+                          borderRadius: '6px',
+                          backgroundColor: 'rgba(255, 255, 255, 0.14)',
+                          border: '1px solid rgba(255, 255, 255, 0.2)',
+                          color: '#ffffff',
                         }}
                       >
                         {venture.stage || 'Operating'}
                       </span>
                       <span
                         style={{
-                          fontSize: '10.5px',
+                          fontSize: '11px',
                           fontWeight: 600,
-                          padding: '2px 8px',
-                          borderRadius: '3px',
-                          backgroundColor: 'rgba(226, 202, 161, 0.18)',
-                          border: '1px solid rgba(226, 202, 161, 0.35)',
-                          color: '#fef3c7',
-                          backdropFilter: 'blur(4px)',
+                          padding: '3px 9px',
+                          borderRadius: '6px',
+                          backgroundColor: 'rgba(0, 102, 204, 0.35)',
+                          border: '1px solid rgba(96, 165, 250, 0.4)',
+                          color: '#ffffff',
                         }}
                       >
                         {formatReadableEnum(venture.proposed_arrangement)}
@@ -925,48 +908,48 @@ export const InvestorGuidedDiscovery: React.FC<InvestorGuidedDiscoveryProps> = (
                   <div className="nv-comparative-strip">
                     <div>
                       <div className="nv-comparative-label-row">
-                        <span style={{ fontSize: '10px', fontWeight: 700, color: '#7a5c2e', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
-                          🛡️ Operating Baseline
+                        <span style={{ fontSize: '10.5px', fontWeight: 700, color: '#0066cc', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                          Operating Baseline
                         </span>
                         <span
                           style={{
-                            fontSize: '9.5px',
+                            fontSize: '10px',
                             fontWeight: 600,
-                            padding: '1px 5px',
-                            borderRadius: '3px',
-                            backgroundColor: '#f5efe5',
-                            border: '1px solid #d6c9b2',
-                            color: '#7a5c2e',
+                            padding: '2px 7px',
+                            borderRadius: '5px',
+                            backgroundColor: '#ffffff',
+                            border: '1px solid rgba(0, 0, 0, 0.08)',
+                            color: '#0066cc',
                           }}
                         >
                           {verification}
                         </span>
                       </div>
-                      <div style={{ fontSize: '13px', color: '#121a29', fontWeight: 600, lineHeight: 1.4 }}>
+                      <div style={{ fontSize: '13px', color: '#0f172a', fontWeight: 600, lineHeight: 1.45 }}>
                         {metric}
                       </div>
                     </div>
 
                     <div>
                       <div className="nv-comparative-label-row">
-                        <span style={{ fontSize: '10px', fontWeight: 700, color: '#15803d', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
-                          📈 Expansion Target
+                        <span style={{ fontSize: '10.5px', fontWeight: 700, color: '#16a34a', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                          Expansion Target
                         </span>
                         <span
                           style={{
-                            fontSize: '9.5px',
+                            fontSize: '10px',
                             fontWeight: 600,
-                            padding: '1px 5px',
-                            borderRadius: '3px',
-                            backgroundColor: '#edf5ee',
-                            color: '#15803d',
-                            border: '1px solid #b8deb9',
+                            padding: '2px 7px',
+                            borderRadius: '5px',
+                            backgroundColor: '#ecfdf5',
+                            color: '#16a34a',
+                            border: '1px solid rgba(22, 163, 74, 0.2)',
                           }}
                         >
                           Projection
                         </span>
                       </div>
-                      <div style={{ fontSize: '13px', color: '#121a29', lineHeight: 1.4 }}>
+                      <div style={{ fontSize: '13px', color: '#0f172a', lineHeight: 1.45 }}>
                         {projection}
                       </div>
                     </div>
@@ -975,22 +958,22 @@ export const InvestorGuidedDiscovery: React.FC<InvestorGuidedDiscoveryProps> = (
                   {/* Row 3: Mandate Alignment Strip */}
                   <div
                     style={{
-                      borderLeft: `3px solid ${outcomeColor.text}`,
-                      backgroundColor: '#faf6ee',
-                      padding: '8px 12px',
-                      borderRadius: '0 4px 4px 0',
+                      backgroundColor: '#f5f5f7',
+                      padding: '10px 14px',
+                      borderRadius: '10px',
+                      border: '1px solid rgba(0, 0, 0, 0.05)',
                       fontSize: '12.5px',
                       lineHeight: 1.45,
                     }}
                   >
-                    <div style={{ color: '#15803d', fontWeight: 600 }}>
-                      ✓ Alignment: <span style={{ color: '#334155', fontWeight: 400 }}>{fitReason}</span>
+                    <div style={{ color: '#16a34a', fontWeight: 600 }}>
+                      Alignment: <span style={{ color: '#0f172a', fontWeight: 400 }}>{fitReason}</span>
                     </div>
 
                     {materialConcern && (
-                      <div style={{ marginTop: '4px', color: hasMismatch ? '#b91c1c' : '#b45309', fontWeight: 600 }}>
-                        {hasMismatch ? '✕ Mandatory Mismatch: ' : '⚠️ Consideration: '}
-                        <span style={{ color: hasMismatch ? '#b91c1c' : '#475569', fontWeight: 400 }}>
+                      <div style={{ marginTop: '4px', color: hasMismatch ? '#dc2626' : '#b45309', fontWeight: 600 }}>
+                        {hasMismatch ? 'Mandatory Mismatch: ' : 'Consideration: '}
+                        <span style={{ color: hasMismatch ? '#dc2626' : '#475569', fontWeight: 400 }}>
                           {materialConcern}
                         </span>
                       </div>
@@ -1004,19 +987,19 @@ export const InvestorGuidedDiscovery: React.FC<InvestorGuidedDiscoveryProps> = (
                           style={{
                             background: 'none',
                             border: 'none',
-                            color: '#7a5c2e',
+                            color: '#0066cc',
                             fontSize: '11.5px',
                             fontWeight: 600,
                             cursor: 'pointer',
                             padding: 0,
                           }}
                         >
-                          {isReasonsOpen ? '▴ Hide full matching breakdown' : `▾ View all ${matchCase.rule_results?.length || 7} matching factors`}
+                          {isReasonsOpen ? 'Hide full matching breakdown' : `View all ${matchCase.rule_results?.length || 7} matching factors`}
                         </button>
 
                         {isReasonsOpen && (
-                          <div style={{ marginTop: '8px', paddingTop: '8px', borderTop: '1px dashed #d6c9b2' }}>
-                            <div style={{ fontWeight: 600, color: '#121a29', fontSize: '11.5px', marginBottom: '4px' }}>
+                          <div style={{ marginTop: '8px', paddingTop: '8px', borderTop: '1px solid rgba(0, 0, 0, 0.08)' }}>
+                            <div style={{ fontWeight: 600, color: '#0f172a', fontSize: '11.5px', marginBottom: '4px' }}>
                               Compatibility Reasons:
                             </div>
                             <ul style={{ margin: '0 0 8px 16px', padding: 0, fontSize: '12px', color: '#475569' }}>
@@ -1028,7 +1011,7 @@ export const InvestorGuidedDiscovery: React.FC<InvestorGuidedDiscoveryProps> = (
                             {matchCase.trade_offs.length > 0 && (
                               <>
                                 <div style={{ fontWeight: 600, color: '#b45309', fontSize: '11.5px', marginBottom: '4px' }}>
-                                  Trade-Offs & Involvement Friction:
+                                  Trade-Offs &amp; Involvement Friction:
                                 </div>
                                 <ul style={{ margin: '0 0 8px 16px', padding: 0, fontSize: '12px', color: '#b45309' }}>
                                   {matchCase.trade_offs.map((t, tIdx) => (
@@ -1040,10 +1023,10 @@ export const InvestorGuidedDiscovery: React.FC<InvestorGuidedDiscoveryProps> = (
 
                             {matchCase.mandatory_mismatches.length > 0 && (
                               <>
-                                <div style={{ fontWeight: 600, color: '#b91c1c', fontSize: '11.5px', marginBottom: '4px' }}>
+                                <div style={{ fontWeight: 600, color: '#dc2626', fontSize: '11.5px', marginBottom: '4px' }}>
                                   Mandatory Mismatches:
                                 </div>
-                                <ul style={{ margin: '0 0 8px 16px', padding: 0, fontSize: '12px', color: '#b91c1c' }}>
+                                <ul style={{ margin: '0 0 8px 16px', padding: 0, fontSize: '12px', color: '#dc2626' }}>
                                   {matchCase.mandatory_mismatches.map((m, mIdx) => (
                                     <li key={mIdx}>{cleanReasonText(m)}</li>
                                   ))}
@@ -1062,33 +1045,29 @@ export const InvestorGuidedDiscovery: React.FC<InvestorGuidedDiscoveryProps> = (
                       display: 'flex',
                       justifyContent: 'space-between',
                       alignItems: 'center',
-                      paddingTop: '10px',
-                      borderTop: '1px solid #f2ede1',
+                      paddingTop: '12px',
+                      borderTop: '1px solid rgba(0, 0, 0, 0.06)',
                       flexWrap: 'wrap',
                       gap: '10px',
                       marginTop: 'auto',
                     }}
                   >
                     {/* Left quick inspection links */}
-                    <div style={{ display: 'flex', gap: '14px', alignItems: 'center', flexWrap: 'wrap' }}>
+                    <div style={{ display: 'flex', gap: '16px', alignItems: 'center', flexWrap: 'wrap' }}>
                       <button
                         type="button"
                         onClick={() => setExpandedDossierVentureId(isDossierOpen ? null : venture.id)}
                         style={{
                           background: 'none',
                           border: 'none',
-                          color: isDossierOpen ? '#7a5c2e' : '#0c1826',
+                          color: isDossierOpen ? '#0066cc' : '#0f172a',
                           fontWeight: 600,
                           fontSize: '12px',
                           cursor: 'pointer',
                           padding: 0,
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: '4px',
                         }}
                       >
-                        <span>{isDossierOpen ? '▲' : '▼'}</span>
-                        <span>{isDossierOpen ? 'Hide 10-Pt Dossier' : '10-Pt Dossier'}</span>
+                        {isDossierOpen ? 'Hide Dossier' : '10-Pt Dossier'}
                       </button>
 
                       <button
@@ -1097,18 +1076,14 @@ export const InvestorGuidedDiscovery: React.FC<InvestorGuidedDiscoveryProps> = (
                         style={{
                           background: 'none',
                           border: 'none',
-                          color: isDiligenceOpen ? '#0c1826' : '#7a5c2e',
+                          color: isDiligenceOpen ? '#0f172a' : '#0066cc',
                           fontWeight: 600,
                           fontSize: '12px',
                           cursor: 'pointer',
                           padding: 0,
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: '4px',
                         }}
                       >
-                        <span>{isDiligenceOpen ? '▲' : '▼'}</span>
-                        <span>{isDiligenceOpen ? 'Hide Diligence' : 'Diligence Audit'}</span>
+                        {isDiligenceOpen ? 'Hide Audit' : 'Diligence Audit'}
                       </button>
 
                       {gallery.length > 1 && (
@@ -1118,65 +1093,46 @@ export const InvestorGuidedDiscovery: React.FC<InvestorGuidedDiscoveryProps> = (
                           style={{
                             background: 'none',
                             border: 'none',
-                            color: '#685d4d',
+                            color: isGalleryOpen ? '#0f172a' : '#475569',
                             fontWeight: 600,
                             fontSize: '12px',
                             cursor: 'pointer',
                             padding: 0,
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: '4px',
                           }}
                         >
-                          <span>📷</span>
-                          <span>{isGalleryOpen ? 'Hide Media' : `Gallery (${gallery.length})`}</span>
+                          {isGalleryOpen ? 'Hide Media' : `Gallery (${gallery.length})`}
                         </button>
                       )}
                     </div>
 
                     {/* Right Primary Actions */}
-                    <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                    <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
                       {venture.connection_status === 'CONNECTED' && onOpenDirectChat && venture.connection_id ? (
                         <button
                           type="button"
                           onClick={() => onOpenDirectChat(venture.connection_id!)}
                           style={{
-                            padding: '7px 14px',
-                            backgroundColor: '#15803d',
+                            padding: '8px 18px',
+                            backgroundColor: '#16a34a',
                             color: '#ffffff',
-                            borderRadius: '4px',
+                            borderRadius: '980px',
                             fontSize: '12.5px',
                             fontWeight: 600,
                             border: 'none',
                             cursor: 'pointer',
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: '5px',
                           }}
                         >
-                          <span>💬</span>
-                          <span>Direct Messages</span>
+                          Direct Messages
                         </button>
                       ) : (
                         <button
                           type="button"
                           onClick={() => handleOpenDirectDM(venture)}
-                          style={{
-                            padding: '7px 14px',
-                            backgroundColor: '#fffdf9',
-                            color: '#0c1826',
-                            borderRadius: '4px',
-                            fontSize: '12.5px',
-                            fontWeight: 600,
-                            border: '1px solid #d6c9b2',
-                            cursor: 'pointer',
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: '5px',
-                          }}
+                          className="nv-link-chevron"
+                          style={{ fontSize: '13px' }}
                         >
-                          <span>💬</span>
                           <span>Direct Message</span>
+                          <span aria-hidden="true" style={{ fontSize: '15px', lineHeight: 1 }}>&rsaquo;</span>
                         </button>
                       )}
 
@@ -1184,23 +1140,14 @@ export const InvestorGuidedDiscovery: React.FC<InvestorGuidedDiscoveryProps> = (
                       <button
                         type="button"
                         onClick={() => onSelectVenture?.(venture.id)}
+                        className="nv-btn-dark"
                         style={{
-                          padding: '7px 18px',
-                          backgroundColor: '#0c1826',
-                          color: '#ffffff',
-                          borderRadius: '4px',
+                          padding: '8px 20px',
                           fontSize: '12.5px',
-                          fontWeight: 600,
-                          border: 'none',
-                          cursor: 'pointer',
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: '5px',
-                          boxShadow: '0 2px 4px rgba(12, 24, 38, 0.16)',
+                          borderRadius: '980px',
                         }}
                       >
-                        <span>Review dossier</span>
-                        <span style={{ fontSize: '12px' }}>↗</span>
+                        Review dossier
                       </button>
                     </div>
                   </div>
@@ -1214,13 +1161,13 @@ export const InvestorGuidedDiscovery: React.FC<InvestorGuidedDiscoveryProps> = (
                   {isDossierOpen && (
                     <div style={{ marginBottom: isDiligenceOpen || isGalleryOpen ? '16px' : '0' }}>
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
-                        <div style={{ fontSize: '13.5px', fontWeight: 600, color: '#0c1826', fontFamily: "Newsreader, Georgia, serif" }}>
+                        <div style={{ fontSize: '13.5px', fontWeight: 600, color: '#0f172a', fontFamily: "var(--font-sans)" }}>
                           10-Section Venture Summary Preview
                         </div>
                         <button
                           type="button"
                           onClick={() => onSelectVenture?.(venture.id)}
-                          style={{ fontSize: '11.5px', color: '#7a5c2e', fontWeight: 600, background: 'none', border: 'none', cursor: 'pointer' }}
+                          style={{ fontSize: '11.5px', color: '#0066cc', fontWeight: 600, background: 'none', border: 'none', cursor: 'pointer' }}
                         >
                           Open in Full Dossier Modal ↗
                         </button>
@@ -1229,10 +1176,10 @@ export const InvestorGuidedDiscovery: React.FC<InvestorGuidedDiscoveryProps> = (
                         {tenSecs.map((sec) => (
                           <div key={sec.num} style={{ background: '#ffffff', border: '1px solid #e6decb', borderRadius: '4px', padding: '8px 10px' }}>
                             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2px' }}>
-                              <span style={{ fontSize: '11px', fontWeight: 700, color: '#7a5c2e', fontFamily: 'monospace' }}>
+                              <span style={{ fontSize: '11px', fontWeight: 700, color: '#0066cc', fontFamily: 'monospace' }}>
                                 {sec.num}. {sec.title}
                               </span>
-                              <span style={{ fontSize: '8.5px', padding: '1px 4px', background: '#faf6ee', border: '1px solid #d6c9b2', color: '#7a5c2e' }}>
+                              <span style={{ fontSize: '8.5px', padding: '1px 4px', background: '#faf6ee', border: '1px solid rgba(0, 0, 0, 0.1)', color: '#0066cc' }}>
                                 {sec.source}
                               </span>
                             </div>
@@ -1248,7 +1195,7 @@ export const InvestorGuidedDiscovery: React.FC<InvestorGuidedDiscoveryProps> = (
                   {/* INLINE DILIGENCE CHECKLIST DRAWER */}
                   {isDiligenceOpen && (
                     <div style={{ marginBottom: isGalleryOpen ? '16px' : '0' }}>
-                      <div style={{ fontSize: '13px', fontWeight: 600, color: '#0c1826', marginBottom: '8px' }}>
+                      <div style={{ fontSize: '13px', fontWeight: 600, color: '#0f172a', marginBottom: '8px' }}>
                         6 Standardized Due Diligence Categories
                       </div>
                       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '8px' }}>
@@ -1267,7 +1214,7 @@ export const InvestorGuidedDiscovery: React.FC<InvestorGuidedDiscoveryProps> = (
                           return (
                             <div key={cat.key} style={{ background: '#ffffff', border: '1px solid #e6decb', borderRadius: '4px', padding: '8px 10px' }}>
                               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2px' }}>
-                                <span style={{ fontSize: '11.5px', fontWeight: 600, color: '#0c1826' }}>{cat.label}</span>
+                                <span style={{ fontSize: '11.5px', fontWeight: 600, color: '#0f172a' }}>{cat.label}</span>
                                 <span style={{ fontSize: '9px', fontWeight: 600, padding: '1px 4px', borderRadius: '2px', background: '#e9f5ed', color: '#15803d' }}>
                                   {item.status}
                                 </span>
@@ -1285,7 +1232,7 @@ export const InvestorGuidedDiscovery: React.FC<InvestorGuidedDiscoveryProps> = (
                   {/* INLINE GALLERY MEDIA DRAWER */}
                   {isGalleryOpen && gallery.length > 1 && (
                     <div>
-                      <div style={{ fontSize: '11px', fontWeight: 700, color: '#7a5c2e', textTransform: 'uppercase', marginBottom: '6px' }}>
+                      <div style={{ fontSize: '11px', fontWeight: 700, color: '#0066cc', textTransform: 'uppercase', marginBottom: '6px' }}>
                         Media Showcase ({gallery.length} verified photos):
                       </div>
                       <div style={{ display: 'flex', gap: '8px', overflowX: 'auto', paddingBottom: '4px' }}>
@@ -1295,7 +1242,7 @@ export const InvestorGuidedDiscovery: React.FC<InvestorGuidedDiscoveryProps> = (
                             type="button"
                             onClick={() => setSelectedGalleryIndices((prev) => ({ ...prev, [venture.id]: gIdx }))}
                             style={{
-                              border: selectedIdx === gIdx ? '2px solid #7a5c2e' : '1px solid #d6c9b2',
+                              border: selectedIdx === gIdx ? '2px solid #0066cc' : '1px solid rgba(0, 0, 0, 0.1)',
                               borderRadius: '4px',
                               padding: 0,
                               overflow: 'hidden',
@@ -1342,16 +1289,16 @@ export const InvestorGuidedDiscovery: React.FC<InvestorGuidedDiscoveryProps> = (
               width: '100%',
               padding: '24px 28px',
               boxShadow: '0 20px 40px rgba(12, 24, 38, 0.25)',
-              border: '1px solid #d6c9b2',
+              border: '1px solid rgba(0, 0, 0, 0.1)',
             }}
             onClick={(e) => e.stopPropagation()}
           >
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px' }}>
               <div>
-                <div style={{ fontSize: '10.5px', fontWeight: 700, color: '#7a5c2e', letterSpacing: '0.08em', textTransform: 'uppercase' }}>
+                <div style={{ fontSize: '10.5px', fontWeight: 700, color: '#0066cc', letterSpacing: '0.08em', textTransform: 'uppercase' }}>
                   DIRECT MESSAGING
                 </div>
-                <h3 style={{ fontSize: '18px', color: '#0c1826', fontFamily: "Newsreader, Georgia, serif", margin: '2px 0 0 0' }}>
+                <h3 style={{ fontSize: '18px', color: '#0f172a', fontFamily: "var(--font-sans)", margin: '2px 0 0 0' }}>
                   Message {directDMModalVenture.company_name}
                 </h3>
               </div>
@@ -1369,7 +1316,7 @@ export const InvestorGuidedDiscovery: React.FC<InvestorGuidedDiscoveryProps> = (
             </p>
 
             <div style={{ marginBottom: '14px' }}>
-              <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, color: '#0c1826', marginBottom: '4px' }}>
+              <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, color: '#0f172a', marginBottom: '4px' }}>
                 Your Message
               </label>
               <textarea
@@ -1379,20 +1326,20 @@ export const InvestorGuidedDiscovery: React.FC<InvestorGuidedDiscoveryProps> = (
                 placeholder="Write your direct message to the founder..."
                 style={{
                   width: '100%',
-                  padding: '10px 12px',
-                  borderRadius: '4px',
-                  border: '1px solid #e6decb',
-                  fontSize: '13px',
+                  padding: '12px 14px',
+                  borderRadius: '12px',
+                  border: '1px solid rgba(15, 23, 42, 0.12)',
+                  backgroundColor: '#f5f5f7',
+                  fontSize: '13.5px',
                   lineHeight: 1.45,
                   fontFamily: 'inherit',
-                  outline: 'none',
                   boxSizing: 'border-box',
                 }}
               />
             </div>
 
             {/* Quick Suggestions */}
-            <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', marginBottom: '18px' }}>
+            <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', marginBottom: '20px' }}>
               {[
                 'Discuss ticket allocation',
                 'Ask about unit economics',
@@ -1404,12 +1351,13 @@ export const InvestorGuidedDiscovery: React.FC<InvestorGuidedDiscoveryProps> = (
                   type="button"
                   onClick={() => setDirectDMNote((prev) => `${prev} I would particularly like to ${topic.toLowerCase()}.`)}
                   style={{
-                    padding: '3px 8px',
-                    borderRadius: '4px',
-                    backgroundColor: '#faf6ee',
-                    border: '1px solid #d6c9b2',
-                    fontSize: '11px',
-                    color: '#7a5c2e',
+                    padding: '5px 10px',
+                    borderRadius: '8px',
+                    backgroundColor: '#f5f5f7',
+                    border: '1px solid rgba(15, 23, 42, 0.08)',
+                    fontSize: '11.5px',
+                    fontWeight: 500,
+                    color: '#0066cc',
                     cursor: 'pointer',
                   }}
                 >
@@ -1418,11 +1366,12 @@ export const InvestorGuidedDiscovery: React.FC<InvestorGuidedDiscoveryProps> = (
               ))}
             </div>
 
-            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '8px' }}>
+            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px', alignItems: 'center' }}>
               <button
                 type="button"
                 onClick={() => setDirectDMModalVenture(null)}
-                style={{ padding: '8px 14px', background: 'transparent', border: '1px solid #e6decb', borderRadius: '4px', fontSize: '12.5px' }}
+                className="nv-link-chevron"
+                style={{ fontSize: '13px', color: '#475569' }}
               >
                 Cancel
               </button>
@@ -1430,21 +1379,15 @@ export const InvestorGuidedDiscovery: React.FC<InvestorGuidedDiscoveryProps> = (
                 type="button"
                 onClick={handleSendDirectDM}
                 disabled={submittingDM || !directDMNote.trim()}
+                className="nv-btn-dark"
                 style={{
-                  padding: '8px 20px',
-                  backgroundColor: '#0c1826',
-                  color: '#fff',
-                  borderRadius: '4px',
-                  fontWeight: 600,
-                  fontSize: '12.5px',
+                  padding: '9px 22px',
+                  fontSize: '13px',
                   cursor: submittingDM || !directDMNote.trim() ? 'not-allowed' : 'pointer',
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: '6px',
+                  opacity: submittingDM || !directDMNote.trim() ? 0.5 : 1,
                 }}
               >
-                <span>💬</span>
-                <span>{submittingDM ? 'Sending...' : 'Send Direct Message →'}</span>
+                {submittingDM ? 'Sending...' : 'Send Direct Message'}
               </button>
             </div>
           </div>

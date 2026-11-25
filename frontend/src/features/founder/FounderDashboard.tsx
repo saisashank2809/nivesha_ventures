@@ -295,7 +295,7 @@ export const FounderDashboard: React.FC<FounderDashboardProps> = ({
   if (!currentUser) {
     return (
       <div style={{ maxWidth: '800px', margin: '80px auto', textAlign: 'center', padding: '0 20px', fontFamily: "-apple-system, BlinkMacSystemFont, 'Inter', sans-serif" }}>
-        <h2 style={{ fontFamily: "Newsreader, Georgia, serif", fontSize: '32px', color: '#121a29', marginBottom: '16px' }}>
+        <h2 style={{ fontFamily: "var(--font-sans)", fontSize: '32px', color: '#0f172a', marginBottom: '16px' }}>
           Founder Portal Access
         </h2>
         <p style={{ fontSize: '15px', color: '#4c5262', marginBottom: '28px' }}>
@@ -305,8 +305,8 @@ export const FounderDashboard: React.FC<FounderDashboardProps> = ({
           onClick={onOpenLogin}
           style={{
             padding: '12px 28px',
-            backgroundColor: '#0c1826',
-            color: '#f5efe5',
+            backgroundColor: '#0f172a',
+            color: '#f5f5f7',
             fontWeight: 600,
             fontSize: '14.5px',
             border: 'none',
@@ -321,7 +321,7 @@ export const FounderDashboard: React.FC<FounderDashboardProps> = ({
 
   if (loading) {
     return (
-      <div style={{ textAlign: 'center', padding: '100px 20px', color: '#7a5c2e', fontSize: '15px' }}>
+      <div style={{ textAlign: 'center', padding: '100px 20px', color: '#0066cc', fontSize: '15px' }}>
         Loading founder dashboard & venture dossier...
       </div>
     );
@@ -329,8 +329,8 @@ export const FounderDashboard: React.FC<FounderDashboardProps> = ({
 
   if (!venture) {
     return (
-      <div style={{ maxWidth: '800px', margin: '60px auto', textAlign: 'center', padding: '40px 20px', backgroundColor: '#fffdf9', border: '1px solid #d6c9b2' }}>
-        <h2 style={{ fontFamily: "Newsreader, Georgia, serif", fontSize: '30px', color: '#121a29', marginBottom: '12px' }}>
+      <div style={{ maxWidth: '800px', margin: '60px auto', textAlign: 'center', padding: '40px 20px', backgroundColor: '#ffffff', border: '1px solid rgba(0, 0, 0, 0.1)' }}>
+        <h2 style={{ fontFamily: "var(--font-sans)", fontSize: '30px', color: '#0f172a', marginBottom: '12px' }}>
           No Active Venture Profile Found
         </h2>
         <p style={{ fontSize: '14.5px', color: '#4c5262', marginBottom: '24px' }}>
@@ -340,8 +340,8 @@ export const FounderDashboard: React.FC<FounderDashboardProps> = ({
           onClick={onOpenBuilder}
           style={{
             padding: '12px 26px',
-            backgroundColor: '#0c1826',
-            color: '#f5efe5',
+            backgroundColor: '#0f172a',
+            color: '#f5f5f7',
             fontWeight: 600,
             fontSize: '14.5px',
             border: 'none',
@@ -380,8 +380,8 @@ export const FounderDashboard: React.FC<FounderDashboardProps> = ({
             position: 'fixed',
             top: '20px',
             right: '20px',
-            backgroundColor: '#0c1826',
-            color: '#f5efe5',
+            backgroundColor: '#0f172a',
+            color: '#f5f5f7',
             padding: '12px 20px',
             borderRadius: '4px',
             boxShadow: '0 8px 24px rgba(0,0,0,0.25)',
@@ -404,20 +404,20 @@ export const FounderDashboard: React.FC<FounderDashboardProps> = ({
           marginBottom: '28px',
           flexWrap: 'wrap',
           gap: '20px',
-          backgroundColor: '#fffdf9',
-          border: '1px solid #d6c9b2',
+          backgroundColor: '#ffffff',
+          border: '1px solid rgba(0, 0, 0, 0.1)',
           padding: '24px 28px',
         }}
       >
         <div>
-          <div style={{ fontSize: '11px', color: '#7a5c2e', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.12em' }}>
+          <div style={{ fontSize: '11px', color: '#0066cc', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.12em' }}>
             Founder Enterprise Dashboard
           </div>
           <h1
             style={{
-              fontFamily: "Newsreader, Georgia, serif",
+              fontFamily: "var(--font-sans)",
               fontSize: '32px',
-              color: '#121a29',
+              color: '#0f172a',
               margin: '4px 0 8px',
               fontWeight: 400,
             }}
@@ -439,7 +439,7 @@ export const FounderDashboard: React.FC<FounderDashboardProps> = ({
               ✓ {venture.verification_status}
             </span>
             <span>•</span>
-            <span style={{ fontWeight: 600, color: '#121a29' }}>{venture.sector}</span>
+            <span style={{ fontWeight: 600, color: '#0f172a' }}>{venture.sector}</span>
             <span>•</span>
             <span>{venture.stage}</span>
             <span>•</span>
@@ -454,9 +454,9 @@ export const FounderDashboard: React.FC<FounderDashboardProps> = ({
             onClick={() => setPreviewModalOpen(true)}
             style={{
               padding: '9px 16px',
-              backgroundColor: '#f5efe5',
-              border: '1px solid #7a5c2e',
-              color: '#7a5c2e',
+              backgroundColor: '#f5f5f7',
+              border: '1px solid #0066cc',
+              color: '#0066cc',
               fontSize: '13px',
               fontWeight: 600,
               cursor: 'pointer',
@@ -473,8 +473,8 @@ export const FounderDashboard: React.FC<FounderDashboardProps> = ({
             onClick={onOpenBuilder}
             style={{
               padding: '9px 18px',
-              backgroundColor: '#0c1826',
-              color: '#f5efe5',
+              backgroundColor: '#0f172a',
+              color: '#f5f5f7',
               border: 'none',
               fontSize: '13px',
               fontWeight: 600,
@@ -498,31 +498,31 @@ export const FounderDashboard: React.FC<FounderDashboardProps> = ({
           marginBottom: '28px',
         }}
       >
-        <div style={{ backgroundColor: '#fffdf9', border: '1px solid #d6c9b2', padding: '18px 20px' }}>
-          <div style={{ fontSize: '11px', color: '#7a5c2e', textTransform: 'uppercase', fontWeight: 600 }}>Target Capital</div>
-          <div style={{ fontSize: '22px', fontWeight: 700, color: '#121a29', marginTop: '4px' }}>{formatINR(venture.capital_target)}</div>
+        <div style={{ backgroundColor: '#ffffff', border: '1px solid rgba(0, 0, 0, 0.1)', padding: '18px 20px' }}>
+          <div style={{ fontSize: '11px', color: '#0066cc', textTransform: 'uppercase', fontWeight: 600 }}>Target Capital</div>
+          <div style={{ fontSize: '22px', fontWeight: 700, color: '#0f172a', marginTop: '4px' }}>{formatINR(venture.capital_target)}</div>
           <div style={{ fontSize: '11.5px', color: '#4c5262', marginTop: '4px' }}>Tickets: {formatINR(venture.ticket_min || 0)} – {formatINR(venture.ticket_max || 0)}</div>
         </div>
 
-        <div style={{ backgroundColor: '#fffdf9', border: '1px solid #d6c9b2', padding: '18px 20px' }}>
-          <div style={{ fontSize: '11px', color: '#7a5c2e', textTransform: 'uppercase', fontWeight: 600 }}>Proposed Arrangement</div>
-          <div style={{ fontSize: '16px', fontWeight: 600, color: '#121a29', marginTop: '4px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+        <div style={{ backgroundColor: '#ffffff', border: '1px solid rgba(0, 0, 0, 0.1)', padding: '18px 20px' }}>
+          <div style={{ fontSize: '11px', color: '#0066cc', textTransform: 'uppercase', fontWeight: 600 }}>Proposed Arrangement</div>
+          <div style={{ fontSize: '16px', fontWeight: 600, color: '#0f172a', marginTop: '4px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
             {venture.proposed_arrangement || 'Direct Facilitation'}
           </div>
           <div style={{ fontSize: '11.5px', color: '#15803d', marginTop: '4px' }}>Active in Investor Matching</div>
         </div>
 
-        <div style={{ backgroundColor: '#fffdf9', border: '1px solid #d6c9b2', padding: '18px 20px' }}>
-          <div style={{ fontSize: '11px', color: '#7a5c2e', textTransform: 'uppercase', fontWeight: 600 }}>Dossier Content</div>
-          <div style={{ fontSize: '22px', fontWeight: 700, color: '#121a29', marginTop: '4px' }}>
+        <div style={{ backgroundColor: '#ffffff', border: '1px solid rgba(0, 0, 0, 0.1)', padding: '18px 20px' }}>
+          <div style={{ fontSize: '11px', color: '#0066cc', textTransform: 'uppercase', fontWeight: 600 }}>Dossier Content</div>
+          <div style={{ fontSize: '22px', fontWeight: 700, color: '#0f172a', marginTop: '4px' }}>
             {10 + customSections.length} Sections
           </div>
           <div style={{ fontSize: '11.5px', color: '#4c5262', marginTop: '4px' }}>10 Standard + {customSections.length} Custom Sections</div>
         </div>
 
-        <div style={{ backgroundColor: '#fffdf9', border: '1px solid #d6c9b2', padding: '18px 20px' }}>
-          <div style={{ fontSize: '11px', color: '#7a5c2e', textTransform: 'uppercase', fontWeight: 600 }}>Inbound Introductions</div>
-          <div style={{ fontSize: '22px', fontWeight: 700, color: pendingRequests.length > 0 ? '#b45309' : '#121a29', marginTop: '4px' }}>
+        <div style={{ backgroundColor: '#ffffff', border: '1px solid rgba(0, 0, 0, 0.1)', padding: '18px 20px' }}>
+          <div style={{ fontSize: '11px', color: '#0066cc', textTransform: 'uppercase', fontWeight: 600 }}>Inbound Introductions</div>
+          <div style={{ fontSize: '22px', fontWeight: 700, color: pendingRequests.length > 0 ? '#b45309' : '#0f172a', marginTop: '4px' }}>
             {pendingRequests.length} Pending
           </div>
           <div style={{ fontSize: '11.5px', color: '#15803d', marginTop: '4px' }}>{activeConnections.length} Active Direct Chats</div>
@@ -530,7 +530,7 @@ export const FounderDashboard: React.FC<FounderDashboardProps> = ({
       </div>
 
       {/* Tab Navigation Switcher */}
-      <div style={{ display: 'flex', gap: '8px', borderBottom: '1px solid #d6c9b2', marginBottom: '24px', flexWrap: 'wrap' }}>
+      <div style={{ display: 'flex', gap: '8px', borderBottom: '1px solid rgba(0, 0, 0, 0.1)', marginBottom: '24px', flexWrap: 'wrap' }}>
         <button
           type="button"
           onClick={() => setActiveTab('SECTIONS')}
@@ -540,9 +540,9 @@ export const FounderDashboard: React.FC<FounderDashboardProps> = ({
             background: 'none',
             fontSize: '14px',
             fontWeight: activeTab === 'SECTIONS' ? 700 : 500,
-            color: activeTab === 'SECTIONS' ? '#0c1826' : '#4c5262',
+            color: activeTab === 'SECTIONS' ? '#0f172a' : '#4c5262',
             cursor: 'pointer',
-            borderBottom: activeTab === 'SECTIONS' ? '3px solid #7a5c2e' : '3px solid transparent',
+            borderBottom: activeTab === 'SECTIONS' ? '3px solid #0066cc' : '3px solid transparent',
             display: 'flex',
             alignItems: 'center',
             gap: '8px',
@@ -560,9 +560,9 @@ export const FounderDashboard: React.FC<FounderDashboardProps> = ({
             background: 'none',
             fontSize: '14px',
             fontWeight: activeTab === 'PROFILE' ? 700 : 500,
-            color: activeTab === 'PROFILE' ? '#0c1826' : '#4c5262',
+            color: activeTab === 'PROFILE' ? '#0f172a' : '#4c5262',
             cursor: 'pointer',
-            borderBottom: activeTab === 'PROFILE' ? '3px solid #7a5c2e' : '3px solid transparent',
+            borderBottom: activeTab === 'PROFILE' ? '3px solid #0066cc' : '3px solid transparent',
             display: 'flex',
             alignItems: 'center',
             gap: '8px',
@@ -580,9 +580,9 @@ export const FounderDashboard: React.FC<FounderDashboardProps> = ({
             background: 'none',
             fontSize: '14px',
             fontWeight: activeTab === 'CONNECTIONS' ? 700 : 500,
-            color: activeTab === 'CONNECTIONS' ? '#0c1826' : '#4c5262',
+            color: activeTab === 'CONNECTIONS' ? '#0f172a' : '#4c5262',
             cursor: 'pointer',
-            borderBottom: activeTab === 'CONNECTIONS' ? '3px solid #7a5c2e' : '3px solid transparent',
+            borderBottom: activeTab === 'CONNECTIONS' ? '3px solid #0066cc' : '3px solid transparent',
             display: 'flex',
             alignItems: 'center',
             gap: '8px',
@@ -605,9 +605,9 @@ export const FounderDashboard: React.FC<FounderDashboardProps> = ({
             background: 'none',
             fontSize: '14px',
             fontWeight: activeTab === 'EVIDENCE' ? 700 : 500,
-            color: activeTab === 'EVIDENCE' ? '#0c1826' : '#4c5262',
+            color: activeTab === 'EVIDENCE' ? '#0f172a' : '#4c5262',
             cursor: 'pointer',
-            borderBottom: activeTab === 'EVIDENCE' ? '3px solid #7a5c2e' : '3px solid transparent',
+            borderBottom: activeTab === 'EVIDENCE' ? '3px solid #0066cc' : '3px solid transparent',
             display: 'flex',
             alignItems: 'center',
             gap: '8px',
@@ -621,9 +621,9 @@ export const FounderDashboard: React.FC<FounderDashboardProps> = ({
       {activeTab === 'SECTIONS' && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
           {/* Controls Bar */}
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', backgroundColor: '#fffdf9', border: '1px solid #d6c9b2', padding: '16px 20px', flexWrap: 'wrap', gap: '12px' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', backgroundColor: '#ffffff', border: '1px solid rgba(0, 0, 0, 0.1)', padding: '16px 20px', flexWrap: 'wrap', gap: '12px' }}>
             <div>
-              <h3 style={{ margin: 0, fontSize: '17px', color: '#121a29' }}>Manage Presentation Dossier Sections</h3>
+              <h3 style={{ margin: 0, fontSize: '17px', color: '#0f172a' }}>Manage Presentation Dossier Sections</h3>
               <p style={{ margin: '4px 0 0', fontSize: '13px', color: '#4c5262' }}>
                 Edit any of your 10 standardized presentation sections or add new custom sections to address specific investor inquiries.
               </p>
@@ -635,7 +635,7 @@ export const FounderDashboard: React.FC<FounderDashboardProps> = ({
                 onClick={() => setShowAddSectionModal(true)}
                 style={{
                   padding: '9px 18px',
-                  backgroundColor: '#7a5c2e',
+                  backgroundColor: '#0066cc',
                   color: '#fff',
                   border: 'none',
                   fontSize: '13px',
@@ -655,8 +655,8 @@ export const FounderDashboard: React.FC<FounderDashboardProps> = ({
                 disabled={saving}
                 style={{
                   padding: '9px 24px',
-                  backgroundColor: '#0c1826',
-                  color: '#f5efe5',
+                  backgroundColor: '#0f172a',
+                  color: '#f5f5f7',
                   border: 'none',
                   fontSize: '13px',
                   fontWeight: 600,
@@ -670,9 +670,9 @@ export const FounderDashboard: React.FC<FounderDashboardProps> = ({
 
           {/* Add Section Creator Box */}
           {showAddSectionModal && (
-            <div style={{ backgroundColor: '#faf4eb', border: '2px dashed #7a5c2e', padding: '24px' }}>
+            <div style={{ backgroundColor: '#f5f5f7', border: '1px solid rgba(0, 0, 0, 0.08)', borderRadius: '16px', padding: '24px' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-                <h4 style={{ margin: 0, fontSize: '16px', color: '#121a29' }}>Create a New Custom Section for Your Venture</h4>
+                <h4 style={{ margin: 0, fontSize: '16px', color: '#0f172a' }}>Create a New Custom Section for Your Venture</h4>
                 <button
                   type="button"
                   onClick={() => setShowAddSectionModal(false)}
@@ -684,7 +684,7 @@ export const FounderDashboard: React.FC<FounderDashboardProps> = ({
 
               <div style={{ display: 'grid', gridTemplateColumns: '1.5fr 1fr', gap: '16px', marginBottom: '14px' }}>
                 <div>
-                  <label style={{ display: 'block', fontSize: '12.5px', fontWeight: 600, color: '#121a29', marginBottom: '6px' }}>
+                  <label style={{ display: 'block', fontSize: '12.5px', fontWeight: 600, color: '#0f172a', marginBottom: '6px' }}>
                     Section Title <span style={{ color: '#b45309' }}>*</span>
                   </label>
                   <input
@@ -696,7 +696,7 @@ export const FounderDashboard: React.FC<FounderDashboardProps> = ({
                   />
                 </div>
                 <div>
-                  <label style={{ display: 'block', fontSize: '12.5px', fontWeight: 600, color: '#121a29', marginBottom: '6px' }}>
+                  <label style={{ display: 'block', fontSize: '12.5px', fontWeight: 600, color: '#0f172a', marginBottom: '6px' }}>
                     Category / Source Tag
                   </label>
                   <input
@@ -710,7 +710,7 @@ export const FounderDashboard: React.FC<FounderDashboardProps> = ({
               </div>
 
               <div style={{ marginBottom: '16px' }}>
-                <label style={{ display: 'block', fontSize: '12.5px', fontWeight: 600, color: '#121a29', marginBottom: '6px' }}>
+                <label style={{ display: 'block', fontSize: '12.5px', fontWeight: 600, color: '#0f172a', marginBottom: '6px' }}>
                   Section Content / Narrative Details
                 </label>
                 <textarea
@@ -743,7 +743,7 @@ export const FounderDashboard: React.FC<FounderDashboardProps> = ({
 
           {/* List of 10 Standard Sections */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-            <div style={{ fontSize: '13.5px', fontWeight: 700, color: '#7a5c2e', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
+            <div style={{ fontSize: '13.5px', fontWeight: 700, color: '#0066cc', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
               Standard 10 Facilitation Sections
             </div>
 
@@ -751,17 +751,17 @@ export const FounderDashboard: React.FC<FounderDashboardProps> = ({
               <div
                 key={sec.key}
                 style={{
-                  backgroundColor: '#fffdf9',
-                  border: '1px solid #d6c9b2',
+                  backgroundColor: '#ffffff',
+                  border: '1px solid rgba(0, 0, 0, 0.1)',
                   padding: '18px 22px',
                 }}
               >
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <span style={{ fontSize: '12px', fontWeight: 700, color: '#7a5c2e', fontFamily: 'monospace' }}>{sec.num}</span>
-                    <span style={{ fontSize: '15px', fontWeight: 600, color: '#121a29' }}>{sec.title}</span>
+                    <span style={{ fontSize: '12px', fontWeight: 700, color: '#0066cc', fontFamily: 'monospace' }}>{sec.num}</span>
+                    <span style={{ fontSize: '15px', fontWeight: 600, color: '#0f172a' }}>{sec.title}</span>
                   </div>
-                  <span style={{ fontSize: '10px', color: '#7a5c2e', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.08em', backgroundColor: '#faf4eb', padding: '2px 8px', border: '1px solid #d6c9b2' }}>
+                  <span style={{ fontSize: '10px', color: '#0066cc', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.08em', backgroundColor: '#f5f5f7', padding: '2px 8px', border: '1px solid rgba(0, 0, 0, 0.1)' }}>
                     {sec.tag}
                   </span>
                 </div>
@@ -773,7 +773,7 @@ export const FounderDashboard: React.FC<FounderDashboardProps> = ({
                   style={{
                     width: '100%',
                     padding: '10px 12px',
-                    border: '1px solid #d6c9b2',
+                    border: '1px solid rgba(0, 0, 0, 0.1)',
                     backgroundColor: '#faf8f4',
                     fontSize: '13.5px',
                     lineHeight: 1.55,
@@ -788,7 +788,7 @@ export const FounderDashboard: React.FC<FounderDashboardProps> = ({
           {/* List of Custom Sections (If any) */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', marginTop: '12px' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <div style={{ fontSize: '13.5px', fontWeight: 700, color: '#7a5c2e', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
+              <div style={{ fontSize: '13.5px', fontWeight: 700, color: '#0066cc', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
                 Custom Sections Added by Founder ({customSections.length})
               </div>
               <button
@@ -796,9 +796,9 @@ export const FounderDashboard: React.FC<FounderDashboardProps> = ({
                 onClick={() => setShowAddSectionModal(true)}
                 style={{
                   padding: '4px 12px',
-                  backgroundColor: '#fffdf9',
-                  border: '1px dashed #7a5c2e',
-                  color: '#7a5c2e',
+                  backgroundColor: '#ffffff',
+                  border: '1px solid rgba(0, 0, 0, 0.08)', borderRadius: '14px',
+                  color: '#0066cc',
                   fontSize: '12px',
                   fontWeight: 600,
                   cursor: 'pointer',
@@ -809,7 +809,7 @@ export const FounderDashboard: React.FC<FounderDashboardProps> = ({
             </div>
 
             {customSections.length === 0 ? (
-              <div style={{ padding: '24px', backgroundColor: '#faf5ec', border: '1px dashed #d6c9b2', textAlign: 'center', color: '#4c5262', fontSize: '13.5px' }}>
+              <div style={{ padding: '24px', backgroundColor: '#f5f5f7', border: 'none', borderRadius: '16px', textAlign: 'center', color: '#4c5262', fontSize: '13.5px' }}>
                 No custom sections added yet. Click <strong>"+ Add New Section"</strong> above to add proprietary topics like Unit Economics, IP / Patents, or Customer Case Studies.
               </div>
             ) : (
@@ -817,14 +817,14 @@ export const FounderDashboard: React.FC<FounderDashboardProps> = ({
                 <div
                   key={cs.id}
                   style={{
-                    backgroundColor: '#fffdf9',
-                    border: '1px solid #c5b59b',
+                    backgroundColor: '#ffffff',
+                    border: '1px solid rgba(0, 0, 0, 0.16)',
                     padding: '18px 22px',
                   }}
                 >
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                      <span style={{ fontSize: '12px', fontWeight: 700, color: '#7a5c2e', fontFamily: 'monospace' }}>{cs.num}</span>
+                      <span style={{ fontSize: '12px', fontWeight: 700, color: '#0066cc', fontFamily: 'monospace' }}>{cs.num}</span>
                       <input
                         type="text"
                         value={cs.title}
@@ -833,11 +833,11 @@ export const FounderDashboard: React.FC<FounderDashboardProps> = ({
                           updated[idx].title = e.target.value;
                           setCustomSections(updated);
                         }}
-                        style={{ fontSize: '15px', fontWeight: 600, color: '#121a29', border: '1px solid transparent', padding: '2px 6px', background: 'transparent' }}
+                        style={{ fontSize: '15px', fontWeight: 600, color: '#0f172a', border: '1px solid transparent', padding: '2px 6px', background: 'transparent' }}
                       />
                     </div>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                      <span style={{ fontSize: '10px', color: '#7a5c2e', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.08em', backgroundColor: '#faf4eb', padding: '2px 8px', border: '1px solid #d6c9b2' }}>
+                      <span style={{ fontSize: '10px', color: '#0066cc', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.08em', backgroundColor: '#f5f5f7', padding: '2px 8px', border: '1px solid rgba(0, 0, 0, 0.1)' }}>
                         {cs.source}
                       </span>
                       <button
@@ -862,7 +862,7 @@ export const FounderDashboard: React.FC<FounderDashboardProps> = ({
                     style={{
                       width: '100%',
                       padding: '10px 12px',
-                      border: '1px solid #d6c9b2',
+                      border: '1px solid rgba(0, 0, 0, 0.1)',
                       backgroundColor: '#faf8f4',
                       fontSize: '13.5px',
                       lineHeight: 1.55,
@@ -882,8 +882,8 @@ export const FounderDashboard: React.FC<FounderDashboardProps> = ({
               disabled={saving}
               style={{
                 padding: '12px 36px',
-                backgroundColor: '#0c1826',
-                color: '#f5efe5',
+                backgroundColor: '#0f172a',
+                color: '#f5f5f7',
                 border: 'none',
                 fontSize: '14.5px',
                 fontWeight: 600,
@@ -898,10 +898,10 @@ export const FounderDashboard: React.FC<FounderDashboardProps> = ({
 
       {/* TAB 2: EDIT VENTURE PROFILE & DEAL TERMS */}
       {activeTab === 'PROFILE' && (
-        <form onSubmit={handleSaveProfile} style={{ backgroundColor: '#fffdf9', border: '1px solid #d6c9b2', padding: '32px' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px', borderBottom: '1px solid #d6c9b2', paddingBottom: '16px' }}>
+        <form onSubmit={handleSaveProfile} style={{ backgroundColor: '#ffffff', border: '1px solid rgba(0, 0, 0, 0.1)', padding: '32px' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px', borderBottom: '1px solid rgba(0, 0, 0, 0.1)', paddingBottom: '16px' }}>
             <div>
-              <h3 style={{ margin: 0, fontSize: '20px', color: '#121a29' }}>Edit Venture Deal Terms & Core Profile</h3>
+              <h3 style={{ margin: 0, fontSize: '20px', color: '#0f172a' }}>Edit Venture Deal Terms & Core Profile</h3>
               <p style={{ margin: '4px 0 0', fontSize: '13px', color: '#4c5262' }}>
                 Changes made here immediately update your venture card, matching parameters, and investor discovery profile.
               </p>
@@ -909,7 +909,7 @@ export const FounderDashboard: React.FC<FounderDashboardProps> = ({
             <button
               type="submit"
               disabled={saving}
-              style={{ padding: '10px 24px', backgroundColor: '#0c1826', color: '#f5efe5', border: 'none', fontSize: '13.5px', fontWeight: 600, cursor: saving ? 'wait' : 'pointer' }}
+              style={{ padding: '10px 24px', backgroundColor: '#0f172a', color: '#f5f5f7', border: 'none', fontSize: '13.5px', fontWeight: 600, cursor: saving ? 'wait' : 'pointer' }}
             >
               {saving ? 'Saving...' : 'Save Profile Changes'}
             </button>
@@ -919,7 +919,7 @@ export const FounderDashboard: React.FC<FounderDashboardProps> = ({
             {/* Row 1: Company Name & Location */}
             <div style={{ display: 'grid', gridTemplateColumns: '1.5fr 1fr', gap: '16px' }}>
               <div>
-                <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: '#121a29', marginBottom: '6px' }}>
+                <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: '#0f172a', marginBottom: '6px' }}>
                   Company / Entity Name <span style={{ color: '#b45309' }}>*</span>
                 </label>
                 <input
@@ -930,7 +930,7 @@ export const FounderDashboard: React.FC<FounderDashboardProps> = ({
                 />
               </div>
               <div>
-                <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: '#121a29', marginBottom: '6px' }}>
+                <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: '#0f172a', marginBottom: '6px' }}>
                   Operating Location(s)
                 </label>
                 <input
@@ -944,7 +944,7 @@ export const FounderDashboard: React.FC<FounderDashboardProps> = ({
 
             {/* Row 2: Tagline */}
             <div>
-              <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: '#121a29', marginBottom: '6px' }}>
+              <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: '#0f172a', marginBottom: '6px' }}>
                 Elevator Tagline / Opportunity Hook
               </label>
               <input
@@ -958,7 +958,7 @@ export const FounderDashboard: React.FC<FounderDashboardProps> = ({
             {/* Row 3: Sector & Stage */}
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
               <div>
-                <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: '#121a29', marginBottom: '6px' }}>
+                <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: '#0f172a', marginBottom: '6px' }}>
                   Sector / Industry
                 </label>
                 <select
@@ -981,13 +981,13 @@ export const FounderDashboard: React.FC<FounderDashboardProps> = ({
                     value={customSector}
                     onChange={(e) => setCustomSector(e.target.value)}
                     placeholder="Specify custom sector..."
-                    style={{ width: '100%', marginTop: '8px', padding: '8px 10px', border: '1px solid #8a8070', background: '#faf4eb', fontSize: '13px', boxSizing: 'border-box' }}
+                    style={{ width: '100%', marginTop: '8px', padding: '8px 10px', border: '1px solid #8a8070', background: '#f5f5f7', fontSize: '13px', boxSizing: 'border-box' }}
                   />
                 )}
               </div>
 
               <div>
-                <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: '#121a29', marginBottom: '6px' }}>
+                <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: '#0f172a', marginBottom: '6px' }}>
                   Operating Stage
                 </label>
                 <select
@@ -1008,7 +1008,7 @@ export const FounderDashboard: React.FC<FounderDashboardProps> = ({
                     value={customStage}
                     onChange={(e) => setCustomStage(e.target.value)}
                     placeholder="Specify custom stage..."
-                    style={{ width: '100%', marginTop: '8px', padding: '8px 10px', border: '1px solid #8a8070', background: '#faf4eb', fontSize: '13px', boxSizing: 'border-box' }}
+                    style={{ width: '100%', marginTop: '8px', padding: '8px 10px', border: '1px solid #8a8070', background: '#f5f5f7', fontSize: '13px', boxSizing: 'border-box' }}
                   />
                 )}
               </div>
@@ -1017,7 +1017,7 @@ export const FounderDashboard: React.FC<FounderDashboardProps> = ({
             {/* Row 4: Capital Financial Targets */}
             <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr 1fr', gap: '16px' }}>
               <div>
-                <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: '#121a29', marginBottom: '6px' }}>
+                <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: '#0f172a', marginBottom: '6px' }}>
                   Total Capital Sought (INR)
                 </label>
                 <input
@@ -1026,11 +1026,11 @@ export const FounderDashboard: React.FC<FounderDashboardProps> = ({
                   onChange={(e) => setCapitalTarget(Number(e.target.value))}
                   style={{ width: '100%', padding: '10px 12px', border: '1px solid #8a8070', background: '#fff', fontSize: '14px', boxSizing: 'border-box' }}
                 />
-                <span style={{ fontSize: '11.5px', color: '#7a5c2e' }}>Formatted: {formatINR(capitalTarget)}</span>
+                <span style={{ fontSize: '11.5px', color: '#0066cc' }}>Formatted: {formatINR(capitalTarget)}</span>
               </div>
 
               <div>
-                <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: '#121a29', marginBottom: '6px' }}>
+                <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: '#0f172a', marginBottom: '6px' }}>
                   Min Investor Ticket (INR)
                 </label>
                 <input
@@ -1039,11 +1039,11 @@ export const FounderDashboard: React.FC<FounderDashboardProps> = ({
                   onChange={(e) => setTicketMin(Number(e.target.value))}
                   style={{ width: '100%', padding: '10px 12px', border: '1px solid #8a8070', background: '#fff', fontSize: '14px', boxSizing: 'border-box' }}
                 />
-                <span style={{ fontSize: '11.5px', color: '#7a5c2e' }}>Formatted: {formatINR(ticketMin)}</span>
+                <span style={{ fontSize: '11.5px', color: '#0066cc' }}>Formatted: {formatINR(ticketMin)}</span>
               </div>
 
               <div>
-                <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: '#121a29', marginBottom: '6px' }}>
+                <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: '#0f172a', marginBottom: '6px' }}>
                   Max Investor Ticket (INR)
                 </label>
                 <input
@@ -1052,13 +1052,13 @@ export const FounderDashboard: React.FC<FounderDashboardProps> = ({
                   onChange={(e) => setTicketMax(Number(e.target.value))}
                   style={{ width: '100%', padding: '10px 12px', border: '1px solid #8a8070', background: '#fff', fontSize: '14px', boxSizing: 'border-box' }}
                 />
-                <span style={{ fontSize: '11.5px', color: '#7a5c2e' }}>Formatted: {formatINR(ticketMax)}</span>
+                <span style={{ fontSize: '11.5px', color: '#0066cc' }}>Formatted: {formatINR(ticketMax)}</span>
               </div>
             </div>
 
             {/* Row 5: Proposed Arrangement */}
             <div>
-              <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: '#121a29', marginBottom: '6px' }}>
+              <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: '#0f172a', marginBottom: '6px' }}>
                 Proposed Funding Structure / Consideration
               </label>
               <input
@@ -1072,7 +1072,7 @@ export const FounderDashboard: React.FC<FounderDashboardProps> = ({
 
             {/* Row 6: Itemized Budget */}
             <div>
-              <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: '#121a29', marginBottom: '6px' }}>
+              <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: '#0f172a', marginBottom: '6px' }}>
                 Itemized Use of Capital Breakdown
               </label>
               <textarea
@@ -1087,7 +1087,7 @@ export const FounderDashboard: React.FC<FounderDashboardProps> = ({
             {/* Row 7: Media & Showcase Assets */}
             <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr 1fr', gap: '16px' }}>
               <div>
-                <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: '#121a29', marginBottom: '6px' }}>
+                <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: '#0f172a', marginBottom: '6px' }}>
                   Hero Image Showcase URL
                 </label>
                 <input
@@ -1100,7 +1100,7 @@ export const FounderDashboard: React.FC<FounderDashboardProps> = ({
               </div>
 
               <div>
-                <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: '#121a29', marginBottom: '6px' }}>
+                <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: '#0f172a', marginBottom: '6px' }}>
                   Pitch Deck URL (DocSend / PDF)
                 </label>
                 <input
@@ -1113,7 +1113,7 @@ export const FounderDashboard: React.FC<FounderDashboardProps> = ({
               </div>
 
               <div>
-                <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: '#121a29', marginBottom: '6px' }}>
+                <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: '#0f172a', marginBottom: '6px' }}>
                   Founder Video Pitch (Loom / YouTube)
                 </label>
                 <input
@@ -1133,8 +1133,8 @@ export const FounderDashboard: React.FC<FounderDashboardProps> = ({
                 disabled={saving}
                 style={{
                   padding: '12px 32px',
-                  backgroundColor: '#0c1826',
-                  color: '#f5efe5',
+                  backgroundColor: '#0f172a',
+                  color: '#f5f5f7',
                   border: 'none',
                   fontSize: '14.5px',
                   fontWeight: 600,
@@ -1152,8 +1152,8 @@ export const FounderDashboard: React.FC<FounderDashboardProps> = ({
       {activeTab === 'CONNECTIONS' && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
           {/* Pending Inbound Connection Requests */}
-          <div style={{ backgroundColor: '#fffdf9', border: '1px solid #d6c9b2', padding: '24px' }}>
-            <h3 style={{ margin: '0 0 6px', fontSize: '18px', color: '#121a29' }}>
+          <div style={{ backgroundColor: '#ffffff', border: '1px solid rgba(0, 0, 0, 0.1)', padding: '24px' }}>
+            <h3 style={{ margin: '0 0 6px', fontSize: '18px', color: '#0f172a' }}>
               Pending Inbound Introductions ({pendingRequests.length})
             </h3>
             <p style={{ margin: '0 0 20px', fontSize: '13.5px', color: '#4c5262' }}>
@@ -1161,7 +1161,7 @@ export const FounderDashboard: React.FC<FounderDashboardProps> = ({
             </p>
 
             {pendingRequests.length === 0 ? (
-              <div style={{ padding: '32px', textAlign: 'center', backgroundColor: '#faf5ec', border: '1px dashed #d6c9b2', color: '#4c5262', fontSize: '14px' }}>
+              <div style={{ padding: '32px', textAlign: 'center', backgroundColor: '#f5f5f7', border: 'none', borderRadius: '16px', color: '#4c5262', fontSize: '14px' }}>
                 No pending connection requests right now. Your profile is actively featured in the investor directory.
               </div>
             ) : (
@@ -1171,8 +1171,8 @@ export const FounderDashboard: React.FC<FounderDashboardProps> = ({
                     key={conn.id}
                     style={{
                       padding: '18px 20px',
-                      backgroundColor: '#fbf8f2',
-                      border: '1px solid #d6c9b2',
+                      backgroundColor: '#fbfbfd',
+                      border: '1px solid rgba(0, 0, 0, 0.1)',
                       display: 'flex',
                       justifyContent: 'space-between',
                       alignItems: 'center',
@@ -1181,14 +1181,14 @@ export const FounderDashboard: React.FC<FounderDashboardProps> = ({
                     }}
                   >
                     <div>
-                      <div style={{ fontSize: '15px', fontWeight: 700, color: '#121a29' }}>
+                      <div style={{ fontSize: '15px', fontWeight: 700, color: '#0f172a' }}>
                         {conn.investor_name || 'Accredited Investor'}
                       </div>
-                      <div style={{ fontSize: '12.5px', color: '#7a5c2e', marginTop: '2px' }}>
+                      <div style={{ fontSize: '12.5px', color: '#0066cc', marginTop: '2px' }}>
                         {conn.investor_firm ? `${conn.investor_firm} • ` : ''}Requested on {new Date(conn.created_at).toLocaleDateString()}
                       </div>
                       {conn.request_note && (
-                        <div style={{ marginTop: '8px', fontSize: '13px', color: '#4c5262', backgroundColor: '#fff', padding: '8px 12px', border: '1px solid #e3d6bf' }}>
+                        <div style={{ marginTop: '8px', fontSize: '13px', color: '#4c5262', backgroundColor: '#fff', padding: '8px 12px', border: '1px solid rgba(0, 0, 0, 0.08)' }}>
                           "{conn.request_note}"
                         </div>
                       )}
@@ -1200,7 +1200,7 @@ export const FounderDashboard: React.FC<FounderDashboardProps> = ({
                         onClick={() => handleConsent(conn.id, false)}
                         style={{
                           padding: '8px 16px',
-                          backgroundColor: '#fffdf9',
+                          backgroundColor: '#ffffff',
                           border: '1px solid #8a8070',
                           color: '#4c5262',
                           fontSize: '13px',
@@ -1233,8 +1233,8 @@ export const FounderDashboard: React.FC<FounderDashboardProps> = ({
           </div>
 
           {/* Active Connected Direct Chats */}
-          <div style={{ backgroundColor: '#fffdf9', border: '1px solid #d6c9b2', padding: '24px' }}>
-            <h3 style={{ margin: '0 0 6px', fontSize: '18px', color: '#121a29' }}>
+          <div style={{ backgroundColor: '#ffffff', border: '1px solid rgba(0, 0, 0, 0.1)', padding: '24px' }}>
+            <h3 style={{ margin: '0 0 6px', fontSize: '18px', color: '#0f172a' }}>
               Active Investor Connections ({activeConnections.length})
             </h3>
             <p style={{ margin: '0 0 20px', fontSize: '13.5px', color: '#4c5262' }}>
@@ -1242,7 +1242,7 @@ export const FounderDashboard: React.FC<FounderDashboardProps> = ({
             </p>
 
             {activeConnections.length === 0 ? (
-              <div style={{ padding: '32px', textAlign: 'center', backgroundColor: '#faf5ec', border: '1px dashed #d6c9b2', color: '#4c5262', fontSize: '14px' }}>
+              <div style={{ padding: '32px', textAlign: 'center', backgroundColor: '#f5f5f7', border: 'none', borderRadius: '16px', color: '#4c5262', fontSize: '14px' }}>
                 No active connections yet.
               </div>
             ) : (
@@ -1252,18 +1252,18 @@ export const FounderDashboard: React.FC<FounderDashboardProps> = ({
                     key={conn.id}
                     style={{
                       padding: '16px 20px',
-                      backgroundColor: '#f5efe5',
-                      border: '1px solid #d6c9b2',
+                      backgroundColor: '#f5f5f7',
+                      border: '1px solid rgba(0, 0, 0, 0.1)',
                       display: 'flex',
                       justifyContent: 'space-between',
                       alignItems: 'center',
                     }}
                   >
                     <div>
-                      <div style={{ fontSize: '15px', fontWeight: 600, color: '#121a29' }}>
+                      <div style={{ fontSize: '15px', fontWeight: 600, color: '#0f172a' }}>
                         {conn.investor_name || 'Active Investor Partner'}
                       </div>
-                      <div style={{ fontSize: '12px', color: '#7a5c2e' }}>
+                      <div style={{ fontSize: '12px', color: '#0066cc' }}>
                         {conn.investor_firm || 'Private Capital Office'} • Direct Channel Unlocked
                       </div>
                     </div>
@@ -1273,8 +1273,8 @@ export const FounderDashboard: React.FC<FounderDashboardProps> = ({
                       onClick={() => onOpenChat(conn.id)}
                       style={{
                         padding: '8px 18px',
-                        backgroundColor: '#0c1826',
-                        color: '#f5efe5',
+                        backgroundColor: '#0f172a',
+                        color: '#f5f5f7',
                         border: 'none',
                         fontSize: '13px',
                         fontWeight: 600,
@@ -1296,10 +1296,10 @@ export const FounderDashboard: React.FC<FounderDashboardProps> = ({
 
       {/* TAB 4: EVIDENCE CHECKLIST */}
       {activeTab === 'EVIDENCE' && (
-        <div style={{ backgroundColor: '#fffdf9', border: '1px solid #d6c9b2', padding: '32px' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px', borderBottom: '1px solid #d6c9b2', paddingBottom: '16px' }}>
+        <div style={{ backgroundColor: '#ffffff', border: '1px solid rgba(0, 0, 0, 0.1)', padding: '32px' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px', borderBottom: '1px solid rgba(0, 0, 0, 0.1)', paddingBottom: '16px' }}>
             <div>
-              <h3 style={{ margin: 0, fontSize: '19px', color: '#121a29' }}>Diligence Evidence & Verification Checklist</h3>
+              <h3 style={{ margin: 0, fontSize: '19px', color: '#0f172a' }}>Diligence Evidence & Verification Checklist</h3>
               <p style={{ margin: '4px 0 0', fontSize: '13px', color: '#4c5262' }}>
                 Maintain transparency on which claims have documentary backing (contracts, MCA filings, property deeds, bank statements).
               </p>
@@ -1308,7 +1308,7 @@ export const FounderDashboard: React.FC<FounderDashboardProps> = ({
               <button
                 type="button"
                 onClick={() => setShowAddEvidence(true)}
-                style={{ padding: '8px 16px', backgroundColor: '#7a5c2e', color: '#fff', border: 'none', fontSize: '13px', fontWeight: 600, cursor: 'pointer' }}
+                style={{ padding: '8px 16px', backgroundColor: '#0066cc', color: '#fff', border: 'none', fontSize: '13px', fontWeight: 600, cursor: 'pointer' }}
               >
                 + Add Evidence Item
               </button>
@@ -1316,7 +1316,7 @@ export const FounderDashboard: React.FC<FounderDashboardProps> = ({
                 type="button"
                 onClick={handleSaveEvidence}
                 disabled={saving}
-                style={{ padding: '8px 24px', backgroundColor: '#0c1826', color: '#f5efe5', border: 'none', fontSize: '13px', fontWeight: 600, cursor: saving ? 'wait' : 'pointer' }}
+                style={{ padding: '8px 24px', backgroundColor: '#0f172a', color: '#f5f5f7', border: 'none', fontSize: '13px', fontWeight: 600, cursor: saving ? 'wait' : 'pointer' }}
               >
                 {saving ? 'Saving...' : '💾 Save Evidence Checklist'}
               </button>
@@ -1325,11 +1325,11 @@ export const FounderDashboard: React.FC<FounderDashboardProps> = ({
 
           {/* Add Evidence Creator Box */}
           {showAddEvidence && (
-            <div style={{ padding: '16px', backgroundColor: '#faf4eb', border: '1px solid #d6c9b2', marginBottom: '20px' }}>
-              <h4 style={{ margin: '0 0 12px', fontSize: '13.5px', color: '#121a29' }}>Add Document or Statutory Verification Check</h4>
+            <div style={{ padding: '16px', backgroundColor: '#f5f5f7', border: '1px solid rgba(0, 0, 0, 0.1)', marginBottom: '20px' }}>
+              <h4 style={{ margin: '0 0 12px', fontSize: '13.5px', color: '#0f172a' }}>Add Document or Statutory Verification Check</h4>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '12px' }}>
                 <div>
-                  <label style={{ display: 'block', fontSize: '12px', fontWeight: 500, color: '#121a29', marginBottom: '4px' }}>Document / Check Title</label>
+                  <label style={{ display: 'block', fontSize: '12px', fontWeight: 500, color: '#0f172a', marginBottom: '4px' }}>Document / Check Title</label>
                   <input
                     type="text"
                     value={newEvidenceLabel}
@@ -1339,7 +1339,7 @@ export const FounderDashboard: React.FC<FounderDashboardProps> = ({
                   />
                 </div>
                 <div>
-                  <label style={{ display: 'block', fontSize: '12px', fontWeight: 500, color: '#121a29', marginBottom: '4px' }}>Verification Note / Reference</label>
+                  <label style={{ display: 'block', fontSize: '12px', fontWeight: 500, color: '#0f172a', marginBottom: '4px' }}>Verification Note / Reference</label>
                   <input
                     type="text"
                     value={newEvidenceNote}
@@ -1361,7 +1361,7 @@ export const FounderDashboard: React.FC<FounderDashboardProps> = ({
                         padding: '4px 8px',
                         fontSize: '11px',
                         fontWeight: 600,
-                        backgroundColor: newEvidenceStatus === st ? '#0c1826' : '#fff',
+                        backgroundColor: newEvidenceStatus === st ? '#0f172a' : '#fff',
                         color: newEvidenceStatus === st ? '#fff' : '#4c5262',
                         border: '1px solid #8a8070',
                         cursor: 'pointer',
@@ -1412,14 +1412,14 @@ export const FounderDashboard: React.FC<FounderDashboardProps> = ({
                 style={{
                   padding: '14px 18px',
                   backgroundColor: item.status === 'VERIFIED' ? '#f0fdf4' : item.status === 'UNRESOLVED_CHECK' ? '#fffbeb' : '#fff',
-                  border: '1px solid #d6c9b2',
+                  border: '1px solid rgba(0, 0, 0, 0.1)',
                   display: 'flex',
                   justifyContent: 'space-between',
                   alignItems: 'center',
                 }}
               >
                 <div>
-                  <div style={{ fontSize: '14px', fontWeight: 600, color: '#121a29' }}>{item.label}</div>
+                  <div style={{ fontSize: '14px', fontWeight: 600, color: '#0f172a' }}>{item.label}</div>
                   <div style={{ fontSize: '12px', color: '#4c5262', marginTop: '2px' }}>{item.note}</div>
                 </div>
                 <div style={{ display: 'flex', gap: '6px' }}>
@@ -1453,7 +1453,7 @@ export const FounderDashboard: React.FC<FounderDashboardProps> = ({
                       padding: '4px 10px',
                       fontSize: '11px',
                       fontWeight: 600,
-                      backgroundColor: item.status === 'SUPPORTED' ? '#0c1826' : '#fff',
+                      backgroundColor: item.status === 'SUPPORTED' ? '#0f172a' : '#fff',
                       color: item.status === 'SUPPORTED' ? '#fff' : '#4c5262',
                       border: '1px solid #8a8070',
                       cursor: 'pointer',

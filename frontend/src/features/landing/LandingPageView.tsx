@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { VentureCard, User } from '../../shared/types';
 import { formatINR } from '../../shared/formatters';
+import './LandingPageView.css';
 
 interface LandingPageViewProps {
   ventures: VentureCard[];
@@ -12,980 +13,642 @@ interface LandingPageViewProps {
   onNavigateToDashboard?: () => void;
 }
 
-interface ArchetypePreview {
-  id: string;
-  name: string;
-  sector: string;
-  arrangement: string;
-  target: string;
-  summary: string;
-  sectionsPreview: Array<{ num: string; title: string; highlight: string; source: string }>;
-}
-
-const ARCHETYPES: ArchetypePreview[] = [
-  {
-    id: 'film',
-    name: 'Garuda: The Legend Begins',
-    sector: 'Film / Entertainment',
-    arrangement: 'Fractional Equity Units + Producer Credits',
-    target: '₹6.00 Cr (50% of ₹12 Cr Budget)',
-    summary: 'High-concept mythological fantasy action feature film with locked credentials (Hanu-Man DOP, Sam CS score). Seeking ₹6 Cr via ₹25 Lakhs per unit with tiered producer credits.',
-    sectionsPreview: [
-      { num: '01', title: 'Venture Overview', highlight: 'Mythological adventure film written by national-award winning script consultants. Theatrical & digital rights locked.', source: 'FOUNDER DECLARATION' },
-      { num: '04', title: 'Capital Requirement', highlight: 'Total budget ₹12 Cr; promoter equity ₹6 Cr committed. Seeking ₹6 Cr gap divided into 24 fractional units of ₹25 Lakhs each.', source: 'BUDGET SCHEDULE' },
-      { num: '06', title: 'Investment Proposal', highlight: 'Priority recoupment from first box-office & OTT proceeds before equity split. Tiered producer credits (Co-Producer, Presents).', source: 'STRUCTURE TERMS' },
-      { num: '07', title: 'Execution Capability', highlight: 'DOP Dasaradhi Sivendra (Hanu-Man), music director Sam CS (Vikram, Kaithi). 65-day principal photography schedule.', source: 'CREDENTIALS' },
-      { num: '08', title: 'Risks & Dependencies', highlight: 'VFX vendor milestone sign-offs, weather window in Araku Valley, and Hindi satellite pre-licensing timelines.', source: 'DISCLOSURES' },
-      { num: '10', title: 'Evidence & Next Steps', highlight: 'Script copyright registration, lead actor agreement, bank escrow mandate under platform review.', source: 'REVIEW DESK' },
-    ],
-  },
-  {
-    id: 'shoe',
-    name: 'StrideCraft Footwear',
-    sector: 'Manufacturing / Consumer Brand',
-    arrangement: 'Growth Capital + Celebrity Revenue Share',
-    target: '₹3.00 Cr Growth Facility',
-    summary: 'Operating Indian footwear manufacturer expanding D2C reach with a zero-upfront-fee celebrity service line model, sharing per-unit net revenue to drive pan-India buzz.',
-    sectionsPreview: [
-      { num: '02', title: 'Current Position', highlight: '₹42 Lakhs MRR with 42% gross margin. Operating 12,000 pairs/month capacity in Agra industrial corridor.', source: 'OPERATING AUDIT' },
-      { num: '03', title: 'Opportunity', highlight: 'Restructuring brand around zero-upfront celebrity endorsement with 4.5% revenue-share per pair sold.', source: 'MARKET CONTEXT' },
-      { num: '05', title: 'Use of Capital', highlight: '₹1.2 Cr in specialized injection molds; ₹1.1 Cr launch inventory; ₹70 Lakhs digital distribution setup.', source: 'DEPLOYMENT PLAN' },
-      { num: '06', title: 'Investment Proposal', highlight: 'Growth equity tranche with liquidation preference and monthly MIS reporting verified via GST filings.', source: 'STRUCTURE TERMS' },
-      { num: '08', title: 'Risks & Dependencies', highlight: 'Talent campaign schedule delivery, return-rate management, and rubber raw material price volatility.', source: 'DISCLOSURES' },
-      { num: '10', title: 'Evidence & Next Steps', highlight: '3-year audited financials, MCA 2024 filings, and preliminary celebrity term sheet on file.', source: 'REVIEW DESK' },
-    ],
-  },
-  {
-    id: 'debt',
-    name: 'Apex CNC Precision',
-    sector: 'Manufacturing / Industrial Debt',
-    arrangement: '18% Secured Debt (3 BHK Collateral)',
-    target: '₹25.00 Lakhs Working Capital',
-    summary: 'Precision CNC machining supplier serving aerospace and automotive clients, offering a 1-year loan at 18% p.a. fully secured against a 3 BHK luxury residential flat.',
-    sectionsPreview: [
-      { num: '01', title: 'Venture Overview', highlight: '10-year established CNC machining facility holding AS9100 aerospace certification in Hyderabad.', source: 'FOUNDER DECLARATION' },
-      { num: '04', title: 'Capital Requirement', highlight: '₹25 Lakhs for raw titanium billet procurement against verified purchase orders worth ₹85 Lakhs.', source: 'BUDGET SCHEDULE' },
-      { num: '06', title: 'Investment Proposal', highlight: '18% committed annual return payable quarterly. First mortgage charge registered on unencumbered 3 BHK flat.', source: 'STRUCTURE TERMS' },
-      { num: '08', title: 'Risks & Dependencies', highlight: 'Repayment dependent on 60-day Tier-1 aerospace payment terms; title search verification required.', source: 'DISCLOSURES' },
-      { num: '09', title: 'Investor Participation', highlight: 'Registered mortgage deed with power of attorney, quarterly audit inspection rights, and post-dated cheques.', source: 'GOVERNANCE' },
-      { num: '10', title: 'Evidence & Next Steps', highlight: 'Property title search clearance, encumbrance certificate, and CA-certified net worth certificate verified.', source: 'REVIEW DESK' },
-    ],
-  },
-  {
-    id: 'logistics',
-    name: 'GramaBlink Logistics',
-    sector: 'Logistics / Rural Delivery',
-    arrangement: 'Tier-3 Network Equity Financing',
-    target: '₹1.20 Cr Expansion Round',
-    summary: 'Hyperlocal 30-minute delivery infrastructure in Andhra Pradesh Tier-3 towns (Vizianagaram, Bobbili), partnering with DWACRA women self-help groups for village micro-hubs.',
-    sectionsPreview: [
-      { num: '02', title: 'Current Position', highlight: '14,800 monthly deliveries across 3 towns; ₹18 average gross delivery take-rate; cash-flow breakeven.', source: 'OPERATING AUDIT' },
-      { num: '03', title: 'Opportunity', highlight: 'Capturing unserved tier-3 FMCG demand with 6,500 daily active households and 120 kirana merchant partners.', source: 'MARKET CONTEXT' },
-      { num: '05', title: 'Use of Capital', highlight: '8 new town micro-hubs, 40 retrofitted EV two-wheelers, and regional dispatch routing software.', source: 'DEPLOYMENT PLAN' },
-      { num: '07', title: 'Execution Capability', highlight: 'Promoters ex-Delhivery & Ninjacart; formal partnership with 24 DWACRA cluster federations.', source: 'CREDENTIALS' },
-      { num: '08', title: 'Risks & Dependencies', highlight: 'Monsoon access in rural interior mandals, regional smartphone penetration, and merchant credit cycles.', source: 'DISCLOSURES' },
-      { num: '10', title: 'Evidence & Next Steps', highlight: 'UPI settlement records, Gram Panchayat operating permissions, and fleet insurance papers verified.', source: 'REVIEW DESK' },
-    ],
-  },
-  {
-    id: 'hospital',
-    name: 'Varma Superspeciality Hospital',
-    sector: 'Healthcare / Acquisition',
-    arrangement: '50% Secondary Equity Buyout',
-    target: '₹8.00 Cr Partial Acquisition',
-    summary: '120-bed established multi-specialty hospital with digital Cath Lab and NABH accreditation. Founding director offering 50% equity buyout for institutional expansion.',
-    sectionsPreview: [
-      { num: '01', title: 'Venture Overview', highlight: 'NABH-accredited tertiary center operating for 8 years with cardiology, orthopedics, and nephrology focus.', source: 'FOUNDER DECLARATION' },
-      { num: '02', title: 'Current Position', highlight: '₹14.2 Cr FY25 revenue; 22.4% EBITDA; 74% average bed occupancy; 18 full-time senior surgeons.', source: 'OPERATING AUDIT' },
-      { num: '06', title: 'Investment Proposal', highlight: '50% equity transfer from retiring co-founder; joint board nomination rights; quarterly dividend distribution.', source: 'STRUCTURE TERMS' },
-      { num: '07', title: 'Execution Capability', highlight: 'Retaining Medical Director (30 yrs surgical experience) with 5-year lock-in and clinical autonomy.', source: 'CREDENTIALS' },
-      { num: '08', title: 'Risks & Dependencies', highlight: 'Aarogyasri / Ayushman Bharat state reimbursement receivables (average 75-day turnaround).', source: 'DISCLOSURES' },
-      { num: '10', title: 'Evidence & Next Steps', highlight: 'Bio-medical waste compliance, AERB radiation permits, fire safety NOC, and 3-year statutory audits verified.', source: 'REVIEW DESK' },
-    ],
-  },
-  {
-    id: 'realestate',
-    name: 'Suryam Meadows Layout',
-    sector: 'Real Estate / Land Development',
-    arrangement: 'Project Financing + 1st Charge Mortgage',
-    target: '₹4.50 Cr Phase-1 Capital',
-    summary: '18-acre DTCP-approved plotted community adjacent to upcoming industrial corridor. Seeking ₹4.5 Cr for underground cabling, black-top roads, and clubhouse development.',
-    sectionsPreview: [
-      { num: '01', title: 'Venture Overview', highlight: '18-acre plotted development layout with 210 residential plots; DTCP final technical sanction secured.', source: 'FOUNDER DECLARATION' },
-      { num: '04', title: 'Capital Requirement', highlight: '₹4.5 Cr for civil works, solar lighting, rainwater harvesting, and gated security infrastructure.', source: 'BUDGET SCHEDULE' },
-      { num: '06', title: 'Investment Proposal', highlight: 'Project debt facility with 1.4x asset mortgage cover over 80 designated commercial boundary plots.', source: 'STRUCTURE TERMS' },
-      { num: '08', title: 'Risks & Dependencies', highlight: 'Pacing of plot sales dependent on state highway bypass completion; water clearance renewal.', source: 'DISCLOSURES' },
-      { num: '09', title: 'Investor Participation', highlight: 'Escrow account on plot registration proceeds; mandatory 30% revenue sweep to capital retirement.', source: 'GOVERNANCE' },
-      { num: '10', title: 'Evidence & Next Steps', highlight: '30-year non-encumbrance certificate, DTCP sanction letter, and soil stability reports verified.', source: 'REVIEW DESK' },
-    ],
-  },
-];
+const IconArrowRight = () => (
+  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    <path d="M5 12h14" />
+    <path d="m12 5 7 7-7 7" />
+  </svg>
+);
 
 export const LandingPageView: React.FC<LandingPageViewProps> = ({
   ventures,
   currentUser,
   onExploreVentures,
   onStartOnboarding,
-  onOpenLogin,
+  onOpenLogin: _onOpenLogin,
   onSelectVenture,
   onNavigateToDashboard,
 }) => {
   const [openFaq, setOpenFaq] = useState<number | null>(null);
-  const [selectedArchetypeIndex, setSelectedArchetypeIndex] = useState<number>(0);
   const [showDemoCredentials, setShowDemoCredentials] = useState<boolean>(false);
+
+  useEffect(() => {
+    const els = document.querySelectorAll('.nv-reveal');
+    if (!('IntersectionObserver' in window)) {
+      els.forEach((el) => el.classList.add('is-visible'));
+      return;
+    }
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('is-visible');
+            observer.unobserve(entry.target);
+          }
+        });
+      },
+      { threshold: 0.08 }
+    );
+    els.forEach((el) => observer.observe(el));
+    return () => observer.disconnect();
+  }, [ventures.length]);
 
   const toggleFaq = (index: number) => {
     setOpenFaq(openFaq === index ? null : index);
   };
 
-  const activeArchetype = ARCHETYPES[selectedArchetypeIndex] || ARCHETYPES[0];
-
   const faqs = [
     {
-      q: 'What is the role of Nivesha Ventures in investment transactions?',
-      a: 'Nivesha Ventures acts solely as an independent due diligence, structuring, and introduction technology platform. We are not a broker-dealer, investment advisor, or custodian. We never hold, pool, or escrow investor funds. All capital transfers and legal documentation occur bilaterally and directly between the commercial bank accounts of the transacting parties.',
+      q: 'Does Nivesha Ventures hold or collect my investment money?',
+      a: 'No. We never collect, hold, or pool anyone’s money. We are not a bank or a fund manager. We simply check the business details and connect you with the owner. All payments happen directly between your bank account and the business’s bank account.',
     },
     {
-      q: 'What is the standard deal ticket size and platform working assumption?',
-      a: 'Our operating baseline assumes minimum individual investment tickets of ₹10 Lakhs (ranging from ₹10 Lakhs up to ₹8 Crores). Ventures listed on Nivesha are typically seeking between ₹25 Lakhs and ₹15 Crores across debt, revenue share, fractional equity, or secondary buyout structures.',
+      q: 'How much money do I need to invest?',
+      a: 'Deals on this platform start from ₹10 Lakhs and go up to ₹5 Crore+. It is built for people looking to make serious investments in real businesses like factories, land layouts, hospitals, shops, and films.',
     },
     {
-      q: 'How does Nivesha verify venture claims before introduction?',
-      a: 'Every venture must complete our standardized 10-section dossier. Our independent Review Desk verifies submitted P&L against GST filings, checks MCA statutory compliance, conducts primary reference calls with actual paying customers and suppliers, and verifies physical collateral titles before clearing any venture for facilitation.',
+      q: 'Why do you show the risks of a business openly?',
+      a: 'Investing ₹10 Lakhs or more is a big decision. Most websites only show the best sales pitch. We check tax records, property papers, and real profits, and we tell you both the good parts and the risks upfront so there are no surprises later.',
     },
     {
-      q: 'How do introductions and direct communication work?',
-      a: 'To maintain high institutional hygiene and prevent unsolicited spam, all direct communication is strictly gated by mutual consent. An investor submits a formal connection request with a structured deal note. Once the founder inspects the investor’s profile and approves, a private 1-on-1 direct encrypted chat channel is immediately unlocked.',
+      q: 'Do I have to fill out long, complicated forms?',
+      a: 'No. Instead of blank text boxes, you just click simple options to tell us what you are looking for. We show you businesses that match your budget and comfort level.',
     },
     {
-      q: 'What are the platform fees and when are they confirmed?',
-      a: 'In accordance with our neutral facilitation guidelines, platform fees are strictly marked "To be confirmed upon introduction readiness." Nivesha does not promise speculative transaction fees or take unauthorized cuts.',
-    },
-    {
-      q: 'Can founders edit their venture presentation and add custom sections?',
-      a: 'Yes. Once registered, founders access their dedicated Founder Dashboard where they can edit the 10 core sections, add unlimited custom sections (such as Box Office Breakdown or Collateral Title Reports), upload high-resolution media, and manage inbound investor requests.',
+      q: 'How do I talk to a business owner?',
+      a: 'First, read the full 10-point summary of the business. If you are interested, send a message request. Once the business owner reviews your profile and accepts, a private 1-on-1 chat opens right here so you can talk directly and plan a meeting.',
     },
   ];
 
   return (
-    <div style={{ width: '100%', overflowX: 'hidden', backgroundColor: '#faf9f5' }}>
-      {/* Logged-In Executive Strip */}
+    <div className="nv-landing">
+      {/* Logged-In Dashboard Shortcut */}
       {currentUser && (
-        <div
-          style={{
-            background: 'linear-gradient(90deg, #0c1826 0%, #162638 100%)',
-            color: '#f5efe5',
-            padding: '10px 24px',
-            borderBottom: '1px solid #7a5c2e',
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            flexWrap: 'wrap',
-            gap: '12px',
-          }}
-        >
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-            <span
-              style={{
-                backgroundColor: '#7a5c2e',
-                color: '#fff',
-                fontSize: '11px',
-                fontWeight: 700,
-                padding: '3px 8px',
-                borderRadius: '4px',
-                letterSpacing: '0.08em',
-                textTransform: 'uppercase',
-              }}
-            >
-              {currentUser.role.replace('_', ' ')} ACTIVE
-            </span>
-            <span style={{ fontSize: '13.5px' }}>
-              Welcome, <strong>{currentUser.full_name}</strong>. You are currently viewing the public platform showcase.
-            </span>
-          </div>
-
-          <button
-            onClick={onNavigateToDashboard}
+        <div style={{ background: '#ffffff', width: '100%' }}>
+          <div
             style={{
-              padding: '6px 16px',
-              backgroundColor: '#f5efe5',
-              color: '#0c1826',
-              fontWeight: 700,
-              fontSize: '12.5px',
-              borderRadius: '4px',
-              border: 'none',
-              cursor: 'pointer',
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '6px',
-              boxShadow: '0 2px 6px rgba(0,0,0,0.15)',
+              padding: '14px 24px 0',
+              display: 'flex',
+              justifyContent: 'flex-end',
+              maxWidth: '1180px',
+              margin: '0 auto',
             }}
           >
-            <span>Go to your {currentUser.role === 'FOUNDER' ? 'Founder Dashboard' : currentUser.role === 'INVESTOR' ? 'Investor Dashboard' : 'Review Desk'}</span>
-            <span>&rarr;</span>
-          </button>
+            <button
+              onClick={onNavigateToDashboard}
+              className="nv-btn-secondary"
+              style={{
+                padding: '8px 16px',
+                fontSize: '12.5px',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '6px',
+              }}
+            >
+              <span>
+                Go to your{' '}
+                {currentUser.role === 'FOUNDER'
+                  ? 'Founder Dashboard'
+                  : currentUser.role === 'INVESTOR'
+                    ? 'Investor Dashboard'
+                    : 'Review Desk'}
+              </span>
+              <IconArrowRight />
+            </button>
+          </div>
         </div>
       )}
 
-      {/* Hero Section */}
-      <section
-        style={{
-          padding: '88px 24px 72px',
-          background: 'radial-gradient(ellipse at 50% 15%, #ffffff 0%, #faf8f2 50%, #f3ece0 100%)',
-          borderBottom: '1px solid #d6c9b2',
-          textAlign: 'center',
-        }}
-      >
-        <div style={{ maxWidth: '980px', margin: '0 auto' }}>
-          {/* Eyebrow badge */}
-          <div
-            style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '8px',
-              padding: '6px 18px',
-              borderRadius: '9999px',
-              background: '#f1e6d4',
-              border: '1px solid #dcc9af',
-              fontSize: '11.5px',
-              fontWeight: 700,
-              color: '#7a5c2e',
-              letterSpacing: '0.12em',
-              textTransform: 'uppercase',
-              marginBottom: '26px',
-            }}
-          >
+      {/* 1. HERO SECTION */}
+      <section className="nv-hero">
+        <div className="nv-hero-ambient" aria-hidden="true" />
+        <div className="nv-hero-inner">
+          <div className="eyebrow nv-hero-anim-1" style={{ marginBottom: '14px' }}>
+            TRUSTED BUSINESS &amp; INVESTMENT DEALS
+          </div>
+
+          <h1 className="nv-hero-title nv-hero-anim-2">
+            Invest in{' '}
             <span
               style={{
-                width: '7px',
-                height: '7px',
-                borderRadius: '50%',
-                backgroundColor: '#7a5c2e',
+                backgroundColor: '#0066cc',
+                color: '#ffffff',
+                padding: '0 12px',
+                borderRadius: '8px',
+                display: 'inline-block',
               }}
-            />
-            Independent Capital Facilitation & Due Diligence
-          </div>
-
-          <h1
-            style={{
-              fontSize: '52px',
-              lineHeight: 1.15,
-              fontWeight: 600,
-              color: '#0c1826',
-              marginBottom: '22px',
-              letterSpacing: '-0.025em',
-              fontFamily: "Newsreader, Georgia, 'Times New Roman', serif",
-            }}
-          >
-            Institutional Capital Facilitation for Verified Indian Enterprises.
+            >
+              Real Businesses
+            </span>
+            . Clearly and Safely.
           </h1>
 
-          <p
-            style={{
-              fontSize: '19px',
-              lineHeight: 1.6,
-              color: '#4c566a',
-              maxWidth: '820px',
-              margin: '0 auto 36px',
-            }}
-          >
-            We bridge the gap between accredited investors and high-conviction Indian businesses across film production,
-            consumer manufacturing, rural logistics, hospital buyouts, and real estate. Every venture is presented through
-            our standardized 10-section dossier with primary evidence verification—eliminating pitch deck speculation.
+          <p className="nv-hero-subtitle nv-hero-anim-3">
+            Find checked business opportunities—from factories and land to films and hospitals—starting from ₹10 Lakhs.
+            We verify the facts and show both the good and the risks before you talk.
           </p>
 
-          {/* Action CTAs */}
-          <div
-            style={{
-              display: 'flex',
-              gap: '16px',
-              justifyContent: 'center',
-              flexWrap: 'wrap',
-              marginBottom: '48px',
-            }}
-          >
-            <button
-              onClick={onExploreVentures}
-              style={{
-                padding: '14px 32px',
-                borderRadius: '6px',
-                background: '#0c1826',
-                color: '#ffffff',
-                fontSize: '15px',
-                fontWeight: 600,
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '8px',
-                boxShadow: '0 4px 14px rgba(12, 24, 38, 0.25)',
-                cursor: 'pointer',
-              }}
-            >
-              <span>Explore Verified Opportunities</span>
-              <span>&rarr;</span>
+          {/* Primary Pill CTA + Secondary Blue Link */}
+          <div className="nv-hero-ctas nv-hero-anim-4">
+            <button onClick={onExploreVentures} className="nv-cta-card-primary">
+              Explore Businesses to Invest In
             </button>
 
-            <button
-              onClick={onStartOnboarding}
-              style={{
-                padding: '14px 28px',
-                borderRadius: '6px',
-                background: '#ffffff',
-                color: '#0c1826',
-                border: '1px solid #c5b59b',
-                fontSize: '15px',
-                fontWeight: 600,
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '8px',
-                cursor: 'pointer',
-              }}
-            >
-              <span>Submit Venture for Review</span>
+            <button onClick={onStartOnboarding} className="nv-hero-secondary-link">
+              <span>Looking for Funding? Start Here</span>
+              <span aria-hidden="true" style={{ fontSize: '18px', lineHeight: 1 }}>&rsaquo;</span>
             </button>
           </div>
 
-          {/* 4 Key Platform Working Pillars Strip */}
-          <div
-            style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
-              gap: '16px',
-              maxWidth: '920px',
-              margin: '0 auto',
-              textAlign: 'left',
-            }}
-          >
-            <div style={{ background: '#ffffff', border: '1px solid #d6c9b2', padding: '16px 20px', borderRadius: '8px' }}>
-              <div style={{ fontSize: '22px', fontWeight: 700, color: '#0c1826', fontFamily: "Newsreader, Georgia, serif" }}>
-                ≥ ₹10 Lakhs
-              </div>
-              <div style={{ fontSize: '12px', fontWeight: 600, color: '#7a5c2e', marginTop: '2px' }}>
-                Minimum Deal Baseline
-              </div>
-              <div style={{ fontSize: '12px', color: '#687282', marginTop: '4px' }}>
-                Working assumption for serious institutional and accredited tickets.
-              </div>
-            </div>
-
-            <div style={{ background: '#ffffff', border: '1px solid #d6c9b2', padding: '16px 20px', borderRadius: '8px' }}>
-              <div style={{ fontSize: '22px', fontWeight: 700, color: '#0c1826', fontFamily: "Newsreader, Georgia, serif" }}>
-                10 Sections
-              </div>
-              <div style={{ fontSize: '12px', fontWeight: 600, color: '#7a5c2e', marginTop: '2px' }}>
-                Unified Dossier Standard
-              </div>
-              <div style={{ fontSize: '12px', color: '#687282', marginTop: '4px' }}>
-                Every venture presents operational facts, terms, and risks identically.
-              </div>
-            </div>
-
-            <div style={{ background: '#ffffff', border: '1px solid #d6c9b2', padding: '16px 20px', borderRadius: '8px' }}>
-              <div style={{ fontSize: '22px', fontWeight: 700, color: '#0c1826', fontFamily: "Newsreader, Georgia, serif" }}>
-                6 Pillars
-              </div>
-              <div style={{ fontSize: '12px', fontWeight: 600, color: '#7a5c2e', marginTop: '2px' }}>
-                Primary Diligence Audit
-              </div>
-              <div style={{ fontSize: '12px', color: '#687282', marginTop: '4px' }}>
-                Audited GST, MCA checks, customer interviews, and collateral search.
-              </div>
-            </div>
-
-            <div style={{ background: '#ffffff', border: '1px solid #d6c9b2', padding: '16px 20px', borderRadius: '8px' }}>
-              <div style={{ fontSize: '22px', fontWeight: 700, color: '#0c1826', fontFamily: "Newsreader, Georgia, serif" }}>
-                100% Consent
-              </div>
-              <div style={{ fontSize: '12px', fontWeight: 600, color: '#7a5c2e', marginTop: '2px' }}>
-                Gated Direct Messaging
-              </div>
-              <div style={{ fontSize: '12px', color: '#687282', marginTop: '4px' }}>
-                Direct meetings and encrypted chat unlock only upon mutual approval.
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* How Capital Facilitation Works (Sequential 4-Stage Architecture) */}
-      <section style={{ padding: '80px 24px', background: '#faf9f5', borderBottom: '1px solid #d6c9b2' }}>
-        <div style={{ maxWidth: '1180px', margin: '0 auto' }}>
-          <div style={{ textAlign: 'center', maxWidth: '720px', margin: '0 auto 48px' }}>
-            <div style={{ fontSize: '11.5px', fontWeight: 700, color: '#7a5c2e', textTransform: 'uppercase', letterSpacing: '0.12em' }}>
-              THE FACILITATION DISCIPLINE
-            </div>
-            <h2 style={{ fontSize: '36px', color: '#0c1826', marginTop: '8px', marginBottom: '14px', fontFamily: "Newsreader, Georgia, serif" }}>
-              How Nivesha Facilitates High-Value Capital.
-            </h2>
-            <p style={{ fontSize: '16px', color: '#536074', lineHeight: 1.6 }}>
-              A neutral, transparent pathway that separates operating facts, proposed arrangement structures, and evidence verification before capital conversations begin.
-            </p>
-          </div>
-
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '24px' }}>
+          {/* Fanned Venture Categories Photo Showcase */}
+          <div className="nv-hero-fan nv-hero-anim-4" aria-label="Venture categories we cover">
             {[
               {
-                step: '01',
-                title: '10-Section Intake',
-                subtitle: 'Structured Promoter Profile',
-                description: 'The promoter submits verified baseline facts, cap table, current operating traction, itemized use of funds, and proposed consideration terms.',
+                title: 'Film Production',
+                sub: 'Projects & Studios',
+                img: 'https://images.unsplash.com/photo-1485846234645-a62644f84728?auto=format&fit=crop&w=900&q=80',
               },
               {
-                step: '02',
-                title: 'Review Desk Audit',
-                subtitle: 'Independent Evidence Check',
-                description: 'Our review analysts examine 3-year P&L against GST filings, conduct primary customer calls, inspect title deeds, and publish verified badges.',
+                title: 'Manufacturing',
+                sub: 'Factories & CNC',
+                img: 'https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=900&q=80',
               },
               {
-                step: '03',
-                title: 'Mandate Discovery',
-                subtitle: 'Grounded Investor Matching',
-                description: 'Institutional capital providers inspect verified dossiers matched directly to their ticket sizes, preferred arrangements, and sector mandates.',
+                title: 'Real Estate & Land',
+                sub: 'Layouts & Commercial',
+                img: 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=900&q=80',
               },
               {
-                step: '04',
-                title: 'Mutual Consent Meet',
-                subtitle: 'Direct Encrypted Chat',
-                description: 'Once both founder and investor review each other’s credentials and formally consent, 1-on-1 private messaging unlocks without third-party interference.',
+                title: 'Consumer Brands',
+                sub: 'Footwear & D2C',
+                img: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=900&q=80',
               },
-            ].map((st, i) => (
-              <div
-                key={i}
-                style={{
-                  background: '#ffffff',
-                  border: '1px solid #d6c9b2',
-                  borderRadius: '10px',
-                  padding: '28px 24px',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  justifyContent: 'space-between',
-                  boxShadow: '0 2px 6px rgba(12, 24, 38, 0.04)',
-                }}
-              >
-                <div>
-                  <div
-                    style={{
-                      fontSize: '32px',
-                      fontFamily: "Newsreader, Georgia, serif",
-                      color: '#7a5c2e',
-                      fontWeight: 600,
-                      marginBottom: '10px',
-                    }}
-                  >
-                    {st.step}
-                  </div>
-                  <h3 style={{ fontSize: '19px', fontWeight: 600, color: '#0c1826', marginBottom: '4px' }}>
-                    {st.title}
-                  </h3>
-                  <div style={{ fontSize: '12px', fontWeight: 600, color: '#7a5c2e', textTransform: 'uppercase', marginBottom: '12px', letterSpacing: '0.05em' }}>
-                    {st.subtitle}
-                  </div>
-                  <p style={{ fontSize: '14px', lineHeight: 1.6, color: '#536074' }}>
-                    {st.description}
-                  </p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Interactive 10-Section Venture Architecture Deep-Dive */}
-      <section style={{ padding: '84px 24px', background: '#f5efe5', borderBottom: '1px solid #d6c9b2' }}>
-        <div style={{ maxWidth: '1180px', margin: '0 auto' }}>
-          <div style={{ textAlign: 'center', maxWidth: '780px', margin: '0 auto 40px' }}>
-            <div style={{ fontSize: '11.5px', fontWeight: 700, color: '#7a5c2e', textTransform: 'uppercase', letterSpacing: '0.12em' }}>
-              THE COMMON VENTURE MODEL
-            </div>
-            <h2 style={{ fontSize: '36px', color: '#0c1826', marginTop: '8px', marginBottom: '14px', fontFamily: "Newsreader, Georgia, serif" }}>
-              One Rigorous Structure for Every Venture.
-            </h2>
-            <p style={{ fontSize: '16px', color: '#536074', lineHeight: 1.6 }}>
-              Whether a film production, shoe factory, collateral loan, rural logistics hub, hospital buyout, or real estate layout—investors evaluate identical core sections with transparent proof.
-            </p>
-          </div>
-
-          {/* Archetype Selector Tabs */}
-          <div
-            style={{
-              display: 'flex',
-              gap: '8px',
-              justifyContent: 'center',
-              flexWrap: 'wrap',
-              marginBottom: '32px',
-            }}
-          >
-            {ARCHETYPES.map((arch, idx) => (
+              {
+                title: 'Hospitality & Retail',
+                sub: 'Food & Local Hubs',
+                img: 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=900&q=80',
+              },
+            ].map((cat, idx) => (
               <button
-                key={arch.id}
-                onClick={() => setSelectedArchetypeIndex(idx)}
-                style={{
-                  padding: '10px 18px',
-                  borderRadius: '6px',
-                  backgroundColor: selectedArchetypeIndex === idx ? '#0c1826' : '#ffffff',
-                  color: selectedArchetypeIndex === idx ? '#f5efe5' : '#0c1826',
-                  border: selectedArchetypeIndex === idx ? '1px solid #0c1826' : '1px solid #d6c9b2',
-                  fontSize: '13px',
-                  fontWeight: selectedArchetypeIndex === idx ? 700 : 500,
-                  cursor: 'pointer',
-                  transition: 'all 0.15s ease',
-                }}
+                key={cat.title}
+                type="button"
+                onClick={onExploreVentures}
+                className={`nv-fan-card nv-fan-card-${idx + 1}`}
+                title={`Explore ${cat.title} opportunities`}
               >
-                {arch.name.split(':')[0]}
+                <img src={cat.img} alt={cat.title} />
+                <div className="nv-fan-label">
+                  {cat.title}
+                  <span className="nv-fan-sub">{cat.sub}</span>
+                </div>
               </button>
             ))}
           </div>
 
-          {/* Active Archetype Dossier Preview Box */}
-          <div
-            style={{
-              background: '#ffffff',
-              border: '1px solid #d6c9b2',
-              borderRadius: '12px',
-              padding: '32px',
-              boxShadow: '0 8px 24px rgba(12, 24, 38, 0.08)',
-            }}
-          >
-            <div
-              style={{
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'flex-start',
-                flexWrap: 'wrap',
-                gap: '16px',
-                paddingBottom: '20px',
-                borderBottom: '1px solid #e8dfcf',
-                marginBottom: '24px',
-              }}
-            >
-              <div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
-                  <span style={{ fontSize: '11px', fontWeight: 700, backgroundColor: '#f5efe5', color: '#7a5c2e', padding: '3px 8px', borderRadius: '4px', textTransform: 'uppercase' }}>
-                    {activeArchetype.sector}
-                  </span>
-                  <span style={{ fontSize: '11px', fontWeight: 700, backgroundColor: '#e9f5ed', color: '#15803d', padding: '3px 8px', borderRadius: '4px', textTransform: 'uppercase' }}>
-                    {activeArchetype.arrangement}
-                  </span>
-                </div>
-                <h3 style={{ fontSize: '26px', color: '#0c1826', margin: 0, fontFamily: "Newsreader, Georgia, serif" }}>
-                  {activeArchetype.name}
-                </h3>
-                <p style={{ fontSize: '14.5px', color: '#536074', marginTop: '6px', maxWidth: '750px', lineHeight: 1.5 }}>
-                  {activeArchetype.summary}
-                </p>
-              </div>
-
-              <div style={{ textAlign: 'right' }}>
-                <div style={{ fontSize: '11px', color: '#7a5c2e', fontWeight: 600, textTransform: 'uppercase' }}>
-                  Target Capital
-                </div>
-                <div style={{ fontSize: '20px', fontWeight: 700, color: '#0c1826' }}>
-                  {activeArchetype.target}
-                </div>
-                <button
-                  onClick={onExploreVentures}
-                  style={{
-                    marginTop: '10px',
-                    padding: '6px 14px',
-                    backgroundColor: '#0c1826',
-                    color: '#fff',
-                    borderRadius: '4px',
-                    fontSize: '12px',
-                    fontWeight: 600,
-                    cursor: 'pointer',
-                  }}
-                >
-                  View in Deal Directory &rarr;
-                </button>
-              </div>
-            </div>
-
-            {/* Render 6 key sections from this archetype */}
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '18px' }}>
-              {activeArchetype.sectionsPreview.map((sec, i) => (
-                <div
-                  key={i}
-                  style={{
-                    background: '#fcfbf8',
-                    border: '1px solid #e8dfcf',
-                    borderRadius: '8px',
-                    padding: '16px 20px',
-                  }}
-                >
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-                    <span style={{ fontSize: '11px', fontWeight: 700, color: '#7a5c2e' }}>
-                      SECTION {sec.num}
-                    </span>
-                    <span style={{ fontSize: '9.5px', fontWeight: 600, color: '#4c566a', backgroundColor: '#f0e8d9', padding: '2px 6px', borderRadius: '3px' }}>
-                      {sec.source}
-                    </span>
-                  </div>
-                  <div style={{ fontSize: '15px', fontWeight: 600, color: '#0c1826', marginBottom: '6px' }}>
-                    {sec.title}
-                  </div>
-                  <p style={{ fontSize: '13px', lineHeight: 1.55, color: '#536074', margin: 0 }}>
-                    {sec.highlight}
-                  </p>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Featured Verified Ventures Showcase */}
-      <section style={{ padding: '80px 24px', background: '#faf9f5', borderBottom: '1px solid #d6c9b2' }}>
-        <div style={{ maxWidth: '1180px', margin: '0 auto' }}>
-          <div
-            style={{
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'flex-end',
-              marginBottom: '36px',
-              flexWrap: 'wrap',
-              gap: '16px',
-            }}
-          >
-            <div>
-              <div style={{ fontSize: '11.5px', fontWeight: 700, color: '#7a5c2e', textTransform: 'uppercase', letterSpacing: '0.12em' }}>
-                VERIFIED DEAL ROOM
-              </div>
-              <h2 style={{ fontSize: '36px', color: '#0c1826', marginTop: '6px', margin: 0, fontFamily: "Newsreader, Georgia, serif" }}>
-                Active Ventures Currently Facilitating
-              </h2>
-            </div>
-            <button
-              onClick={onExploreVentures}
-              style={{
-                background: 'none',
-                border: 'none',
-                color: '#7a5c2e',
-                fontWeight: 700,
-                fontSize: '14.5px',
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '6px',
-                cursor: 'pointer',
-              }}
-            >
-              Browse all {ventures.length} ventures &rarr;
-            </button>
-          </div>
-
-          <div
-            style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fit, minmax(340px, 1fr))',
-              gap: '28px',
-            }}
-          >
-            {ventures.map((v) => {
-              const coverImg = v.hero_image_url || (v.gallery_urls && v.gallery_urls[0]);
-              return (
-                <div
-                  key={v.id}
-                  style={{
-                    background: '#ffffff',
-                    border: '1px solid #d6c9b2',
-                    borderRadius: '12px',
-                    overflow: 'hidden',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    justifyContent: 'space-between',
-                    boxShadow: '0 2px 8px rgba(12, 24, 38, 0.05)',
-                  }}
-                >
-                  {coverImg && (
-                    <div style={{ position: 'relative', height: '170px', width: '100%', backgroundColor: '#0c1826' }}>
-                      <img
-                        src={coverImg}
-                        alt={v.company_name}
-                        style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                        onError={(e) => {
-                          (e.target as HTMLImageElement).style.display = 'none';
-                        }}
-                      />
-                      <div
-                        style={{
-                          position: 'absolute',
-                          inset: 0,
-                          background: 'linear-gradient(to top, rgba(12, 24, 38, 0.6) 0%, transparent 70%)',
-                        }}
-                      />
-                      <div style={{ position: 'absolute', bottom: '12px', left: '16px', display: 'flex', gap: '6px' }}>
-                        <span
-                          style={{
-                            padding: '3px 8px',
-                            borderRadius: '4px',
-                            background: 'rgba(12, 24, 38, 0.85)',
-                            color: '#f5efe5',
-                            fontSize: '11px',
-                            fontWeight: 600,
-                            backdropFilter: 'blur(4px)',
-                          }}
-                        >
-                          {v.sector}
-                        </span>
-                        <span
-                          style={{
-                            padding: '3px 8px',
-                            borderRadius: '4px',
-                            background: 'rgba(122, 92, 46, 0.9)',
-                            color: '#ffffff',
-                            fontSize: '11px',
-                            fontWeight: 700,
-                          }}
-                        >
-                          {(v.proposed_arrangement || 'Standard').replace(/_/g, ' ')}
-                        </span>
-                      </div>
-                    </div>
-                  )}
-
-                  <div style={{ padding: '24px', display: 'flex', flexDirection: 'column', flex: 1, justifyContent: 'space-between' }}>
-                    <div>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '8px' }}>
-                        <h3 style={{ fontSize: '20px', fontWeight: 600, color: '#0c1826', margin: 0, fontFamily: "Newsreader, Georgia, serif" }}>
-                          {v.company_name}
-                        </h3>
-                        <span style={{ fontSize: '11.5px', color: '#687282', fontWeight: 500 }}>
-                          {v.location}
-                        </span>
-                      </div>
-
-                      <p style={{ fontSize: '13.5px', color: '#536074', lineHeight: 1.5, marginBottom: '18px' }}>
-                        {v.tag_line}
-                      </p>
-
-                      {/* Traction Highlights */}
-                      <div
-                        style={{
-                          background: '#fcfbf8',
-                          border: '1px solid #e8dfcf',
-                          borderRadius: '8px',
-                          padding: '12px',
-                          marginBottom: '18px',
-                          display: 'grid',
-                          gridTemplateColumns: '1fr 1fr',
-                          gap: '10px',
-                        }}
-                      >
-                        {v.traction_metrics && v.traction_metrics.slice(0, 2).map((m, i) => (
-                          <div key={i}>
-                            <div style={{ fontSize: '10.5px', color: '#7a5c2e', fontWeight: 600, textTransform: 'uppercase' }}>
-                              {m.label}
-                            </div>
-                            <div style={{ fontSize: '14px', fontWeight: 700, color: '#0c1826' }}>
-                              {m.value}
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-
-                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: '14px' }}>
-                        <span style={{ fontSize: '12px', color: '#687282' }}>Target Sought:</span>
-                        <strong style={{ fontSize: '17px', color: '#0c1826', fontWeight: 700 }}>
-                          {formatINR(v.capital_target)}
-                        </strong>
-                      </div>
-                    </div>
-
-                    <button
-                      onClick={() => onSelectVenture(v)}
-                      style={{
-                        width: '100%',
-                        padding: '11px',
-                        borderRadius: '6px',
-                        background: '#f5efe5',
-                        border: '1px solid #c5b59b',
-                        color: '#0c1826',
-                        fontWeight: 700,
-                        fontSize: '13px',
-                        cursor: 'pointer',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        gap: '6px',
-                      }}
-                    >
-                      <span>Inspect 10-Section Dossier & Evidence</span>
-                      <span>&rarr;</span>
-                    </button>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-      </section>
-
-      {/* Due Diligence Standards: The 6 Verification Pillars */}
-      <section style={{ padding: '80px 24px', background: '#ffffff', borderBottom: '1px solid #d6c9b2' }}>
-        <div style={{ maxWidth: '1180px', margin: '0 auto' }}>
-          <div style={{ textAlign: 'center', maxWidth: '720px', margin: '0 auto 52px' }}>
-            <div style={{ fontSize: '11.5px', fontWeight: 700, color: '#7a5c2e', textTransform: 'uppercase', letterSpacing: '0.12em' }}>
-              OUR DUE DILIGENCE MANDATE
-            </div>
-            <h2 style={{ fontSize: '36px', color: '#0c1826', marginTop: '8px', marginBottom: '14px', fontFamily: "Newsreader, Georgia, serif" }}>
-              What We Verify Before Any Introduction.
-            </h2>
-            <p style={{ fontSize: '16px', color: '#536074', lineHeight: 1.6 }}>
-              We do not accept decks at face value. Our Review Desk audits the following 6 core verification pillars and publishes findings directly into the venture brief.
-            </p>
-          </div>
-
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '24px' }}>
+          {/* Horizontal 4-Column Spec Strip */}
+          <div className="nv-spec-strip nv-hero-anim-5">
             {[
               {
-                title: 'Financials & GST Reconciliations',
-                desc: '3 years of audited balance sheets, profit & loss, monthly GST portal returns, and bank statements confirming cash collection run-rate.',
-                badge: 'Audited & Reconciled',
+                stat: '₹10 Lakhs+',
+                title: 'Starting Amount',
+                desc: 'Built for serious investments, not small crowd-funding.',
               },
               {
-                title: 'MCA Statutory & Cap Table Verification',
-                desc: 'Ministry of Corporate Affairs filings, shareholder agreements, director disqualification search, charge registries, and IP assignments.',
-                badge: 'Statutory Search',
+                stat: 'Direct Payment',
+                title: 'We Never Hold Money',
+                desc: 'Payments happen directly between your bank and theirs.',
               },
               {
-                title: 'Physical Collateral & Asset Title',
-                desc: '30-year non-encumbrance certificate, registered sub-registrar mortgage charges, site physical inspections, and independent valuation.',
-                badge: 'Physical Verification',
+                stat: 'Full Truth',
+                title: 'No Hidden Risks',
+                desc: 'We check the paperwork and share risks upfront.',
               },
               {
-                title: 'Primary Customer & Supplier Reference Calls',
-                desc: 'Confidential primary calls conducted by our analysts with actual enterprise buyers, vendors, and partners to verify repeat order health.',
-                badge: 'Primary Reference Calls',
+                stat: 'Simple Choices',
+                title: 'No Long Forms',
+                desc: 'Click simple options instead of filling confusing forms.',
               },
-              {
-                title: 'Unit Economics Stress Testing',
-                desc: 'Gross margin reality checks, working capital cycles, debtor collection days, customer acquisition cost payback, and burn coverage.',
-                badge: 'Cashflow Stress-Tested',
-              },
-              {
-                title: 'Milestone-Governed Capital Tranches',
-                desc: 'Itemized use of capital budgets tied to concrete operational deliverables (molds, equipment, print copies, beds) before tranche release.',
-                badge: 'Milestone Governed',
-              },
-            ].map((p, idx) => (
-              <div
-                key={idx}
-                style={{
-                  border: '1px solid #d6c9b2',
-                  borderRadius: '10px',
-                  padding: '24px',
-                  background: '#faf9f5',
-                }}
-              >
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
-                  <h3 style={{ fontSize: '18px', fontWeight: 600, color: '#0c1826', margin: 0 }}>
-                    {p.title}
-                  </h3>
-                </div>
-                <p style={{ fontSize: '13.5px', lineHeight: 1.6, color: '#536074', marginBottom: '16px' }}>
-                  {p.desc}
-                </p>
-                <span
-                  style={{
-                    display: 'inline-block',
-                    padding: '3px 10px',
-                    borderRadius: '4px',
-                    background: '#e8f3ea',
-                    color: '#15803d',
-                    fontSize: '11.5px',
-                    fontWeight: 700,
-                  }}
-                >
-                  ✓ {p.badge}
-                </span>
+            ].map((item, idx) => (
+              <div key={idx} className="nv-spec-item">
+                <div className="nv-spec-stat">{item.stat}</div>
+                <div className="nv-spec-label">{item.title}</div>
+                <div className="nv-spec-desc">{item.desc}</div>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* Neutral Facilitation & Governance Disclosures */}
-      <section style={{ padding: '72px 24px', background: '#f5efe5', borderBottom: '1px solid #d6c9b2' }}>
-        <div style={{ maxWidth: '980px', margin: '0 auto', textAlign: 'center' }}>
-          <div style={{ fontSize: '11px', fontWeight: 700, color: '#7a5c2e', letterSpacing: '0.12em', textTransform: 'uppercase' }}>
-            REGULATORY ARCHITECTURE & TRUST
+      {/* 2. THREE SIMPLE PILLARS */}
+      <section className="nv-section nv-section-ivory nv-reveal">
+        <div className="nv-container">
+          <div className="nv-section-header">
+            <div className="eyebrow">WHY USE NIVESHA</div>
+            <h2 className="nv-section-title">Clear Facts. No Sales Hype.</h2>
+            <p className="nv-section-lead">
+              Whether you are investing hard-earned savings or raising money for your company, everything here is written
+              so anyone can understand it.
+            </p>
           </div>
-          <h2 style={{ fontSize: '32px', color: '#0c1826', marginTop: '8px', marginBottom: '16px', fontFamily: "Newsreader, Georgia, serif" }}>
-            Platform Neutrality & Clear Disclosures.
-          </h2>
-          <div style={{ textAlign: 'left', background: '#ffffff', border: '1px solid #d6c9b2', borderRadius: '10px', padding: '28px 32px' }}>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', fontSize: '14px', color: '#4c566a', lineHeight: 1.65 }}>
+
+          <div className="nv-pillars-grid">
+            <article className="nv-pillar-card">
               <div>
-                <strong style={{ color: '#0c1826' }}>• Independent Facilitator Role:</strong> Nivesha Ventures operates strictly as a technology and due diligence preparation platform. We are not a registered broker-dealer, stock exchange, alternative investment fund (AIF) manager, or portfolio manager under SEBI regulations.
+                <div className="eyebrow" style={{ marginBottom: '10px' }}>
+                  FOR INVESTORS
+                </div>
+                <h3 style={{ fontSize: '23px', fontWeight: 700, color: '#0f172a', marginBottom: '12px' }}>
+                  No Sales Pitch. Just the Full Truth.
+                </h3>
+                <p className="nv-quote-callout">&ldquo;Know both the profits and the risks before you invest.&rdquo;</p>
+                <p style={{ fontSize: '14px', lineHeight: 1.65, color: '#475569', margin: 0 }}>
+                  We don’t just take a business owner’s word for it. Before a business is shown to you, we check their
+                  tax returns, property papers, real profits, and customer feedback—so you never walk in blind.
+                </p>
               </div>
+              <button onClick={onExploreVentures} className="nv-text-cta">
+                <span>See Checked Businesses</span>
+                <span aria-hidden="true" style={{ fontSize: '16px', lineHeight: 1 }}>&rsaquo;</span>
+              </button>
+            </article>
+
+            <article className="nv-pillar-card-dark">
               <div>
-                <strong style={{ color: '#0c1826' }}>• Zero Custody Policy:</strong> Nivesha Ventures never holds, solicits, pools, or escrows client funds. All investment transactions, debentures, share transfers, and loans are executed bilaterally directly between the commercial bank accounts of the transacting parties.
+                <div className="eyebrow" style={{ marginBottom: '10px', color: '#d4af37' }}>
+                  FOR BUSINESS OWNERS
+                </div>
+                <h3 style={{ fontSize: '23px', fontWeight: 700, color: '#ffffff', marginBottom: '12px' }}>
+                  3 Simple Ways to Raise Money
+                </h3>
+                <p className="nv-quote-callout-dark">
+                  &ldquo;Raise ₹10 Lakhs to ₹5 Crore+ on terms that fit your business.&rdquo;
+                </p>
+                <p style={{ fontSize: '14px', lineHeight: 1.6, color: '#94a3b8', marginBottom: '14px' }}>
+                  You don’t have to give away ownership if you don’t want to. Choose how you want to raise funds:
+                </p>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', fontSize: '13px', color: '#e5e5ea' }}>
+                  <div style={{ background: 'rgba(255,255,255,0.07)', padding: '9px 12px', borderRadius: '10px' }}>
+                    <strong style={{ color: '#ffffff' }}>1. Loan Against Property / Assets:</strong> Borrow money backed
+                    by land, a flat, or machines and pay fixed interest.
+                  </div>
+                  <div style={{ background: 'rgba(255,255,255,0.07)', padding: '9px 12px', borderRadius: '10px' }}>
+                    <strong style={{ color: '#ffffff' }}>2. Shared Sales / Hybrid:</strong> Pay a fixed return plus a
+                    small share of your monthly sales.
+                  </div>
+                  <div style={{ background: 'rgba(255,255,255,0.07)', padding: '9px 12px', borderRadius: '10px' }}>
+                    <strong style={{ color: '#ffffff' }}>3. Selling a Share (Equity):</strong> Give investors
+                    part-ownership in your company or project.
+                  </div>
+                </div>
               </div>
+              <button onClick={onStartOnboarding} className="nv-text-cta" style={{ color: '#d4af37' }}>
+                <span>Submit Your Business</span>
+                <span aria-hidden="true" style={{ fontSize: '16px', lineHeight: 1 }}>&rsaquo;</span>
+              </button>
+            </article>
+
+            <article className="nv-pillar-card">
               <div>
-                <strong style={{ color: '#0c1826' }}>• Working Baseline & Deal Tickets:</strong> All venture parameters reflect an assumed institutional working baseline of ≥ ₹10 Lakhs ticket sizes. Platform fees are strictly marked "To be confirmed upon introduction readiness."
+                <div className="eyebrow" style={{ marginBottom: '10px' }}>
+                  SIMPLE EXPERIENCE
+                </div>
+                <h3 style={{ fontSize: '23px', fontWeight: 700, color: '#0f172a', marginBottom: '12px' }}>
+                  Easy to Use. No Jargon.
+                </h3>
+                <p className="nv-quote-callout">&ldquo;Simple steps from start to finish.&rdquo;</p>
+                <p style={{ fontSize: '14px', lineHeight: 1.65, color: '#475569', margin: 0 }}>
+                  Every business is explained in the same simple 10-part format—what they do, how much they earn, how
+                  they will use the money, and what could go wrong. Talk directly with the owner only when you are
+                  ready.
+                </p>
               </div>
-              <div>
-                <strong style={{ color: '#0c1826' }}>• Verified vs. Declared Separation:</strong> The platform maintains an explicit distinction between founder-submitted declarations, calculated benchmarks, and review-desk verified primary evidence.
+              <button onClick={onExploreVentures} className="nv-text-cta">
+                <span>Browse All Deals</span>
+                <span aria-hidden="true" style={{ fontSize: '16px', lineHeight: 1 }}>&rsaquo;</span>
+              </button>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      {/* 3. STATIC SHOWCASE OF ALL PLATFORM VENTURES */}
+      <section className="nv-section nv-section-parchment nv-reveal">
+        <div className="nv-container">
+          <div className="nv-section-header" style={{ marginBottom: '40px' }}>
+            <div className="eyebrow">AVAILABLE OPPORTUNITIES ({ventures.length})</div>
+            <h2 className="nv-section-title">Businesses Currently Looking for Funding</h2>
+            <p className="nv-section-lead">
+              Every active business on Nivesha Ventures is listed below with its simple summary and target amount.
+            </p>
+          </div>
+
+          {ventures.length > 0 ? (
+            <div
+              style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
+                gap: '20px',
+              }}
+            >
+              {ventures.map((v) => {
+                const coverImg = v.hero_image_url || (v.gallery_urls && v.gallery_urls[0]);
+                return (
+                  <article
+                    key={v.id}
+                    className="nv-card-interactive"
+                    style={{
+                      borderRadius: '20px',
+                      overflow: 'hidden',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      justifyContent: 'space-between',
+                      border: '1px solid rgba(15, 23, 42, 0.08)',
+                    }}
+                  >
+                    <div>
+                      {coverImg && (
+                        <div style={{ height: '165px', width: '100%', backgroundColor: '#0f172a', overflow: 'hidden' }}>
+                          <img
+                            src={coverImg}
+                            alt={v.company_name}
+                            loading="lazy"
+                            className="nv-venture-card-img"
+                            onError={(e) => {
+                              (e.target as HTMLImageElement).style.display = 'none';
+                            }}
+                          />
+                        </div>
+                      )}
+
+                      <div style={{ padding: '22px 24px 16px' }}>
+                        <div className="mono-label" style={{ fontSize: '11px', fontWeight: 600, color: '#0066cc', textTransform: 'uppercase', marginBottom: '6px' }}>
+                          {v.sector} &bull; {v.location}
+                        </div>
+
+                        <h3 style={{ fontSize: '20px', fontWeight: 700, color: '#0f172a', margin: '0 0 8px' }}>
+                          {v.company_name}
+                        </h3>
+
+                        <p style={{ fontSize: '13.5px', color: '#475569', lineHeight: 1.55, margin: '0 0 16px' }}>
+                          {v.tag_line || v.business_context}
+                        </p>
+
+                        <div
+                          style={{
+                            background: '#f5f5f7',
+                            borderRadius: '12px',
+                            padding: '12px 14px',
+                            display: 'flex',
+                            justifyContent: 'space-between',
+                            alignItems: 'center',
+                            gap: '12px',
+                          }}
+                        >
+                          <div>
+                            <div style={{ fontSize: '11px', color: '#64748b', fontWeight: 600 }}>Amount Needed</div>
+                            <div style={{ fontSize: '16px', fontWeight: 700, color: '#0f172a' }}>
+                              {formatINR(v.capital_target)}
+                            </div>
+                          </div>
+                          <div style={{ textAlign: 'right' }}>
+                            <div style={{ fontSize: '11px', color: '#64748b', fontWeight: 600 }}>Deal Type</div>
+                            <div style={{ fontSize: '12.5px', fontWeight: 600, color: '#0f172a' }}>
+                              {(v.proposed_arrangement || v.capital_structures?.[0] || 'Direct Deal').replace(/_/g, ' ')}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div style={{ padding: '0 24px 22px' }}>
+                      <button
+                        onClick={() => onSelectVenture(v)}
+                        className="nv-link-chevron"
+                        style={{ fontSize: '13.5px', padding: 0 }}
+                      >
+                        <span>Read Full Details &amp; Risks</span>
+                        <span aria-hidden="true" style={{ fontSize: '16px', lineHeight: 1 }}>&rsaquo;</span>
+                      </button>
+                    </div>
+                  </article>
+                );
+              })}
+            </div>
+          ) : (
+            <div style={{ background: '#f5f5f7', borderRadius: '20px', padding: '32px', textAlign: 'center', color: '#475569' }}>
+              Opportunities are loading. Click &ldquo;Explore Businesses to Invest In&rdquo; above to view the full directory.
+            </div>
+          )}
+        </div>
+      </section>
+
+      {/* 3b. WHY CHOOSE NIVESHA */}
+      <section className="nv-section nv-section-ivory nv-reveal">
+        <div className="nv-container">
+          <div className="nv-section-header" style={{ marginBottom: '40px' }}>
+            <div className="eyebrow">WHY CHOOSE NIVESHA</div>
+            <h2 className="nv-section-title">Why Choose Nivesha Over Brokers &amp; Listing Sites.</h2>
+            <p className="nv-section-lead">
+              Most websites just post ads and leave you to figure out the truth. We check the facts first and keep
+              everything simple.
+            </p>
+          </div>
+
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
+              gap: '20px',
+              marginBottom: '24px',
+            }}
+          >
+            {/* Typical Sites & Brokers */}
+            <div
+              style={{
+                background: '#ffffff',
+                borderRadius: '22px',
+                padding: '30px 28px',
+                border: '1px solid rgba(15, 23, 42, 0.08)',
+              }}
+            >
+              <div className="mono-label" style={{ fontSize: '11px', fontWeight: 700, color: '#64748b', textTransform: 'uppercase', marginBottom: '10px' }}>
+                OTHER PLATFORMS &amp; BROKERS
               </div>
+              <h3 style={{ fontSize: '21px', fontWeight: 700, color: '#0f172a', margin: '0 0 16px' }}>
+                Guesswork, Hype &amp; Middlemen
+              </h3>
+              <ul style={{ margin: 0, paddingLeft: '18px', display: 'flex', flexDirection: 'column', gap: '10px', fontSize: '14px', color: '#475569', lineHeight: 1.55 }}>
+                <li>Anyone can post unverified claims and optimistic profit numbers.</li>
+                <li>Risks and hidden problems are left out of the sales pitch.</li>
+                <li>Long, confusing forms and endless cold calls from brokers.</li>
+                <li>Hard-to-read pitch decks full of complicated finance words.</li>
+              </ul>
+            </div>
+
+            {/* Nivesha Ventures */}
+            <div
+              style={{
+                background: '#0f172a',
+                color: '#f5f5f7',
+                borderRadius: '22px',
+                padding: '30px 28px',
+                boxShadow: 'var(--shadow-lg)',
+              }}
+            >
+              <div className="mono-label" style={{ fontSize: '11px', fontWeight: 700, color: '#d4af37', textTransform: 'uppercase', marginBottom: '10px' }}>
+                NIVESHA VENTURES
+              </div>
+              <h3 style={{ fontSize: '21px', fontWeight: 700, color: '#ffffff', margin: '0 0 16px' }}>
+                Checked Facts &amp; Direct Control
+              </h3>
+              <ul style={{ margin: 0, paddingLeft: '18px', display: 'flex', flexDirection: 'column', gap: '10px', fontSize: '14px', color: '#cbd5e1', lineHeight: 1.55 }}>
+                <li>Every business is checked against tax filings, bank records, and property titles.</li>
+                <li>Both the upside and the real risks are shown upfront in plain words.</li>
+                <li>No spam calls—chat 1-on-1 with the owner only when both sides agree.</li>
+                <li>Your money stays in your bank until you pay the business directly.</li>
+              </ul>
             </div>
           </div>
         </div>
       </section>
 
-      {/* FAQ Section */}
-      <section style={{ padding: '80px 24px', background: '#faf9f5', borderBottom: '1px solid #d6c9b2' }}>
-        <div style={{ maxWidth: '840px', margin: '0 auto' }}>
-          <div style={{ textAlign: 'center', marginBottom: '44px' }}>
-            <div style={{ fontSize: '11.5px', fontWeight: 700, color: '#7a5c2e', textTransform: 'uppercase', letterSpacing: '0.12em' }}>
-              FREQUENTLY ASKED QUESTIONS
-            </div>
-            <h2 style={{ fontSize: '36px', color: '#0c1826', marginTop: '8px', fontFamily: "Newsreader, Georgia, serif" }}>
-              Answers for Investors and Founders.
-            </h2>
+      {/* 4. HOW IT WORKS IN 4 SIMPLE STEPS (STATIC) */}
+      <section className="nv-section nv-section-parchment nv-reveal">
+        <div className="nv-container">
+          <div className="nv-section-header">
+            <div className="eyebrow">HOW IT WORKS</div>
+            <h2 className="nv-section-title">4 Simple Steps From Start to Finish.</h2>
+            <p className="nv-section-lead">
+              We do the background checking first so you only spend time talking when everything looks right.
+            </p>
           </div>
 
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+          <div className="nv-steps-grid">
+            {[
+              {
+                step: '01',
+                title: 'Pick What Fits You',
+                subtitle: 'Simple Options',
+                desc: 'Tell us your budget and whether you prefer fixed interest, profit-sharing, or part-ownership.',
+              },
+              {
+                step: '02',
+                title: 'We Check the Papers',
+                subtitle: 'Background Check',
+                desc: 'Our team checks tax filings, property titles, and real business numbers before listing any deal.',
+              },
+              {
+                step: '03',
+                title: 'Read the Full Story',
+                subtitle: '10-Point Summary',
+                desc: 'See how the business makes money, how your funds will be used, and what the risks are.',
+              },
+              {
+                step: '04',
+                title: 'Talk & Close Directly',
+                subtitle: 'Direct Connection',
+                desc: 'Send a message to the owner. When both sides agree, chat directly and transfer funds bank-to-bank.',
+              },
+            ].map((st, i) => (
+              <div key={i} className="nv-step-card">
+                <div className="mono-label" style={{ fontSize: '24px', color: '#0066cc', fontWeight: 700, marginBottom: '8px' }}>
+                  {st.step}
+                </div>
+                <h3 style={{ fontSize: '18.5px', fontWeight: 700, color: '#0f172a', margin: '0 0 4px' }}>
+                  {st.title}
+                </h3>
+                <div className="eyebrow" style={{ fontSize: '10.5px', marginBottom: '12px', color: '#64748b' }}>
+                  {st.subtitle}
+                </div>
+                <p style={{ fontSize: '13.5px', lineHeight: 1.6, color: '#475569', margin: 0 }}>{st.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* 5. OUR PROMISE: WE NEVER HOLD YOUR MONEY */}
+      <section className="nv-section nv-section-parchment nv-reveal">
+        <div style={{ maxWidth: '980px', margin: '0 auto', textAlign: 'center' }}>
+          <div className="eyebrow">OUR PROMISE</div>
+          <h2 className="nv-section-title" style={{ marginBottom: '24px' }}>
+            We Connect &amp; Verify. We Never Hold Your Money.
+          </h2>
+          <div
+            style={{
+              background: '#0f172a',
+              color: '#f5f5f7',
+              borderRadius: '24px',
+              padding: '34px 32px',
+              textAlign: 'left',
+              boxShadow: 'var(--shadow-lg)',
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))',
+              gap: '20px',
+            }}
+          >
+            {[
+              {
+                title: 'Not a Bank or Investment Fund',
+                desc: 'Nivesha Ventures is an independent checking and introduction platform—not a broker or fund manager.',
+              },
+              {
+                title: 'Direct Bank-to-Bank Deals',
+                desc: 'We never collect, hold, or pool your money. All payments and legal papers happen directly between you and the business.',
+              },
+              {
+                title: 'Clear Service Fees',
+                desc: 'We charge a clear fee only for checking documents, preparing the deal story, and helping with legal paperwork.',
+              },
+              {
+                title: 'Facts Separated From Claims',
+                desc: 'We always show clearly what the owner claimed versus what our team actually verified from records.',
+              },
+            ].map((g, i) => (
+              <div
+                key={i}
+                style={{
+                  background: 'rgba(255, 255, 255, 0.06)',
+                  borderRadius: '16px',
+                  padding: '20px',
+                  border: '1px solid rgba(255, 255, 255, 0.08)',
+                }}
+              >
+                <div style={{ fontSize: '15px', fontWeight: 700, color: '#ffffff', marginBottom: '6px' }}>{g.title}</div>
+                <div style={{ fontSize: '13.5px', color: '#94a3b8', lineHeight: 1.55 }}>{g.desc}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* 6. COMMON QUESTIONS (FAQ) */}
+      <section className="nv-section nv-section-ivory nv-reveal">
+        <div style={{ maxWidth: '840px', margin: '0 auto' }}>
+          <div style={{ textAlign: 'center', marginBottom: '40px' }}>
+            <div className="eyebrow">COMMON QUESTIONS</div>
+            <h2 className="nv-section-title">Simple Answers Before You Start.</h2>
+          </div>
+
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
             {faqs.map((faq, index) => {
               const isOpen = openFaq === index;
               return (
-                <div
-                  key={index}
-                  style={{
-                    background: '#ffffff',
-                    border: '1px solid #d6c9b2',
-                    borderRadius: '8px',
-                    overflow: 'hidden',
-                  }}
-                >
+                <div key={index} className="nv-faq-item">
                   <button
                     onClick={() => toggleFaq(index)}
-                    style={{
-                      width: '100%',
-                      padding: '20px 24px',
-                      background: 'none',
-                      display: 'flex',
-                      justifyContent: 'space-between',
-                      alignItems: 'center',
-                      textAlign: 'left',
-                      fontSize: '16px',
-                      fontWeight: 600,
-                      color: '#0c1826',
-                      cursor: 'pointer',
-                    }}
+                    className="nv-faq-btn"
+                    aria-expanded={isOpen}
                   >
                     <span>{faq.q}</span>
-                    <span style={{ fontSize: '20px', color: '#7a5c2e', fontWeight: 700 }}>
-                      {isOpen ? '−' : '+'}
+                    <span className={`nv-faq-chevron ${isOpen ? 'open' : ''}`} aria-hidden="true">
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="m9 18 6-6-6-6" />
+                      </svg>
                     </span>
                   </button>
                   {isOpen && (
-                    <div
-                      style={{
-                        padding: '0 24px 20px',
-                        fontSize: '14.5px',
-                        lineHeight: 1.6,
-                        color: '#536074',
-                        borderTop: '1px solid #f2ede1',
-                      }}
-                    >
+                    <div style={{ padding: '0 24px 20px', fontSize: '14.5px', lineHeight: 1.6, color: '#475569' }}>
                       {faq.a}
                     </div>
                   )}
@@ -997,31 +660,25 @@ export const LandingPageView: React.FC<LandingPageViewProps> = ({
       </section>
 
       {/* Discreet Demo Evaluator Credentials Drawer */}
-      <section style={{ padding: '32px 24px', background: '#f5efe5', borderBottom: '1px solid #d6c9b2' }}>
+      <section style={{ padding: '28px 24px', background: '#ebebf0' }}>
         <div style={{ maxWidth: '980px', margin: '0 auto' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px' }}>
             <div>
-              <span style={{ fontSize: '12px', fontWeight: 700, color: '#7a5c2e', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
-                🔑 Platform Evaluator Reference (Demo Accounts)
+              <span className="eyebrow" style={{ fontSize: '11.5px' }}>
+                Demo Accounts (For Testing)
               </span>
-              <p style={{ fontSize: '12px', color: '#687282', margin: '2px 0 0' }}>
-                Quick credentials for testing individual founder dashboards and the investor portal. (Password: <code>password123</code> or <code>Password123!</code>)
+              <p style={{ fontSize: '12.5px', color: '#475569', margin: '3px 0 0' }}>
+                Quick logins to test the investor and business owner dashboards. (Password:{' '}
+                <code>password123</code> or <code>Password123!</code>)
               </p>
             </div>
             <button
               onClick={() => setShowDemoCredentials(!showDemoCredentials)}
-              style={{
-                padding: '6px 14px',
-                backgroundColor: '#ffffff',
-                border: '1px solid #c5b59b',
-                color: '#0c1826',
-                borderRadius: '4px',
-                fontSize: '12px',
-                fontWeight: 600,
-                cursor: 'pointer',
-              }}
+              className="nv-btn-secondary"
+              style={{ padding: '7px 16px', fontSize: '12px' }}
+              aria-expanded={showDemoCredentials}
             >
-              {showDemoCredentials ? 'Hide Accounts ▲' : 'Show Accounts ▼'}
+              {showDemoCredentials ? 'Hide Accounts' : 'Show Accounts'}
             </button>
           </div>
 
@@ -1030,93 +687,65 @@ export const LandingPageView: React.FC<LandingPageViewProps> = ({
               style={{
                 marginTop: '16px',
                 display: 'grid',
-                gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))',
+                gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
                 gap: '10px',
                 fontSize: '12px',
-                animation: 'fadeIn 0.2s ease',
               }}
             >
-              <div style={{ padding: '8px 12px', background: '#f5efe5', border: '1px solid #e3d6bf' }}>
-                <strong style={{ color: '#0c1826' }}>Investor Portal:</strong> Rohan Varma
-                <div style={{ color: '#7a5c2e', fontFamily: 'monospace', marginTop: '2px' }}>investor@peakindia.vc</div>
-              </div>
-              <div style={{ padding: '8px 12px', background: '#fff', border: '1px solid #e3d6bf' }}>
-                <strong style={{ color: '#0c1826' }}>Film Production:</strong> Raghavendra Rao (Garuda)
-                <div style={{ color: '#7a5c2e', fontFamily: 'monospace', marginTop: '2px' }}>film.producer@nivesha.in</div>
-              </div>
-              <div style={{ padding: '8px 12px', background: '#fff', border: '1px solid #e3d6bf' }}>
-                <strong style={{ color: '#0c1826' }}>Shoe D2C Brand:</strong> Vikramaditya Sahni (StrideCraft)
-                <div style={{ color: '#7a5c2e', fontFamily: 'monospace', marginTop: '2px' }}>footwear.founder@nivesha.in</div>
-              </div>
-              <div style={{ padding: '8px 12px', background: '#fff', border: '1px solid #e3d6bf' }}>
-                <strong style={{ color: '#0c1826' }}>Collateral Debt:</strong> Suresh Chandra (Apex CNC)
-                <div style={{ color: '#7a5c2e', fontFamily: 'monospace', marginTop: '2px' }}>debt.founder@nivesha.in</div>
-              </div>
-              <div style={{ padding: '8px 12px', background: '#fff', border: '1px solid #e3d6bf' }}>
-                <strong style={{ color: '#0c1826' }}>Rural Logistics:</strong> Sravani Reddy (GramaBlink)
-                <div style={{ color: '#7a5c2e', fontFamily: 'monospace', marginTop: '2px' }}>logistics.founder@nivesha.in</div>
-              </div>
-              <div style={{ padding: '8px 12px', background: '#fff', border: '1px solid #e3d6bf' }}>
-                <strong style={{ color: '#0c1826' }}>Healthcare Buyout:</strong> Dr. Hariprasad Varma
-                <div style={{ color: '#7a5c2e', fontFamily: 'monospace', marginTop: '2px' }}>healthcare.founder@nivesha.in</div>
-              </div>
-              <div style={{ padding: '8px 12px', background: '#fff', border: '1px solid #e3d6bf' }}>
-                <strong style={{ color: '#0c1826' }}>Real Estate Layout:</strong> Karthik Narayana (Suryam)
-                <div style={{ color: '#7a5c2e', fontFamily: 'monospace', marginTop: '2px' }}>realestate.founder@nivesha.in</div>
-              </div>
-              <div style={{ padding: '8px 12px', background: '#fff', border: '1px solid #e3d6bf' }}>
-                <strong style={{ color: '#0c1826' }}>Food & Hospitality:</strong> Arvind Nair (Malabar)
-                <div style={{ color: '#7a5c2e', fontFamily: 'monospace', marginTop: '2px' }}>founder@malabarcoast.in</div>
-              </div>
+              {[
+                { label: 'Investor Portal', name: 'Rohan Varma', email: 'investor@peakindia.vc' },
+                { label: 'Film Production', name: 'Raghavendra Rao (Garuda)', email: 'film.producer@nivesha.in' },
+                { label: 'Shoe D2C Brand', name: 'Vikramaditya Sahni (StrideCraft)', email: 'footwear.founder@nivesha.in' },
+                { label: 'Collateral Debt', name: 'Suresh Chandra (Apex CNC)', email: 'debt.founder@nivesha.in' },
+                { label: 'Rural Logistics', name: 'Sravani Reddy (GramaBlink)', email: 'logistics.founder@nivesha.in' },
+                { label: 'Healthcare Buyout', name: 'Dr. Hariprasad Varma', email: 'healthcare.founder@nivesha.in' },
+                { label: 'Real Estate Layout', name: 'Karthik Narayana (Suryam)', email: 'realestate.founder@nivesha.in' },
+                { label: 'Food & Hospitality', name: 'Arvind Nair (Malabar)', email: 'founder@malabarcoast.in' },
+              ].map((acc, idx) => (
+                <div
+                  key={idx}
+                  style={{
+                    padding: '10px 14px',
+                    background: '#ffffff',
+                    border: '1px solid rgba(15, 23, 42, 0.06)',
+                    borderRadius: '12px',
+                  }}
+                >
+                  <strong style={{ color: '#0f172a' }}>{acc.label}:</strong> {acc.name}
+                  <div className="mono-label" style={{ color: '#0066cc', marginTop: '2px', fontSize: '11.5px' }}>
+                    {acc.email}
+                  </div>
+                </div>
+              ))}
             </div>
           )}
         </div>
       </section>
 
-      {/* Final Call to Action */}
-      <section
-        style={{
-          padding: '88px 24px',
-          background: '#f1e8da',
-          textAlign: 'center',
-        }}
-      >
-        <div style={{ maxWidth: '720px', margin: '0 auto' }}>
-          <h2 style={{ fontSize: '38px', color: '#0c1826', marginBottom: '16px', fontFamily: "Newsreader, Georgia, serif" }}>
-            Begin Your Capital Facilitation Journey.
+      {/* 7. FINAL CALL TO ACTION */}
+      <section style={{ padding: '88px 24px', background: '#ffffff', textAlign: 'center' }}>
+        <div style={{ maxWidth: '740px', margin: '0 auto' }}>
+          <h2 className="nv-section-title" style={{ marginBottom: '14px' }}>
+            Ready to Take a Closer Look?
           </h2>
-          <p style={{ fontSize: '17px', color: '#536074', marginBottom: '32px', lineHeight: 1.6 }}>
-            Whether evaluating verified enterprises for high-conviction deployment or raising capital with audited credibility, Nivesha Ventures provides the institutional infrastructure.
+          <p style={{ fontSize: '17px', color: '#475569', marginBottom: '34px', lineHeight: 1.6 }}>
+            Browse checked businesses looking for ₹10 Lakhs+ or share your own business details in a few simple steps.
           </p>
-          <div style={{ display: 'flex', gap: '16px', justifyContent: 'center', flexWrap: 'wrap' }}>
+          <div style={{ display: 'flex', gap: '24px', justifyContent: 'center', alignItems: 'center', flexWrap: 'wrap' }}>
             <button
               onClick={onExploreVentures}
-              style={{
-                padding: '14px 30px',
-                borderRadius: '6px',
-                background: '#0c1826',
-                color: '#ffffff',
-                fontWeight: 600,
-                fontSize: '15px',
-                cursor: 'pointer',
-              }}
+              className="nv-btn-dark"
+              style={{ padding: '14px 30px', fontSize: '15px' }}
             >
-              Explore Verified Opportunities &rarr;
+              Explore Businesses to Invest In
             </button>
             <button
               onClick={onStartOnboarding}
-              style={{
-                padding: '14px 28px',
-                borderRadius: '6px',
-                background: '#ffffff',
-                border: '1px solid #c5b59b',
-                color: '#0c1826',
-                fontWeight: 600,
-                fontSize: '15px',
-                cursor: 'pointer',
-              }}
+              className="nv-link-chevron"
+              style={{ fontSize: '16px', color: '#0f172a', fontWeight: 600 }}
             >
-              Submit Enterprise Dossier
+              <span>Looking for Funding? Start Here</span>
+              <span aria-hidden="true" style={{ fontSize: '18px', lineHeight: 1 }}>&rsaquo;</span>
             </button>
           </div>
         </div>
@@ -1125,11 +754,10 @@ export const LandingPageView: React.FC<LandingPageViewProps> = ({
       {/* Footer */}
       <footer
         style={{
-          padding: '44px 24px',
-          background: '#0c1826',
+          padding: '40px 24px',
+          background: '#0f172a',
           color: '#94a3b8',
           fontSize: '13px',
-          borderTop: '1px solid #23344a',
         }}
       >
         <div
@@ -1144,14 +772,16 @@ export const LandingPageView: React.FC<LandingPageViewProps> = ({
           }}
         >
           <div>
-            <span style={{ fontFamily: "Newsreader, Georgia, serif", fontSize: '19px', color: '#ffffff', fontWeight: 600 }}>
+            <span style={{ fontSize: '17px', color: '#ffffff', fontWeight: 700, letterSpacing: '-0.02em' }}>
               Nivesha Ventures
             </span>
-            <span style={{ marginLeft: '12px', color: '#cbd5e1' }}>
-              Independent Capital Facilitation & Diligence Preparation Platform.
+            <span style={{ marginLeft: '12px', color: '#94a3b8' }}>
+              Checked Business Deals &bull; Direct Connections.
             </span>
           </div>
-          <div>© {new Date().getFullYear()} Nivesha Ventures. All rights reserved. Platform fees to be confirmed upon introduction readiness.</div>
+          <div>
+            &copy; {new Date().getFullYear()} Nivesha Ventures. We never hold client funds.
+          </div>
         </div>
       </footer>
     </div>

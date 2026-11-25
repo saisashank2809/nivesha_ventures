@@ -432,8 +432,8 @@ export const FounderGuidedJourney: React.FC<FounderGuidedJourneyProps> = ({
 
   if (!currentUser) {
     return (
-      <div style={{ maxWidth: '800px', margin: '60px auto', padding: '32px', textAlign: 'center', backgroundColor: '#fffdf9', border: '1px solid #d6c9b2' }}>
-        <h2 style={{ fontFamily: "Newsreader, Georgia, serif", fontSize: '28px', color: '#121a29' }}>
+      <div style={{ maxWidth: '800px', margin: '60px auto', padding: '32px', textAlign: 'center', backgroundColor: '#ffffff', border: '1px solid rgba(0, 0, 0, 0.1)' }}>
+        <h2 style={{ fontFamily: "var(--font-sans)", fontSize: '28px', color: '#0f172a' }}>
           Founder Venture Showcase & Story Builder
         </h2>
         <p style={{ color: '#4c5262', fontSize: '14.5px', margin: '12px 0 24px' }}>
@@ -441,7 +441,7 @@ export const FounderGuidedJourney: React.FC<FounderGuidedJourneyProps> = ({
         </p>
         <button
           onClick={onOpenLogin}
-          style={{ padding: '10px 24px', backgroundColor: '#0c1826', color: '#f5efe5', border: 'none', fontSize: '14px', fontWeight: 600, cursor: 'pointer' }}
+          style={{ padding: '10px 24px', backgroundColor: '#0f172a', color: '#f5f5f7', border: 'none', fontSize: '14px', fontWeight: 600, cursor: 'pointer' }}
         >
           Sign In as Founder
         </button>
@@ -519,13 +519,13 @@ export const FounderGuidedJourney: React.FC<FounderGuidedJourneyProps> = ({
   return (
     <div style={{ maxWidth: '1080px', margin: '30px auto', padding: '0 20px', fontFamily: "-apple-system, BlinkMacSystemFont, 'Inter', sans-serif" }}>
       {/* Top Wizard Steps Bar */}
-      <div style={{ backgroundColor: '#fffdf9', border: '1px solid #d6c9b2', padding: '20px 24px', marginBottom: '24px' }}>
+      <div style={{ backgroundColor: '#ffffff', border: '1px solid rgba(0, 0, 0, 0.1)', padding: '20px 24px', marginBottom: '24px' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
           <div>
-            <div style={{ fontSize: '11px', color: '#7a5c2e', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.12em' }}>
+            <div style={{ fontSize: '11px', color: '#0066cc', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.12em' }}>
               Nivesha Venture Builder • Step {step} of 7
             </div>
-            <h2 style={{ margin: '4px 0 0', fontFamily: "Newsreader, Georgia, serif", fontSize: '24px', color: '#121a29', fontWeight: 400 }}>
+            <h2 style={{ margin: '4px 0 0', fontFamily: "var(--font-sans)", fontSize: '24px', color: '#0f172a', fontWeight: 400 }}>
               {step === 1 && '1. Choose Business Classification'}
               {step === 2 && '2. Operating Stage & Maturity'}
               {step === 3 && '3. Proposed Funding Arrangement'}
@@ -541,9 +541,9 @@ export const FounderGuidedJourney: React.FC<FounderGuidedJourneyProps> = ({
               onClick={() => setPreviewModalOpen(true)}
               style={{
                 padding: '8px 16px',
-                backgroundColor: '#f5efe5',
-                border: '1px solid #7a5c2e',
-                color: '#7a5c2e',
+                backgroundColor: '#f5f5f7',
+                border: '1px solid #0066cc',
+                color: '#0066cc',
                 fontSize: '13px',
                 fontWeight: 600,
                 cursor: 'pointer',
@@ -559,7 +559,7 @@ export const FounderGuidedJourney: React.FC<FounderGuidedJourneyProps> = ({
             {step > 1 && (
               <button
                 onClick={() => setStep(step - 1)}
-                style={{ padding: '8px 16px', backgroundColor: '#fffdf9', border: '1px solid #8a8070', fontSize: '13px', cursor: 'pointer' }}
+                style={{ padding: '8px 16px', backgroundColor: '#ffffff', border: '1px solid #8a8070', fontSize: '13px', cursor: 'pointer' }}
               >
                 Back
               </button>
@@ -567,7 +567,7 @@ export const FounderGuidedJourney: React.FC<FounderGuidedJourneyProps> = ({
             {step < 7 ? (
               <button
                 onClick={() => setStep(step + 1)}
-                style={{ padding: '8px 20px', backgroundColor: '#0c1826', color: '#f5efe5', border: 'none', fontSize: '13px', fontWeight: 600, cursor: 'pointer' }}
+                style={{ padding: '8px 20px', backgroundColor: '#0f172a', color: '#f5f5f7', border: 'none', fontSize: '13px', fontWeight: 600, cursor: 'pointer' }}
               >
                 Next Step →
               </button>
@@ -592,7 +592,7 @@ export const FounderGuidedJourney: React.FC<FounderGuidedJourneyProps> = ({
               style={{
                 flex: 1,
                 height: '4px',
-                backgroundColor: s <= step ? '#7a5c2e' : '#e3d6bf',
+                backgroundColor: s <= step ? '#0066cc' : 'rgba(0, 0, 0, 0.08)',
                 cursor: 'pointer',
                 transition: 'background-color 0.2s',
               }}
@@ -603,8 +603,8 @@ export const FounderGuidedJourney: React.FC<FounderGuidedJourneyProps> = ({
 
       {/* STEP 1: BUSINESS CLASSIFICATION */}
       {step === 1 && (
-        <div style={{ backgroundColor: '#fffdf9', border: '1px solid #d6c9b2', padding: '32px' }}>
-          <h3 style={{ margin: '0 0 8px', fontSize: '18px', color: '#121a29' }}>What operational category best describes your venture?</h3>
+        <div style={{ backgroundColor: '#ffffff', border: '1px solid rgba(0, 0, 0, 0.1)', padding: '32px' }}>
+          <h3 style={{ margin: '0 0 8px', fontSize: '18px', color: '#0f172a' }}>What operational category best describes your venture?</h3>
           <p style={{ margin: '0 0 24px', color: '#4c5262', fontSize: '13.5px' }}>
             Note: Selecting a sector does <strong>not</strong> predetermine your funding arrangement. A film, factory, and hospital each follow separate capital structures.
           </p>
@@ -625,20 +625,20 @@ export const FounderGuidedJourney: React.FC<FounderGuidedJourneyProps> = ({
                 onClick={() => handleSelectBusinessType(item.type as SectorType)}
                 style={{
                   padding: '16px',
-                  border: businessType === item.type ? '2px solid #0c1826' : '1px solid #d6c9b2',
-                  backgroundColor: businessType === item.type ? '#f5efe5' : '#fff',
+                  border: businessType === item.type ? '2px solid #0f172a' : '1px solid rgba(0, 0, 0, 0.1)',
+                  backgroundColor: businessType === item.type ? '#f5f5f7' : '#fff',
                   cursor: 'pointer',
                 }}
               >
-                <div style={{ fontWeight: 600, fontSize: '14px', color: '#121a29', marginBottom: '4px' }}>{item.title}</div>
+                <div style={{ fontWeight: 600, fontSize: '14px', color: '#0f172a', marginBottom: '4px' }}>{item.title}</div>
                 <div style={{ fontSize: '12px', color: '#4c5262' }}>{item.desc}</div>
               </div>
             ))}
           </div>
 
           {businessType === 'OTHER' && (
-            <div style={{ marginBottom: '24px', padding: '16px', backgroundColor: '#faf4eb', border: '1px solid #d6c9b2' }}>
-              <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: '#121a29', marginBottom: '6px' }}>
+            <div style={{ marginBottom: '24px', padding: '16px', backgroundColor: '#f5f5f7', border: '1px solid rgba(0, 0, 0, 0.1)' }}>
+              <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: '#0f172a', marginBottom: '6px' }}>
                 Specify Custom Sector / Industry Name <span style={{ color: '#b45309' }}>*</span>
               </label>
               <input
@@ -646,28 +646,28 @@ export const FounderGuidedJourney: React.FC<FounderGuidedJourneyProps> = ({
                 value={customBusinessType}
                 onChange={(e) => setCustomBusinessType(e.target.value)}
                 placeholder="e.g. Agritech & Cold Chain, Solar EPC, SaaS / DeepTech, Specialty Chemicals, EdTech..."
-                style={{ width: '100%', padding: '10px 12px', border: '1px solid #8a8070', background: '#fffdf9', fontSize: '14px', boxSizing: 'border-box' }}
+                style={{ width: '100%', padding: '10px 12px', border: '1px solid #8a8070', background: '#ffffff', fontSize: '14px', boxSizing: 'border-box' }}
               />
             </div>
           )}
 
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
             <div>
-              <label style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#121a29', marginBottom: '6px' }}>Venture / Entity Name</label>
+              <label style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#0f172a', marginBottom: '6px' }}>Venture / Entity Name</label>
               <input
                 type="text"
                 value={companyName}
                 onChange={(e) => setCompanyName(e.target.value)}
-                style={{ width: '100%', padding: '10px 12px', border: '1px solid #8a8070', background: '#fffdf9', fontSize: '14px', boxSizing: 'border-box' }}
+                style={{ width: '100%', padding: '10px 12px', border: '1px solid #8a8070', background: '#ffffff', fontSize: '14px', boxSizing: 'border-box' }}
               />
             </div>
             <div>
-              <label style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#121a29', marginBottom: '6px' }}>Operating Location(s)</label>
+              <label style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#0f172a', marginBottom: '6px' }}>Operating Location(s)</label>
               <input
                 type="text"
                 value={location}
                 onChange={(e) => setLocation(e.target.value)}
-                style={{ width: '100%', padding: '10px 12px', border: '1px solid #8a8070', background: '#fffdf9', fontSize: '14px', boxSizing: 'border-box' }}
+                style={{ width: '100%', padding: '10px 12px', border: '1px solid #8a8070', background: '#ffffff', fontSize: '14px', boxSizing: 'border-box' }}
               />
             </div>
           </div>
@@ -676,8 +676,8 @@ export const FounderGuidedJourney: React.FC<FounderGuidedJourneyProps> = ({
 
       {/* STEP 2: STAGE OF BUSINESS */}
       {step === 2 && (
-        <div style={{ backgroundColor: '#fffdf9', border: '1px solid #d6c9b2', padding: '32px' }}>
-          <h3 style={{ margin: '0 0 8px', fontSize: '18px', color: '#121a29' }}>What is the current operating stage of the venture?</h3>
+        <div style={{ backgroundColor: '#ffffff', border: '1px solid rgba(0, 0, 0, 0.1)', padding: '32px' }}>
+          <h3 style={{ margin: '0 0 8px', fontSize: '18px', color: '#0f172a' }}>What is the current operating stage of the venture?</h3>
           <p style={{ margin: '0 0 24px', color: '#4c5262', fontSize: '13.5px' }}>
             Identifies the risk profile and verification baseline required by capital providers.
           </p>
@@ -696,20 +696,20 @@ export const FounderGuidedJourney: React.FC<FounderGuidedJourneyProps> = ({
                 onClick={() => setStage(item.type as StageType)}
                 style={{
                   padding: '18px',
-                  border: stage === item.type ? '2px solid #0c1826' : '1px solid #d6c9b2',
-                  backgroundColor: stage === item.type ? '#f5efe5' : '#fff',
+                  border: stage === item.type ? '2px solid #0f172a' : '1px solid rgba(0, 0, 0, 0.1)',
+                  backgroundColor: stage === item.type ? '#f5f5f7' : '#fff',
                   cursor: 'pointer',
                 }}
               >
-                <div style={{ fontWeight: 600, fontSize: '14.5px', color: '#121a29', marginBottom: '6px' }}>{item.title}</div>
+                <div style={{ fontWeight: 600, fontSize: '14.5px', color: '#0f172a', marginBottom: '6px' }}>{item.title}</div>
                 <div style={{ fontSize: '12.5px', color: '#4c5262' }}>{item.desc}</div>
               </div>
             ))}
           </div>
 
           {stage === 'OTHER' && (
-            <div style={{ marginTop: '20px', padding: '16px', backgroundColor: '#faf4eb', border: '1px solid #d6c9b2' }}>
-              <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: '#121a29', marginBottom: '6px' }}>
+            <div style={{ marginTop: '20px', padding: '16px', backgroundColor: '#f5f5f7', border: '1px solid rgba(0, 0, 0, 0.1)' }}>
+              <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: '#0f172a', marginBottom: '6px' }}>
                 Specify Custom Operating Stage <span style={{ color: '#b45309' }}>*</span>
               </label>
               <input
@@ -717,7 +717,7 @@ export const FounderGuidedJourney: React.FC<FounderGuidedJourneyProps> = ({
                 value={customStage}
                 onChange={(e) => setCustomStage(e.target.value)}
                 placeholder="e.g. Commercial Pilot Complete, Asset Holding & IP Licensing, Turnaround & Revitalization, Special Situation..."
-                style={{ width: '100%', padding: '10px 12px', border: '1px solid #8a8070', background: '#fffdf9', fontSize: '14px', boxSizing: 'border-box' }}
+                style={{ width: '100%', padding: '10px 12px', border: '1px solid #8a8070', background: '#ffffff', fontSize: '14px', boxSizing: 'border-box' }}
               />
             </div>
           )}
@@ -726,8 +726,8 @@ export const FounderGuidedJourney: React.FC<FounderGuidedJourneyProps> = ({
 
       {/* STEP 3: PROPOSED FUNDING ARRANGEMENT */}
       {step === 3 && (
-        <div style={{ backgroundColor: '#fffdf9', border: '1px solid #d6c9b2', padding: '32px' }}>
-          <h3 style={{ margin: '0 0 8px', fontSize: '18px', color: '#121a29' }}>What funding arrangement are you proposing to investors?</h3>
+        <div style={{ backgroundColor: '#ffffff', border: '1px solid rgba(0, 0, 0, 0.1)', padding: '32px' }}>
+          <h3 style={{ margin: '0 0 8px', fontSize: '18px', color: '#0f172a' }}>What funding arrangement are you proposing to investors?</h3>
           <p style={{ margin: '0 0 24px', color: '#4c5262', fontSize: '13.5px' }}>
             These are proposed structures, not finalized legal terms. You decide what consideration you offer.
           </p>
@@ -780,20 +780,20 @@ export const FounderGuidedJourney: React.FC<FounderGuidedJourneyProps> = ({
                 onClick={() => setProposedArrangement(item.type as ArrangementType)}
                 style={{
                   padding: '18px',
-                  border: proposedArrangement === item.type ? '2px solid #0c1826' : '1px solid #d6c9b2',
-                  backgroundColor: proposedArrangement === item.type ? '#f5efe5' : '#fff',
+                  border: proposedArrangement === item.type ? '2px solid #0f172a' : '1px solid rgba(0, 0, 0, 0.1)',
+                  backgroundColor: proposedArrangement === item.type ? '#f5f5f7' : '#fff',
                   cursor: 'pointer',
                 }}
               >
-                <div style={{ fontWeight: 600, fontSize: '14.5px', color: '#121a29', marginBottom: '6px' }}>{item.title}</div>
+                <div style={{ fontWeight: 600, fontSize: '14.5px', color: '#0f172a', marginBottom: '6px' }}>{item.title}</div>
                 <div style={{ fontSize: '12.5px', color: '#4c5262' }}>{item.desc}</div>
               </div>
             ))}
           </div>
 
           {proposedArrangement === 'OTHER' && (
-            <div style={{ marginTop: '20px', padding: '16px', backgroundColor: '#faf4eb', border: '1px solid #d6c9b2' }}>
-              <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: '#121a29', marginBottom: '6px' }}>
+            <div style={{ marginTop: '20px', padding: '16px', backgroundColor: '#f5f5f7', border: '1px solid rgba(0, 0, 0, 0.1)' }}>
+              <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: '#0f172a', marginBottom: '6px' }}>
                 Specify Custom Proposed Funding Arrangement <span style={{ color: '#b45309' }}>*</span>
               </label>
               <input
@@ -801,7 +801,7 @@ export const FounderGuidedJourney: React.FC<FounderGuidedJourneyProps> = ({
                 value={customArrangement}
                 onChange={(e) => setCustomArrangement(e.target.value)}
                 placeholder="e.g. Compulsorily Convertible Debenture (CCD) at 12% coupon, Gross Revenue Royalty Note..."
-                style={{ width: '100%', padding: '10px 12px', border: '1px solid #8a8070', background: '#fffdf9', fontSize: '14px', boxSizing: 'border-box' }}
+                style={{ width: '100%', padding: '10px 12px', border: '1px solid #8a8070', background: '#ffffff', fontSize: '14px', boxSizing: 'border-box' }}
               />
             </div>
           )}
@@ -810,12 +810,12 @@ export const FounderGuidedJourney: React.FC<FounderGuidedJourneyProps> = ({
 
       {/* STEP 4: CONTEXTUAL BRANCHING QUESTIONS */}
       {step === 4 && (
-        <div style={{ backgroundColor: '#fffdf9', border: '1px solid #d6c9b2', padding: '32px' }}>
+        <div style={{ backgroundColor: '#ffffff', border: '1px solid rgba(0, 0, 0, 0.1)', padding: '32px' }}>
           <div style={{ marginBottom: '24px' }}>
-            <span style={{ fontSize: '11px', color: '#7a5c2e', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.1em' }}>
+            <span style={{ fontSize: '11px', color: '#0066cc', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.1em' }}>
               Dynamic Branching Active
             </span>
-            <h3 style={{ margin: '4px 0 0', fontSize: '19px', color: '#121a29' }}>
+            <h3 style={{ margin: '4px 0 0', fontSize: '19px', color: '#0f172a' }}>
               Specific Details for {businessType.replace(/_/g, ' ')} & {proposedArrangement.replace(/_/g, ' ')}
             </h3>
             <p style={{ margin: '6px 0 0', color: '#4c5262', fontSize: '13.5px' }}>
@@ -828,33 +828,33 @@ export const FounderGuidedJourney: React.FC<FounderGuidedJourneyProps> = ({
             <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
                 <div>
-                  <label style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#121a29', marginBottom: '6px' }}>Total Film Production Budget</label>
+                  <label style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#0f172a', marginBottom: '6px' }}>Total Film Production Budget</label>
                   <input
                     type="number"
                     value={filmTotalBudget}
                     onChange={(e) => setFilmTotalBudget(Number(e.target.value))}
-                    style={{ width: '100%', padding: '10px 12px', border: '1px solid #8a8070', background: '#fffdf9', fontSize: '14px', boxSizing: 'border-box' }}
+                    style={{ width: '100%', padding: '10px 12px', border: '1px solid #8a8070', background: '#ffffff', fontSize: '14px', boxSizing: 'border-box' }}
                   />
-                  <span style={{ fontSize: '11.5px', color: '#7a5c2e' }}>Formatted: {formatINR(filmTotalBudget)}</span>
+                  <span style={{ fontSize: '11.5px', color: '#0066cc' }}>Formatted: {formatINR(filmTotalBudget)}</span>
                 </div>
                 <div>
-                  <label style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#121a29', marginBottom: '6px' }}>Per-Unit Ticket Size</label>
+                  <label style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#0f172a', marginBottom: '6px' }}>Per-Unit Ticket Size</label>
                   <input
                     type="number"
                     value={filmUnitTicket}
                     onChange={(e) => setFilmUnitTicket(Number(e.target.value))}
-                    style={{ width: '100%', padding: '10px 12px', border: '1px solid #8a8070', background: '#fffdf9', fontSize: '14px', boxSizing: 'border-box' }}
+                    style={{ width: '100%', padding: '10px 12px', border: '1px solid #8a8070', background: '#ffffff', fontSize: '14px', boxSizing: 'border-box' }}
                   />
-                  <span style={{ fontSize: '11.5px', color: '#7a5c2e' }}>Formatted: {formatINR(filmUnitTicket)}</span>
+                  <span style={{ fontSize: '11.5px', color: '#0066cc' }}>Formatted: {formatINR(filmUnitTicket)}</span>
                 </div>
               </div>
 
               {derived && (
-                <div style={{ backgroundColor: '#f5efe5', border: '1px solid #d6c9b2', padding: '14px 18px' }}>
-                  <div style={{ fontSize: '12px', fontWeight: 600, color: '#7a5c2e', textTransform: 'uppercase', marginBottom: '4px' }}>
+                <div style={{ backgroundColor: '#f5f5f7', border: '1px solid rgba(0, 0, 0, 0.1)', padding: '14px 18px' }}>
+                  <div style={{ fontSize: '12px', fontWeight: 600, color: '#0066cc', textTransform: 'uppercase', marginBottom: '4px' }}>
                     Platform Calculated Ratio
                   </div>
-                  <div style={{ fontSize: '14px', color: '#121a29', fontWeight: 500 }}>
+                  <div style={{ fontSize: '14px', color: '#0f172a', fontWeight: 500 }}>
                     {formatINR(capitalTarget)} requested $\div$ {formatINR(filmUnitTicket)}/unit = <strong>{derived.unitCount} Participation Units</strong>.
                   </div>
                   <div style={{ fontSize: '12.5px', color: '#4c5262', marginTop: '4px' }}>
@@ -864,22 +864,22 @@ export const FounderGuidedJourney: React.FC<FounderGuidedJourneyProps> = ({
               )}
 
               <div>
-                <label style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#121a29', marginBottom: '6px' }}>Technical Crew & Creative Attachments</label>
+                <label style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#0f172a', marginBottom: '6px' }}>Technical Crew & Creative Attachments</label>
                 <input
                   type="text"
                   value={filmCrewCredentials}
                   onChange={(e) => setFilmCrewCredentials(e.target.value)}
-                  style={{ width: '100%', padding: '10px 12px', border: '1px solid #8a8070', background: '#fffdf9', fontSize: '14px', boxSizing: 'border-box' }}
+                  style={{ width: '100%', padding: '10px 12px', border: '1px solid #8a8070', background: '#ffffff', fontSize: '14px', boxSizing: 'border-box' }}
                 />
               </div>
 
               <div>
-                <label style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#121a29', marginBottom: '6px' }}>Tiered Screen Credit Allocations</label>
+                <label style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#0f172a', marginBottom: '6px' }}>Tiered Screen Credit Allocations</label>
                 <input
                   type="text"
                   value={filmCreditTiers}
                   onChange={(e) => setFilmCreditTiers(e.target.value)}
-                  style={{ width: '100%', padding: '10px 12px', border: '1px solid #8a8070', background: '#fffdf9', fontSize: '14px', boxSizing: 'border-box' }}
+                  style={{ width: '100%', padding: '10px 12px', border: '1px solid #8a8070', background: '#ffffff', fontSize: '14px', boxSizing: 'border-box' }}
                 />
               </div>
             </div>
@@ -890,42 +890,42 @@ export const FounderGuidedJourney: React.FC<FounderGuidedJourneyProps> = ({
             <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
                 <div>
-                  <label style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#121a29', marginBottom: '6px' }}>Loan Tenure (Months)</label>
+                  <label style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#0f172a', marginBottom: '6px' }}>Loan Tenure (Months)</label>
                   <input
                     type="number"
                     value={debtTenureMonths}
                     onChange={(e) => setDebtTenureMonths(Number(e.target.value))}
-                    style={{ width: '100%', padding: '10px 12px', border: '1px solid #8a8070', background: '#fffdf9', fontSize: '14px', boxSizing: 'border-box' }}
+                    style={{ width: '100%', padding: '10px 12px', border: '1px solid #8a8070', background: '#ffffff', fontSize: '14px', boxSizing: 'border-box' }}
                   />
                 </div>
                 <div>
-                  <label style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#121a29', marginBottom: '6px' }}>Committed Interest Rate & Calculation</label>
+                  <label style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#0f172a', marginBottom: '6px' }}>Committed Interest Rate & Calculation</label>
                   <input
                     type="text"
                     value={debtInterestRate}
                     onChange={(e) => setDebtInterestRate(e.target.value)}
-                    style={{ width: '100%', padding: '10px 12px', border: '1px solid #8a8070', background: '#fffdf9', fontSize: '14px', boxSizing: 'border-box' }}
+                    style={{ width: '100%', padding: '10px 12px', border: '1px solid #8a8070', background: '#ffffff', fontSize: '14px', boxSizing: 'border-box' }}
                   />
                 </div>
               </div>
 
               <div>
-                <label style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#121a29', marginBottom: '6px' }}>Offered Immovable / Asset Collateral</label>
+                <label style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#0f172a', marginBottom: '6px' }}>Offered Immovable / Asset Collateral</label>
                 <textarea
                   rows={3}
                   value={collateralDetails}
                   onChange={(e) => setCollateralDetails(e.target.value)}
-                  style={{ width: '100%', padding: '10px 12px', border: '1px solid #8a8070', background: '#fffdf9', fontSize: '14px', boxSizing: 'border-box' }}
+                  style={{ width: '100%', padding: '10px 12px', border: '1px solid #8a8070', background: '#ffffff', fontSize: '14px', boxSizing: 'border-box' }}
                 />
               </div>
 
               <div>
-                <label style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#121a29', marginBottom: '6px' }}>Equity Conversion Option (if unserviced)</label>
+                <label style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#0f172a', marginBottom: '6px' }}>Equity Conversion Option (if unserviced)</label>
                 <input
                   type="text"
                   value={debtEquityConversion}
                   onChange={(e) => setDebtEquityConversion(e.target.value)}
-                  style={{ width: '100%', padding: '10px 12px', border: '1px solid #8a8070', background: '#fffdf9', fontSize: '14px', boxSizing: 'border-box' }}
+                  style={{ width: '100%', padding: '10px 12px', border: '1px solid #8a8070', background: '#ffffff', fontSize: '14px', boxSizing: 'border-box' }}
                 />
               </div>
             </div>
@@ -936,32 +936,32 @@ export const FounderGuidedJourney: React.FC<FounderGuidedJourneyProps> = ({
             <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
                 <div>
-                  <label style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#121a29', marginBottom: '6px' }}>Factory Plant Capacity</label>
+                  <label style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#0f172a', marginBottom: '6px' }}>Factory Plant Capacity</label>
                   <input
                     type="text"
                     value={factoryCapacity}
                     onChange={(e) => setFactoryCapacity(e.target.value)}
-                    style={{ width: '100%', padding: '10px 12px', border: '1px solid #8a8070', background: '#fffdf9', fontSize: '14px', boxSizing: 'border-box' }}
+                    style={{ width: '100%', padding: '10px 12px', border: '1px solid #8a8070', background: '#ffffff', fontSize: '14px', boxSizing: 'border-box' }}
                   />
                 </div>
                 <div>
-                  <label style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#121a29', marginBottom: '6px' }}>Current Utilization</label>
+                  <label style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#0f172a', marginBottom: '6px' }}>Current Utilization</label>
                   <input
                     type="text"
                     value={capacityUtilization}
                     onChange={(e) => setCapacityUtilization(e.target.value)}
-                    style={{ width: '100%', padding: '10px 12px', border: '1px solid #8a8070', background: '#fffdf9', fontSize: '14px', boxSizing: 'border-box' }}
+                    style={{ width: '100%', padding: '10px 12px', border: '1px solid #8a8070', background: '#ffffff', fontSize: '14px', boxSizing: 'border-box' }}
                   />
                 </div>
               </div>
 
               <div>
-                <label style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#121a29', marginBottom: '6px' }}>Celebrity Partnership Terms (Revenue Share)</label>
+                <label style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#0f172a', marginBottom: '6px' }}>Celebrity Partnership Terms (Revenue Share)</label>
                 <input
                   type="text"
                   value={celebrityRevSharePct}
                   onChange={(e) => setCelebrityRevSharePct(e.target.value)}
-                  style={{ width: '100%', padding: '10px 12px', border: '1px solid #8a8070', background: '#fffdf9', fontSize: '14px', boxSizing: 'border-box' }}
+                  style={{ width: '100%', padding: '10px 12px', border: '1px solid #8a8070', background: '#ffffff', fontSize: '14px', boxSizing: 'border-box' }}
                 />
               </div>
             </div>
@@ -972,32 +972,32 @@ export const FounderGuidedJourney: React.FC<FounderGuidedJourneyProps> = ({
             <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
                 <div>
-                  <label style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#121a29', marginBottom: '6px' }}>Operational Beds</label>
+                  <label style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#0f172a', marginBottom: '6px' }}>Operational Beds</label>
                   <input
                     type="text"
                     value={hospitalBeds}
                     onChange={(e) => setHospitalBeds(e.target.value)}
-                    style={{ width: '100%', padding: '10px 12px', border: '1px solid #8a8070', background: '#fffdf9', fontSize: '14px', boxSizing: 'border-box' }}
+                    style={{ width: '100%', padding: '10px 12px', border: '1px solid #8a8070', background: '#ffffff', fontSize: '14px', boxSizing: 'border-box' }}
                   />
                 </div>
                 <div>
-                  <label style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#121a29', marginBottom: '6px' }}>Average Annual Occupancy</label>
+                  <label style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#0f172a', marginBottom: '6px' }}>Average Annual Occupancy</label>
                   <input
                     type="text"
                     value={hospitalOccupancy}
                     onChange={(e) => setHospitalOccupancy(e.target.value)}
-                    style={{ width: '100%', padding: '10px 12px', border: '1px solid #8a8070', background: '#fffdf9', fontSize: '14px', boxSizing: 'border-box' }}
+                    style={{ width: '100%', padding: '10px 12px', border: '1px solid #8a8070', background: '#ffffff', fontSize: '14px', boxSizing: 'border-box' }}
                   />
                 </div>
               </div>
 
               <div>
-                <label style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#121a29', marginBottom: '6px' }}>Transaction Allocation (Buyout vs Primary Capex)</label>
+                <label style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#0f172a', marginBottom: '6px' }}>Transaction Allocation (Buyout vs Primary Capex)</label>
                 <input
                   type="text"
                   value={hospitalBuyoutDetails}
                   onChange={(e) => setHospitalBuyoutDetails(e.target.value)}
-                  style={{ width: '100%', padding: '10px 12px', border: '1px solid #8a8070', background: '#fffdf9', fontSize: '14px', boxSizing: 'border-box' }}
+                  style={{ width: '100%', padding: '10px 12px', border: '1px solid #8a8070', background: '#ffffff', fontSize: '14px', boxSizing: 'border-box' }}
                 />
               </div>
             </div>
@@ -1007,21 +1007,21 @@ export const FounderGuidedJourney: React.FC<FounderGuidedJourneyProps> = ({
           {businessType === 'LOGISTICS_RURAL' && (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
               <div>
-                <label style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#121a29', marginBottom: '6px' }}>Target Tier-3 Towns</label>
+                <label style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#0f172a', marginBottom: '6px' }}>Target Tier-3 Towns</label>
                 <input
                   type="text"
                   value={logisticsTowns}
                   onChange={(e) => setLogisticsTowns(e.target.value)}
-                  style={{ width: '100%', padding: '10px 12px', border: '1px solid #8a8070', background: '#fffdf9', fontSize: '14px', boxSizing: 'border-box' }}
+                  style={{ width: '100%', padding: '10px 12px', border: '1px solid #8a8070', background: '#ffffff', fontSize: '14px', boxSizing: 'border-box' }}
                 />
               </div>
               <div>
-                <label style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#121a29', marginBottom: '6px' }}>Hub & DWACRA SHG Delivery Model</label>
+                <label style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#0f172a', marginBottom: '6px' }}>Hub & DWACRA SHG Delivery Model</label>
                 <textarea
                   rows={2}
                   value={hubModelDetails}
                   onChange={(e) => setHubModelDetails(e.target.value)}
-                  style={{ width: '100%', padding: '10px 12px', border: '1px solid #8a8070', background: '#fffdf9', fontSize: '14px', boxSizing: 'border-box' }}
+                  style={{ width: '100%', padding: '10px 12px', border: '1px solid #8a8070', background: '#ffffff', fontSize: '14px', boxSizing: 'border-box' }}
                 />
               </div>
             </div>
@@ -1032,31 +1032,31 @@ export const FounderGuidedJourney: React.FC<FounderGuidedJourneyProps> = ({
             <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
                 <div>
-                  <label style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#121a29', marginBottom: '6px' }}>Acreage & Plot Units</label>
+                  <label style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#0f172a', marginBottom: '6px' }}>Acreage & Plot Units</label>
                   <input
                     type="text"
                     value={reTotalAcreage}
                     onChange={(e) => setReTotalAcreage(e.target.value)}
-                    style={{ width: '100%', padding: '10px 12px', border: '1px solid #8a8070', background: '#fffdf9', fontSize: '14px', boxSizing: 'border-box' }}
+                    style={{ width: '100%', padding: '10px 12px', border: '1px solid #8a8070', background: '#ffffff', fontSize: '14px', boxSizing: 'border-box' }}
                   />
                 </div>
                 <div>
-                  <label style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#121a29', marginBottom: '6px' }}>Layout Sanction</label>
+                  <label style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#0f172a', marginBottom: '6px' }}>Layout Sanction</label>
                   <input
                     type="text"
                     value={reDtcpApproval}
                     onChange={(e) => setReDtcpApproval(e.target.value)}
-                    style={{ width: '100%', padding: '10px 12px', border: '1px solid #8a8070', background: '#fffdf9', fontSize: '14px', boxSizing: 'border-box' }}
+                    style={{ width: '100%', padding: '10px 12px', border: '1px solid #8a8070', background: '#ffffff', fontSize: '14px', boxSizing: 'border-box' }}
                   />
                 </div>
               </div>
               <div>
-                <label style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#121a29', marginBottom: '6px' }}>Escrow Mortgage Plot Security</label>
+                <label style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#0f172a', marginBottom: '6px' }}>Escrow Mortgage Plot Security</label>
                 <input
                   type="text"
                   value={rePlotEscrowSecurity}
                   onChange={(e) => setRePlotEscrowSecurity(e.target.value)}
-                  style={{ width: '100%', padding: '10px 12px', border: '1px solid #8a8070', background: '#fffdf9', fontSize: '14px', boxSizing: 'border-box' }}
+                  style={{ width: '100%', padding: '10px 12px', border: '1px solid #8a8070', background: '#ffffff', fontSize: '14px', boxSizing: 'border-box' }}
                 />
               </div>
             </div>
@@ -1064,12 +1064,12 @@ export const FounderGuidedJourney: React.FC<FounderGuidedJourneyProps> = ({
 
           {/* Custom / Other Business & Structure Branch */}
           {(businessType === 'OTHER' || proposedArrangement === 'OTHER' || (!['FILM_ENTERTAINMENT', 'MANUFACTURING_CONSUMER', 'HEALTHCARE_HOSPITAL', 'LOGISTICS_RURAL', 'REAL_ESTATE_LAND'].includes(businessType) && proposedArrangement !== 'SECURED_COLLATERAL_DEBT')) && (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', marginTop: '16px', padding: '16px', backgroundColor: '#faf4eb', border: '1px solid #d6c9b2' }}>
-              <div style={{ fontSize: '13.5px', fontWeight: 600, color: '#121a29' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', marginTop: '16px', padding: '16px', backgroundColor: '#f5f5f7', border: '1px solid rgba(0, 0, 0, 0.1)' }}>
+              <div style={{ fontSize: '13.5px', fontWeight: 600, color: '#0f172a' }}>
                 Custom Contextual Briefing: {customBusinessType || businessType.replace(/_/g, ' ')} ({customArrangement || proposedArrangement.replace(/_/g, ' ')})
               </div>
               <div>
-                <label style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#121a29', marginBottom: '6px' }}>
+                <label style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#0f172a', marginBottom: '6px' }}>
                   Business Model & Core Operational Engine
                 </label>
                 <textarea
@@ -1077,13 +1077,13 @@ export const FounderGuidedJourney: React.FC<FounderGuidedJourneyProps> = ({
                   value={customBusinessModel}
                   onChange={(e) => setCustomBusinessModel(e.target.value)}
                   placeholder="Describe how the venture generates revenue, acquires customers, and delivers its product/service..."
-                  style={{ width: '100%', padding: '10px 12px', border: '1px solid #8a8070', background: '#fffdf9', fontSize: '14px', boxSizing: 'border-box' }}
+                  style={{ width: '100%', padding: '10px 12px', border: '1px solid #8a8070', background: '#ffffff', fontSize: '14px', boxSizing: 'border-box' }}
                 />
               </div>
 
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
                 <div>
-                  <label style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#121a29', marginBottom: '6px' }}>
+                  <label style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#0f172a', marginBottom: '6px' }}>
                     Historical Revenue / Key Metrics (If any)
                   </label>
                   <input
@@ -1091,11 +1091,11 @@ export const FounderGuidedJourney: React.FC<FounderGuidedJourneyProps> = ({
                     value={customMetrics}
                     onChange={(e) => setCustomMetrics(e.target.value)}
                     placeholder="e.g. ₹42L last year, 12,000 active users, 3 retail outlets..."
-                    style={{ width: '100%', padding: '10px 12px', border: '1px solid #8a8070', background: '#fffdf9', fontSize: '14px', boxSizing: 'border-box' }}
+                    style={{ width: '100%', padding: '10px 12px', border: '1px solid #8a8070', background: '#ffffff', fontSize: '14px', boxSizing: 'border-box' }}
                   />
                 </div>
                 <div>
-                  <label style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#121a29', marginBottom: '6px' }}>
+                  <label style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#0f172a', marginBottom: '6px' }}>
                     Offered Collateral, Security, or Founder Guarantees (Optional)
                   </label>
                   <input
@@ -1103,13 +1103,13 @@ export const FounderGuidedJourney: React.FC<FounderGuidedJourneyProps> = ({
                     value={customSecurity}
                     onChange={(e) => setCustomSecurity(e.target.value)}
                     placeholder="e.g. First charge on equipment, personal guarantee, or equity pledge..."
-                    style={{ width: '100%', padding: '10px 12px', border: '1px solid #8a8070', background: '#fffdf9', fontSize: '14px', boxSizing: 'border-box' }}
+                    style={{ width: '100%', padding: '10px 12px', border: '1px solid #8a8070', background: '#ffffff', fontSize: '14px', boxSizing: 'border-box' }}
                   />
                 </div>
               </div>
 
               <div>
-                <label style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#121a29', marginBottom: '6px' }}>
+                <label style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#0f172a', marginBottom: '6px' }}>
                   Investor Participation & Proposed Consideration Details
                 </label>
                 <textarea
@@ -1117,7 +1117,7 @@ export const FounderGuidedJourney: React.FC<FounderGuidedJourneyProps> = ({
                   value={customInvestorConsideration}
                   onChange={(e) => setCustomInvestorConsideration(e.target.value)}
                   placeholder="Specific terms: e.g. 15% equity dilution, 16% coupon return, board seat, revenue royalty, or milestones..."
-                  style={{ width: '100%', padding: '10px 12px', border: '1px solid #8a8070', background: '#fffdf9', fontSize: '14px', boxSizing: 'border-box' }}
+                  style={{ width: '100%', padding: '10px 12px', border: '1px solid #8a8070', background: '#ffffff', fontSize: '14px', boxSizing: 'border-box' }}
                 />
               </div>
             </div>
@@ -1127,58 +1127,58 @@ export const FounderGuidedJourney: React.FC<FounderGuidedJourneyProps> = ({
 
       {/* STEP 5: CAPITAL TARGET & USE BREAKDOWN */}
       {step === 5 && (
-        <div style={{ backgroundColor: '#fffdf9', border: '1px solid #d6c9b2', padding: '32px' }}>
-          <h3 style={{ margin: '0 0 8px', fontSize: '18px', color: '#121a29' }}>Capital Requirement & Itemized Deployment</h3>
+        <div style={{ backgroundColor: '#ffffff', border: '1px solid rgba(0, 0, 0, 0.1)', padding: '32px' }}>
+          <h3 style={{ margin: '0 0 8px', fontSize: '18px', color: '#0f172a' }}>Capital Requirement & Itemized Deployment</h3>
           <p style={{ margin: '0 0 24px', color: '#4c5262', fontSize: '13.5px' }}>
             Specify the exact funding amount requested and the specific project line items it will fund.
           </p>
 
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '16px', marginBottom: '24px' }}>
             <div>
-              <label style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#121a29', marginBottom: '6px' }}>Total Capital Target</label>
+              <label style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#0f172a', marginBottom: '6px' }}>Total Capital Target</label>
               <input
                 type="number"
                 value={capitalTarget}
                 onChange={(e) => setCapitalTarget(Number(e.target.value))}
-                style={{ width: '100%', padding: '10px 12px', border: '1px solid #8a8070', background: '#fffdf9', fontSize: '14px', boxSizing: 'border-box' }}
+                style={{ width: '100%', padding: '10px 12px', border: '1px solid #8a8070', background: '#ffffff', fontSize: '14px', boxSizing: 'border-box' }}
               />
-              <span style={{ fontSize: '11.5px', color: '#7a5c2e' }}>Formatted: {formatINR(capitalTarget)}</span>
+              <span style={{ fontSize: '11.5px', color: '#0066cc' }}>Formatted: {formatINR(capitalTarget)}</span>
             </div>
             <div>
-              <label style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#121a29', marginBottom: '6px' }}>Min Investor Ticket</label>
+              <label style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#0f172a', marginBottom: '6px' }}>Min Investor Ticket</label>
               <input
                 type="number"
                 value={ticketMin}
                 onChange={(e) => setTicketMin(Number(e.target.value))}
-                style={{ width: '100%', padding: '10px 12px', border: '1px solid #8a8070', background: '#fffdf9', fontSize: '14px', boxSizing: 'border-box' }}
+                style={{ width: '100%', padding: '10px 12px', border: '1px solid #8a8070', background: '#ffffff', fontSize: '14px', boxSizing: 'border-box' }}
               />
-              <span style={{ fontSize: '11.5px', color: '#7a5c2e' }}>Formatted: {formatINR(ticketMin)}</span>
+              <span style={{ fontSize: '11.5px', color: '#0066cc' }}>Formatted: {formatINR(ticketMin)}</span>
             </div>
             <div>
-              <label style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#121a29', marginBottom: '6px' }}>Max Investor Ticket</label>
+              <label style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#0f172a', marginBottom: '6px' }}>Max Investor Ticket</label>
               <input
                 type="number"
                 value={ticketMax}
                 onChange={(e) => setTicketMax(Number(e.target.value))}
-                style={{ width: '100%', padding: '10px 12px', border: '1px solid #8a8070', background: '#fffdf9', fontSize: '14px', boxSizing: 'border-box' }}
+                style={{ width: '100%', padding: '10px 12px', border: '1px solid #8a8070', background: '#ffffff', fontSize: '14px', boxSizing: 'border-box' }}
               />
-              <span style={{ fontSize: '11.5px', color: '#7a5c2e' }}>Formatted: {formatINR(ticketMax)}</span>
+              <span style={{ fontSize: '11.5px', color: '#0066cc' }}>Formatted: {formatINR(ticketMax)}</span>
             </div>
           </div>
 
           <div>
-            <label style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#121a29', marginBottom: '6px' }}>Itemized Use of Capital Breakdown</label>
+            <label style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#0f172a', marginBottom: '6px' }}>Itemized Use of Capital Breakdown</label>
             <textarea
               rows={4}
               value={itemizedBudget}
               onChange={(e) => setItemizedBudget(e.target.value)}
               placeholder="e.g. Equipment (₹10L), Working capital (₹5L), Fit-out (₹5L)..."
-              style={{ width: '100%', padding: '12px', border: '1px solid #8a8070', background: '#fffdf9', fontSize: '14px', boxSizing: 'border-box', marginBottom: '16px' }}
+              style={{ width: '100%', padding: '12px', border: '1px solid #8a8070', background: '#ffffff', fontSize: '14px', boxSizing: 'border-box', marginBottom: '16px' }}
             />
           </div>
 
           <div>
-            <label style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#121a29', marginBottom: '6px' }}>
+            <label style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#0f172a', marginBottom: '6px' }}>
               Primary Venture Media / Showcase Photo URL (Optional)
             </label>
             <input
@@ -1186,7 +1186,7 @@ export const FounderGuidedJourney: React.FC<FounderGuidedJourneyProps> = ({
               value={heroImageUrl}
               onChange={(e) => setHeroImageUrl(e.target.value)}
               placeholder="https://images.unsplash.com/... (Photo of plant, facility, asset, or prototype)"
-              style={{ width: '100%', padding: '12px', border: '1px solid #8a8070', background: '#fffdf9', fontSize: '14px', boxSizing: 'border-box' }}
+              style={{ width: '100%', padding: '12px', border: '1px solid #8a8070', background: '#ffffff', fontSize: '14px', boxSizing: 'border-box' }}
             />
           </div>
         </div>
@@ -1194,8 +1194,8 @@ export const FounderGuidedJourney: React.FC<FounderGuidedJourneyProps> = ({
 
       {/* STEP 6: EVIDENCE & UNRESOLVED CHECKLIST */}
       {step === 6 && (
-        <div style={{ backgroundColor: '#fffdf9', border: '1px solid #d6c9b2', padding: '32px' }}>
-          <h3 style={{ margin: '0 0 8px', fontSize: '18px', color: '#121a29' }}>Evidence Status & Disclosures</h3>
+        <div style={{ backgroundColor: '#ffffff', border: '1px solid rgba(0, 0, 0, 0.1)', padding: '32px' }}>
+          <h3 style={{ margin: '0 0 8px', fontSize: '18px', color: '#0f172a' }}>Evidence Status & Disclosures</h3>
           <p style={{ margin: '0 0 24px', color: '#4c5262', fontSize: '13.5px' }}>
             Flag which claims have documentary backing and which remain unverified. Preserving transparency speeds up investor reviews.
           </p>
@@ -1207,14 +1207,14 @@ export const FounderGuidedJourney: React.FC<FounderGuidedJourneyProps> = ({
                 style={{
                   padding: '14px 18px',
                   backgroundColor: item.status === 'VERIFIED' ? '#f0fdf4' : item.status === 'UNRESOLVED_CHECK' ? '#fffbeb' : '#fff',
-                  border: '1px solid #d6c9b2',
+                  border: '1px solid rgba(0, 0, 0, 0.1)',
                   display: 'flex',
                   justifyContent: 'space-between',
                   alignItems: 'center',
                 }}
               >
                 <div>
-                  <div style={{ fontSize: '14px', fontWeight: 600, color: '#121a29' }}>{item.label}</div>
+                  <div style={{ fontSize: '14px', fontWeight: 600, color: '#0f172a' }}>{item.label}</div>
                   <div style={{ fontSize: '12px', color: '#4c5262', marginTop: '2px' }}>{item.note}</div>
                 </div>
                 <div style={{ display: 'flex', gap: '6px' }}>
@@ -1248,7 +1248,7 @@ export const FounderGuidedJourney: React.FC<FounderGuidedJourneyProps> = ({
                       padding: '4px 10px',
                       fontSize: '11px',
                       fontWeight: 600,
-                      backgroundColor: item.status === 'SUPPORTED' ? '#0c1826' : '#fff',
+                      backgroundColor: item.status === 'SUPPORTED' ? '#0f172a' : '#fff',
                       color: item.status === 'SUPPORTED' ? '#fff' : '#4c5262',
                       border: '1px solid #8a8070',
                       cursor: 'pointer',
@@ -1281,16 +1281,16 @@ export const FounderGuidedJourney: React.FC<FounderGuidedJourneyProps> = ({
           </div>
 
           {/* Add Custom Evidence / Verification Item */}
-          <div style={{ marginTop: '20px', borderTop: '1px solid #d6c9b2', paddingTop: '16px' }}>
+          <div style={{ marginTop: '20px', borderTop: '1px solid rgba(0, 0, 0, 0.1)', paddingTop: '16px' }}>
             {!showAddEvidence ? (
               <button
                 type="button"
                 onClick={() => setShowAddEvidence(true)}
                 style={{
                   padding: '8px 16px',
-                  backgroundColor: '#fffdf9',
-                  border: '1px dashed #7a5c2e',
-                  color: '#7a5c2e',
+                  backgroundColor: '#ffffff',
+                  border: '1px solid rgba(0, 0, 0, 0.08)', borderRadius: '14px',
+                  color: '#0066cc',
                   fontSize: '13px',
                   fontWeight: 600,
                   cursor: 'pointer',
@@ -1302,27 +1302,27 @@ export const FounderGuidedJourney: React.FC<FounderGuidedJourneyProps> = ({
                 <span>+</span> Add Custom Verification / Document Item
               </button>
             ) : (
-              <div style={{ padding: '16px', backgroundColor: '#faf4eb', border: '1px solid #d6c9b2' }}>
-                <h4 style={{ margin: '0 0 12px', fontSize: '13.5px', color: '#121a29' }}>Add Custom Verification or Document</h4>
+              <div style={{ padding: '16px', backgroundColor: '#f5f5f7', border: '1px solid rgba(0, 0, 0, 0.1)' }}>
+                <h4 style={{ margin: '0 0 12px', fontSize: '13.5px', color: '#0f172a' }}>Add Custom Verification or Document</h4>
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '12px' }}>
                   <div>
-                    <label style={{ display: 'block', fontSize: '12px', fontWeight: 500, color: '#121a29', marginBottom: '4px' }}>Document / Check Title</label>
+                    <label style={{ display: 'block', fontSize: '12px', fontWeight: 500, color: '#0f172a', marginBottom: '4px' }}>Document / Check Title</label>
                     <input
                       type="text"
                       value={newEvidenceLabel}
                       onChange={(e) => setNewEvidenceLabel(e.target.value)}
                       placeholder="e.g. ISO 9001:2015 Certificate, Patent Grant, Valuation Report..."
-                      style={{ width: '100%', padding: '8px 10px', border: '1px solid #8a8070', background: '#fffdf9', fontSize: '13px', boxSizing: 'border-box' }}
+                      style={{ width: '100%', padding: '8px 10px', border: '1px solid #8a8070', background: '#ffffff', fontSize: '13px', boxSizing: 'border-box' }}
                     />
                   </div>
                   <div>
-                    <label style={{ display: 'block', fontSize: '12px', fontWeight: 500, color: '#121a29', marginBottom: '4px' }}>Verification Note / Citation</label>
+                    <label style={{ display: 'block', fontSize: '12px', fontWeight: 500, color: '#0f172a', marginBottom: '4px' }}>Verification Note / Citation</label>
                     <input
                       type="text"
                       value={newEvidenceNote}
                       onChange={(e) => setNewEvidenceNote(e.target.value)}
                       placeholder="e.g. Certified copy uploaded; valid through 2028"
-                      style={{ width: '100%', padding: '8px 10px', border: '1px solid #8a8070', background: '#fffdf9', fontSize: '13px', boxSizing: 'border-box' }}
+                      style={{ width: '100%', padding: '8px 10px', border: '1px solid #8a8070', background: '#ffffff', fontSize: '13px', boxSizing: 'border-box' }}
                     />
                   </div>
                 </div>
@@ -1338,7 +1338,7 @@ export const FounderGuidedJourney: React.FC<FounderGuidedJourneyProps> = ({
                           padding: '4px 8px',
                           fontSize: '11px',
                           fontWeight: 600,
-                          backgroundColor: newEvidenceStatus === st ? '#0c1826' : '#fff',
+                          backgroundColor: newEvidenceStatus === st ? '#0f172a' : '#fff',
                           color: newEvidenceStatus === st ? '#fff' : '#4c5262',
                           border: '1px solid #8a8070',
                           cursor: 'pointer',
@@ -1390,13 +1390,13 @@ export const FounderGuidedJourney: React.FC<FounderGuidedJourneyProps> = ({
 
       {/* STEP 7: REVIEW UNIFIED 10-SECTION DOSSIER & PREVIEW */}
       {step === 7 && (
-        <div style={{ backgroundColor: '#fffdf9', border: '1px solid #d6c9b2', padding: '32px' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid #d6c9b2', paddingBottom: '16px', marginBottom: '20px' }}>
+        <div style={{ backgroundColor: '#ffffff', border: '1px solid rgba(0, 0, 0, 0.1)', padding: '32px' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid rgba(0, 0, 0, 0.1)', paddingBottom: '16px', marginBottom: '20px' }}>
             <div>
-              <span style={{ fontSize: '11px', color: '#7a5c2e', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.12em' }}>
+              <span style={{ fontSize: '11px', color: '#0066cc', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.12em' }}>
                 Unified Presentation Dossier & Investor Preview
               </span>
-              <h3 style={{ margin: '4px 0 0', fontFamily: "Newsreader, Georgia, serif", fontSize: '26px', color: '#121a29', fontWeight: 400 }}>
+              <h3 style={{ margin: '4px 0 0', fontFamily: "var(--font-sans)", fontSize: '26px', color: '#0f172a', fontWeight: 400 }}>
                 {companyName}
               </h3>
               <div style={{ fontSize: '12.5px', color: '#4c5262', marginTop: '2px' }}>
@@ -1404,8 +1404,8 @@ export const FounderGuidedJourney: React.FC<FounderGuidedJourneyProps> = ({
               </div>
             </div>
             <div style={{ textAlign: 'right' }}>
-              <div style={{ fontSize: '20px', fontWeight: 700, color: '#121a29' }}>{formatINR(capitalTarget)}</div>
-              <div style={{ fontSize: '11px', color: '#7a5c2e', textTransform: 'uppercase' }}>Target Capital</div>
+              <div style={{ fontSize: '20px', fontWeight: 700, color: '#0f172a' }}>{formatINR(capitalTarget)}</div>
+              <div style={{ fontSize: '11px', color: '#0066cc', textTransform: 'uppercase' }}>Target Capital</div>
             </div>
           </div>
 
@@ -1417,9 +1417,9 @@ export const FounderGuidedJourney: React.FC<FounderGuidedJourneyProps> = ({
                 onClick={() => setStep7ActiveTab('SECTIONS')}
                 style={{
                   padding: '8px 16px',
-                  backgroundColor: step7ActiveTab === 'SECTIONS' ? '#0c1826' : '#fffdf9',
-                  color: step7ActiveTab === 'SECTIONS' ? '#f5efe5' : '#121a29',
-                  border: '1px solid #0c1826',
+                  backgroundColor: step7ActiveTab === 'SECTIONS' ? '#0f172a' : '#ffffff',
+                  color: step7ActiveTab === 'SECTIONS' ? '#f5f5f7' : '#0f172a',
+                  border: '1px solid #0f172a',
                   fontSize: '13px',
                   fontWeight: 600,
                   cursor: 'pointer',
@@ -1432,9 +1432,9 @@ export const FounderGuidedJourney: React.FC<FounderGuidedJourneyProps> = ({
                 onClick={() => setStep7ActiveTab('LIVE_CARD')}
                 style={{
                   padding: '8px 16px',
-                  backgroundColor: step7ActiveTab === 'LIVE_CARD' ? '#0c1826' : '#fffdf9',
-                  color: step7ActiveTab === 'LIVE_CARD' ? '#f5efe5' : '#121a29',
-                  border: '1px solid #0c1826',
+                  backgroundColor: step7ActiveTab === 'LIVE_CARD' ? '#0f172a' : '#ffffff',
+                  color: step7ActiveTab === 'LIVE_CARD' ? '#f5f5f7' : '#0f172a',
+                  border: '1px solid #0f172a',
                   fontSize: '13px',
                   fontWeight: 600,
                   cursor: 'pointer',
@@ -1449,9 +1449,9 @@ export const FounderGuidedJourney: React.FC<FounderGuidedJourneyProps> = ({
               onClick={() => setPreviewModalOpen(true)}
               style={{
                 padding: '8px 18px',
-                backgroundColor: '#f5efe5',
-                border: '1px solid #7a5c2e',
-                color: '#7a5c2e',
+                backgroundColor: '#f5f5f7',
+                border: '1px solid #0066cc',
+                color: '#0066cc',
                 fontSize: '13px',
                 fontWeight: 600,
                 cursor: 'pointer',
@@ -1467,8 +1467,8 @@ export const FounderGuidedJourney: React.FC<FounderGuidedJourneyProps> = ({
 
           {step7ActiveTab === 'LIVE_CARD' ? (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-              <div style={{ padding: '16px 20px', backgroundColor: '#faf5ec', border: '1px solid #e3d6bf' }}>
-                <div style={{ fontSize: '13.5px', fontWeight: 600, color: '#7a5c2e' }}>
+              <div style={{ padding: '16px 20px', backgroundColor: '#faf5ec', border: '1px solid rgba(0, 0, 0, 0.08)' }}>
+                <div style={{ fontSize: '13.5px', fontWeight: 600, color: '#0066cc' }}>
                   Live Capital Directory Card Simulation
                 </div>
                 <div style={{ fontSize: '12.5px', color: '#4c5262', marginTop: '3px' }}>
@@ -1490,9 +1490,9 @@ export const FounderGuidedJourney: React.FC<FounderGuidedJourneyProps> = ({
                   onClick={() => setPreviewModalOpen(true)}
                   style={{
                     padding: '9px 20px',
-                    backgroundColor: '#fffdf9',
-                    border: '1px solid #7a5c2e',
-                    color: '#7a5c2e',
+                    backgroundColor: '#ffffff',
+                    border: '1px solid #0066cc',
+                    color: '#0066cc',
                     fontSize: '13px',
                     fontWeight: 600,
                     cursor: 'pointer',
@@ -1521,20 +1521,20 @@ export const FounderGuidedJourney: React.FC<FounderGuidedJourneyProps> = ({
                   key={sec.num}
                   style={{
                     padding: '16px 20px',
-                    backgroundColor: '#f5efe5',
-                    border: '1px solid #d6c9b2',
+                    backgroundColor: '#f5f5f7',
+                    border: '1px solid rgba(0, 0, 0, 0.1)',
                   }}
                 >
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                      <span style={{ fontSize: '11px', fontWeight: 700, color: '#7a5c2e', fontFamily: 'monospace' }}>{sec.num}</span>
-                      <span style={{ fontSize: '14px', fontWeight: 600, color: '#121a29' }}>{sec.title}</span>
+                      <span style={{ fontSize: '11px', fontWeight: 700, color: '#0066cc', fontFamily: 'monospace' }}>{sec.num}</span>
+                      <span style={{ fontSize: '14px', fontWeight: 600, color: '#0f172a' }}>{sec.title}</span>
                     </div>
-                    <span style={{ fontSize: '10px', color: '#7a5c2e', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.08em', backgroundColor: '#fff', padding: '2px 8px', border: '1px solid #d6c9b2' }}>
+                    <span style={{ fontSize: '10px', color: '#0066cc', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.08em', backgroundColor: '#fff', padding: '2px 8px', border: '1px solid rgba(0, 0, 0, 0.1)' }}>
                       {sec.tag}
                     </span>
                   </div>
-                  <div style={{ fontSize: '13.5px', color: '#121a29', lineHeight: 1.55 }}>
+                  <div style={{ fontSize: '13.5px', color: '#0f172a', lineHeight: 1.55 }}>
                     {sec.content}
                   </div>
                 </div>
@@ -1548,9 +1548,9 @@ export const FounderGuidedJourney: React.FC<FounderGuidedJourneyProps> = ({
               onClick={() => setPreviewModalOpen(true)}
               style={{
                 padding: '12px 28px',
-                backgroundColor: '#fffdf9',
-                border: '1px solid #7a5c2e',
-                color: '#7a5c2e',
+                backgroundColor: '#ffffff',
+                border: '1px solid #0066cc',
+                color: '#0066cc',
                 fontSize: '14.5px',
                 fontWeight: 600,
                 cursor: 'pointer',
@@ -1568,8 +1568,8 @@ export const FounderGuidedJourney: React.FC<FounderGuidedJourneyProps> = ({
               disabled={saving}
               style={{
                 padding: '12px 36px',
-                backgroundColor: '#0c1826',
-                color: '#f5efe5',
+                backgroundColor: '#0f172a',
+                color: '#f5f5f7',
                 border: 'none',
                 fontSize: '15px',
                 fontWeight: 600,
@@ -1592,8 +1592,8 @@ export const FounderGuidedJourney: React.FC<FounderGuidedJourneyProps> = ({
               left: '50%',
               transform: 'translateX(-50%)',
               zIndex: 1200,
-              backgroundColor: '#0c1826',
-              color: '#f5efe5',
+              backgroundColor: '#0f172a',
+              color: '#f5f5f7',
               padding: '8px 24px',
               borderRadius: '24px',
               boxShadow: '0 8px 24px rgba(0,0,0,0.3)',
@@ -1605,14 +1605,14 @@ export const FounderGuidedJourney: React.FC<FounderGuidedJourneyProps> = ({
             }}
           >
             <span>✨ Live Investor Preview Mode</span>
-            <span style={{ color: '#d6c9b2' }}>|</span>
-            <span style={{ fontSize: '12px', color: '#e3d6bf' }}>This is how verified investors and reviewers see your dossier.</span>
+            <span style={{ color: 'rgba(0, 0, 0, 0.1)' }}>|</span>
+            <span style={{ fontSize: '12px', color: 'rgba(0, 0, 0, 0.08)' }}>This is how verified investors and reviewers see your dossier.</span>
             <button
               onClick={() => setPreviewModalOpen(false)}
               style={{
                 marginLeft: '8px',
                 padding: '3px 10px',
-                backgroundColor: '#7a5c2e',
+                backgroundColor: '#0066cc',
                 color: '#fff',
                 border: 'none',
                 borderRadius: '12px',

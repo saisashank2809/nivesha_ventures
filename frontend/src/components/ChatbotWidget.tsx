@@ -67,20 +67,22 @@ export const ChatbotWidget: React.FC<ChatbotWidgetProps> = ({ currentUser, onSel
           style={{
             display: 'flex',
             alignItems: 'center',
-            gap: '10px',
-            padding: '12px 18px',
-            backgroundColor: '#0c1826',
-            color: '#f5efe5',
-            border: '1px solid #7a5c2e',
-            borderRadius: '24px',
-            boxShadow: '0 8px 24px rgba(12, 24, 38, 0.25)',
+            gap: '9px',
+            padding: '12px 20px',
+            backgroundColor: '#0f172a',
+            color: '#ffffff',
+            border: '1px solid rgba(255, 255, 255, 0.14)',
+            borderRadius: '9999px',
+            boxShadow: '0 10px 28px rgba(0, 0, 0, 0.22)',
             cursor: 'pointer',
-            fontFamily: "Newsreader, Georgia, 'Times New Roman', serif",
-            fontSize: '16px',
-            fontWeight: 500,
+            fontFamily: 'var(--font-sans)',
+            fontSize: '14px',
+            fontWeight: 600,
           }}
         >
-          <span style={{ fontSize: '18px' }}>✨</span>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#d4af37" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            <path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z" />
+          </svg>
           <span>{currentUser?.role === 'FOUNDER' ? 'Founder Co-pilot' : 'AI Diligence Assistant'}</span>
         </button>
       )}
@@ -91,9 +93,10 @@ export const ChatbotWidget: React.FC<ChatbotWidgetProps> = ({ currentUser, onSel
           style={{
             width: '380px',
             height: '520px',
-            backgroundColor: '#fffdf9',
-            border: '1px solid #d6c9b2',
-            boxShadow: '0 20px 48px -10px rgba(12, 24, 38, 0.35)',
+            backgroundColor: '#ffffff',
+            border: '1px solid rgba(0, 0, 0, 0.1)',
+            borderRadius: '22px',
+            boxShadow: '0 24px 56px -10px rgba(0, 0, 0, 0.25)',
             display: 'flex',
             flexDirection: 'column',
             overflow: 'hidden',
@@ -102,9 +105,9 @@ export const ChatbotWidget: React.FC<ChatbotWidgetProps> = ({ currentUser, onSel
           {/* Header */}
           <div
             style={{
-              padding: '14px 16px',
-              backgroundColor: '#0c1826',
-              color: '#f5efe5',
+              padding: '15px 18px',
+              backgroundColor: '#0f172a',
+              color: '#f5f5f7',
               display: 'flex',
               justifyContent: 'space-between',
               alignItems: 'center',
@@ -113,14 +116,15 @@ export const ChatbotWidget: React.FC<ChatbotWidgetProps> = ({ currentUser, onSel
             <div>
               <div
                 style={{
-                  fontFamily: "Newsreader, Georgia, 'Times New Roman', serif",
-                  fontSize: '17px',
-                  fontWeight: 500,
+                  fontFamily: 'var(--font-sans)',
+                  fontSize: '15.5px',
+                  fontWeight: 700,
+                  letterSpacing: '-0.01em',
                 }}
               >
                 {currentUser?.role === 'FOUNDER' ? 'Nivesha Founder Co-pilot' : 'Nivesha Diligence Assistant'}
               </div>
-              <div style={{ fontSize: '11px', color: '#b39463' }}>
+              <div style={{ fontSize: '11px', color: '#d4af37' }}>
                 Powered by Nivesha Diligence Knowledge Base
               </div>
             </div>

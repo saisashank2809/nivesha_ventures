@@ -113,17 +113,17 @@ export const Navbar: React.FC<NavbarProps> = ({
           >
             <div
               style={{
-                width: '32px',
-                height: '32px',
-                backgroundColor: '#0c1826',
-                color: '#f5efe5',
+                width: '34px',
+                height: '34px',
+                backgroundColor: '#0f172a',
+                color: '#ffffff',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
                 fontWeight: 700,
                 fontSize: '16px',
-                fontFamily: "Newsreader, Georgia, 'Times New Roman', serif",
-                borderRadius: '2px',
+                fontFamily: 'var(--font-sans)',
+                borderRadius: '10px',
                 flexShrink: 0,
               }}
             >
@@ -132,11 +132,11 @@ export const Navbar: React.FC<NavbarProps> = ({
             <div>
               <div
                 style={{
-                  fontSize: '18px',
-                  fontWeight: 600,
-                  color: '#121a29',
-                  letterSpacing: '-0.01em',
-                  fontFamily: "Newsreader, Georgia, 'Times New Roman', serif",
+                  fontSize: '17px',
+                  fontWeight: 700,
+                  color: '#0f172a',
+                  letterSpacing: '-0.02em',
+                  fontFamily: 'var(--font-sans)',
                   lineHeight: 1.15,
                   whiteSpace: 'nowrap',
                 }}
@@ -144,7 +144,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                 Nivesha Ventures
               </div>
               <div className="nv-navbar-tagline">
-                Capital Facilitation & Due Diligence
+                Capital Facilitation &amp; Due Diligence
               </div>
             </div>
           </div>
@@ -176,7 +176,7 @@ export const Navbar: React.FC<NavbarProps> = ({
               {unreadCount > 0 && (
                 <span
                   style={{
-                    backgroundColor: '#7a5c2e',
+                    backgroundColor: '#0066cc',
                     color: '#fff',
                     borderRadius: '10px',
                     fontSize: '10px',
@@ -211,9 +211,9 @@ export const Navbar: React.FC<NavbarProps> = ({
                   alignItems: 'center',
                   gap: '6px',
                   padding: '6px 11px',
-                  backgroundColor: '#f5efe5',
-                  border: '1px solid #c5b59b',
-                  color: '#7a5c2e',
+                  backgroundColor: '#f5f5f7',
+                  border: '1px solid rgba(0, 0, 0, 0.16)',
+                  color: '#0066cc',
                   fontSize: '12px',
                   fontWeight: 600,
                   cursor: 'pointer',
@@ -247,8 +247,8 @@ export const Navbar: React.FC<NavbarProps> = ({
                     right: 0,
                     marginTop: '8px',
                     width: '320px',
-                    backgroundColor: '#fffdf9',
-                    border: '1px solid #d6c9b2',
+                    backgroundColor: '#ffffff',
+                    border: '1px solid rgba(0, 0, 0, 0.1)',
                     boxShadow: '0 12px 30px rgba(12, 24, 38, 0.18)',
                     borderRadius: '4px',
                     zIndex: 200,
@@ -256,8 +256,8 @@ export const Navbar: React.FC<NavbarProps> = ({
                     overflowY: 'auto',
                   }}
                 >
-                  <div style={{ padding: '10px 14px', borderBottom: '1px solid #eedec4', backgroundColor: '#faf4eb' }}>
-                    <div style={{ fontSize: '12px', fontWeight: 700, color: '#121a29' }}>Switch Demo Account</div>
+                  <div style={{ padding: '10px 14px', borderBottom: '1px solid rgba(0, 0, 0, 0.08)', backgroundColor: '#f5f5f7' }}>
+                    <div style={{ fontSize: '12px', fontWeight: 700, color: '#0f172a' }}>Switch Demo Account</div>
                     <div style={{ fontSize: '11px', color: '#685d4d' }}>Instant login to demonstrate any persona without re-typing credentials</div>
                   </div>
                   <div style={{ padding: '6px 0' }}>
@@ -280,7 +280,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                             alignItems: 'center',
                             gap: '10px',
                             border: 'none',
-                            background: isCurrent ? '#f5efe5' : 'transparent',
+                            background: isCurrent ? '#f5f5f7' : 'transparent',
                             cursor: isSwitching ? 'wait' : 'pointer',
                             transition: 'background 0.1s ease',
                           }}
@@ -298,7 +298,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                                 style={{
                                   fontSize: '12.5px',
                                   fontWeight: isCurrent ? 700 : 600,
-                                  color: '#121a29',
+                                  color: '#0f172a',
                                   whiteSpace: 'nowrap',
                                   overflow: 'hidden',
                                   textOverflow: 'ellipsis',
@@ -329,7 +329,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                                 {acc.badge}
                               </span>
                             </div>
-                            <div style={{ fontSize: '11px', color: '#7a5c2e', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                            <div style={{ fontSize: '11px', color: '#0066cc', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                               {acc.subtitle}
                             </div>
                           </div>
@@ -337,7 +337,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                             <span style={{ fontSize: '12px', color: '#15803d', fontWeight: 700 }}>✓</span>
                           )}
                           {isSwitching && (
-                            <span style={{ fontSize: '11px', color: '#7a5c2e' }}>...</span>
+                            <span style={{ fontSize: '11px', color: '#0066cc' }}>...</span>
                           )}
                         </button>
                       );
@@ -365,12 +365,12 @@ export const Navbar: React.FC<NavbarProps> = ({
                   alignItems: 'center',
                   gap: '8px',
                   padding: '6px 12px',
-                  backgroundColor: accountMenuOpen ? '#f5efe5' : '#fffdf9',
-                  border: '1px solid #d6c9b2',
+                  backgroundColor: accountMenuOpen ? '#f5f5f7' : '#ffffff',
+                  border: '1px solid rgba(0, 0, 0, 0.1)',
                   borderRadius: '4px',
                   fontSize: '13px',
                   fontWeight: 600,
-                  color: '#121a29',
+                  color: '#0f172a',
                   cursor: 'pointer',
                   transition: 'all 0.15s ease',
                   whiteSpace: 'nowrap',
@@ -379,7 +379,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                   if (!accountMenuOpen) e.currentTarget.style.backgroundColor = '#faf6f0';
                 }}
                 onMouseLeave={(e) => {
-                  if (!accountMenuOpen) e.currentTarget.style.backgroundColor = '#fffdf9';
+                  if (!accountMenuOpen) e.currentTarget.style.backgroundColor = '#ffffff';
                 }}
               >
                 <span
@@ -398,7 +398,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                 <span
                   style={{
                     fontSize: '9px',
-                    color: '#7a5c2e',
+                    color: '#0066cc',
                     display: 'inline-block',
                     transform: accountMenuOpen ? 'rotate(180deg)' : 'none',
                     transition: 'transform 0.15s ease',
@@ -418,8 +418,8 @@ export const Navbar: React.FC<NavbarProps> = ({
                     top: 'calc(100% + 8px)',
                     right: 0,
                     width: '260px',
-                    backgroundColor: '#fffdf9',
-                    border: '1px solid #d6c9b2',
+                    backgroundColor: '#ffffff',
+                    border: '1px solid rgba(0, 0, 0, 0.1)',
                     boxShadow: '0 12px 30px rgba(12, 24, 38, 0.16)',
                     borderRadius: '4px',
                     zIndex: 200,
@@ -427,9 +427,9 @@ export const Navbar: React.FC<NavbarProps> = ({
                   }}
                 >
                   {/* Account Identity Details */}
-                  <div style={{ padding: '12px 14px', backgroundColor: '#faf4eb', borderBottom: '1px solid #eedec4' }}>
+                  <div style={{ padding: '12px 14px', backgroundColor: '#f5f5f7', borderBottom: '1px solid rgba(0, 0, 0, 0.08)' }}>
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '8px', marginBottom: '4px' }}>
-                      <span style={{ fontSize: '13.5px', fontWeight: 700, color: '#121a29' }}>
+                      <span style={{ fontSize: '13.5px', fontWeight: 700, color: '#0f172a' }}>
                         {currentUser.full_name}
                       </span>
                       <span
@@ -452,7 +452,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                         {currentUser.firm_or_company}
                       </div>
                     )}
-                    <div style={{ fontSize: '11px', color: '#7a5c2e', marginTop: '4px', wordBreak: 'break-all' }}>
+                    <div style={{ fontSize: '11px', color: '#0066cc', marginTop: '4px', wordBreak: 'break-all' }}>
                       {currentUser.email}
                     </div>
                   </div>
@@ -509,9 +509,9 @@ export const Navbar: React.FC<NavbarProps> = ({
                 alignItems: 'center',
                 gap: '6px',
                 padding: '6px 12px',
-                backgroundColor: mobileMenuOpen ? '#0c1826' : '#f5efe5',
-                color: mobileMenuOpen ? '#ffffff' : '#121a29',
-                border: '1px solid #c5b59b',
+                backgroundColor: mobileMenuOpen ? '#0f172a' : '#f5f5f7',
+                color: mobileMenuOpen ? '#ffffff' : '#0f172a',
+                border: '1px solid rgba(0, 0, 0, 0.16)',
                 borderRadius: '4px',
                 fontSize: '13px',
                 fontWeight: 600,
@@ -552,8 +552,8 @@ export const Navbar: React.FC<NavbarProps> = ({
             <div
               ref={mobileDrawerRef}
               style={{
-                backgroundColor: '#fffdf9',
-                borderBottom: '2px solid #7a5c2e',
+                backgroundColor: '#ffffff',
+                borderBottom: '2px solid #0066cc',
                 boxShadow: '0 16px 36px rgba(12, 24, 38, 0.25)',
                 padding: '20px',
                 maxHeight: 'calc(100vh - 64px)',
@@ -568,11 +568,11 @@ export const Navbar: React.FC<NavbarProps> = ({
               onClick={(e) => e.stopPropagation()}
             >
               {/* Account Identity Card */}
-              <div style={{ padding: '12px 14px', backgroundColor: '#faf4eb', border: '1px solid #eedec4', borderRadius: '4px' }}>
+              <div style={{ padding: '12px 14px', backgroundColor: '#f5f5f7', border: '1px solid rgba(0, 0, 0, 0.08)', borderRadius: '4px' }}>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '8px', marginBottom: '4px' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                     <span style={{ width: '7px', height: '7px', borderRadius: '50%', backgroundColor: '#15803d' }} />
-                    <span style={{ fontSize: '14px', fontWeight: 700, color: '#121a29' }}>{currentUser.full_name}</span>
+                    <span style={{ fontSize: '14px', fontWeight: 700, color: '#0f172a' }}>{currentUser.full_name}</span>
                   </div>
                   <span style={{ fontSize: '10px', padding: '2px 6px', borderRadius: '3px', backgroundColor: '#e0f2fe', color: '#0369a1', fontWeight: 700 }}>
                     Investor
@@ -581,12 +581,12 @@ export const Navbar: React.FC<NavbarProps> = ({
                 {currentUser.firm_or_company && (
                   <div style={{ fontSize: '12px', color: '#536074' }}>{currentUser.firm_or_company}</div>
                 )}
-                <div style={{ fontSize: '11px', color: '#7a5c2e', marginTop: '2px' }}>{currentUser.email}</div>
+                <div style={{ fontSize: '11px', color: '#0066cc', marginTop: '2px' }}>{currentUser.email}</div>
               </div>
 
               {/* Navigation Links */}
               <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                <div style={{ fontSize: '11px', fontWeight: 700, color: '#7a5c2e', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: '4px' }}>
+                <div style={{ fontSize: '11px', fontWeight: 700, color: '#0066cc', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: '4px' }}>
                   Navigation
                 </div>
                 <button
@@ -600,11 +600,11 @@ export const Navbar: React.FC<NavbarProps> = ({
                     padding: '10px 14px',
                     textAlign: 'left',
                     borderRadius: '4px',
-                    backgroundColor: activeTab === 'LANDING' ? '#f5efe5' : 'transparent',
-                    color: activeTab === 'LANDING' ? '#0c1826' : '#4c5262',
+                    backgroundColor: activeTab === 'LANDING' ? '#f5f5f7' : 'transparent',
+                    color: activeTab === 'LANDING' ? '#0f172a' : '#4c5262',
                     fontWeight: activeTab === 'LANDING' ? 700 : 500,
                     fontSize: '14px',
-                    borderLeft: activeTab === 'LANDING' ? '3px solid #7a5c2e' : '3px solid transparent',
+                    borderLeft: activeTab === 'LANDING' ? '3px solid #0066cc' : '3px solid transparent',
                     borderTop: 'none',
                     borderRight: 'none',
                     borderBottom: 'none',
@@ -624,11 +624,11 @@ export const Navbar: React.FC<NavbarProps> = ({
                     padding: '10px 14px',
                     textAlign: 'left',
                     borderRadius: '4px',
-                    backgroundColor: (activeTab === 'INVESTOR_DISCOVERY' || activeTab === 'DIRECTORY') ? '#f5efe5' : 'transparent',
-                    color: (activeTab === 'INVESTOR_DISCOVERY' || activeTab === 'DIRECTORY') ? '#0c1826' : '#4c5262',
+                    backgroundColor: (activeTab === 'INVESTOR_DISCOVERY' || activeTab === 'DIRECTORY') ? '#f5f5f7' : 'transparent',
+                    color: (activeTab === 'INVESTOR_DISCOVERY' || activeTab === 'DIRECTORY') ? '#0f172a' : '#4c5262',
                     fontWeight: (activeTab === 'INVESTOR_DISCOVERY' || activeTab === 'DIRECTORY') ? 700 : 500,
                     fontSize: '14px',
-                    borderLeft: (activeTab === 'INVESTOR_DISCOVERY' || activeTab === 'DIRECTORY') ? '3px solid #7a5c2e' : '3px solid transparent',
+                    borderLeft: (activeTab === 'INVESTOR_DISCOVERY' || activeTab === 'DIRECTORY') ? '3px solid #0066cc' : '3px solid transparent',
                     borderTop: 'none',
                     borderRight: 'none',
                     borderBottom: 'none',
@@ -648,14 +648,14 @@ export const Navbar: React.FC<NavbarProps> = ({
                     padding: '10px 14px',
                     textAlign: 'left',
                     borderRadius: '4px',
-                    backgroundColor: activeTab === 'MESSAGES' ? '#f5efe5' : 'transparent',
-                    color: activeTab === 'MESSAGES' ? '#0c1826' : '#4c5262',
+                    backgroundColor: activeTab === 'MESSAGES' ? '#f5f5f7' : 'transparent',
+                    color: activeTab === 'MESSAGES' ? '#0f172a' : '#4c5262',
                     fontWeight: activeTab === 'MESSAGES' ? 700 : 500,
                     fontSize: '14px',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'space-between',
-                    borderLeft: activeTab === 'MESSAGES' ? '3px solid #7a5c2e' : '3px solid transparent',
+                    borderLeft: activeTab === 'MESSAGES' ? '3px solid #0066cc' : '3px solid transparent',
                     borderTop: 'none',
                     borderRight: 'none',
                     borderBottom: 'none',
@@ -664,7 +664,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                 >
                   <span>Direct Chat</span>
                   {unreadCount > 0 && (
-                    <span style={{ backgroundColor: '#7a5c2e', color: '#fff', borderRadius: '10px', fontSize: '10px', fontWeight: 700, padding: '1px 6px' }}>
+                    <span style={{ backgroundColor: '#0066cc', color: '#fff', borderRadius: '10px', fontSize: '10px', fontWeight: 700, padding: '1px 6px' }}>
                       {unreadCount}
                     </span>
                   )}
@@ -672,7 +672,7 @@ export const Navbar: React.FC<NavbarProps> = ({
               </div>
 
               {/* Developer Demo Switcher */}
-              <div style={{ borderTop: '1px solid #eedec4', paddingTop: '12px' }}>
+              <div style={{ borderTop: '1px solid rgba(0, 0, 0, 0.08)', paddingTop: '12px' }}>
                 <button
                   type="button"
                   onClick={() => setMobileQuickSwitchOpen(!mobileQuickSwitchOpen)}
@@ -683,10 +683,10 @@ export const Navbar: React.FC<NavbarProps> = ({
                     alignItems: 'center',
                     justifyContent: 'space-between',
                     padding: '9px 12px',
-                    backgroundColor: '#f5efe5',
-                    border: '1px solid #c5b59b',
+                    backgroundColor: '#f5f5f7',
+                    border: '1px solid rgba(0, 0, 0, 0.16)',
                     borderRadius: '4px',
-                    color: '#7a5c2e',
+                    color: '#0066cc',
                     fontSize: '12.5px',
                     fontWeight: 600,
                     cursor: 'pointer',
@@ -697,7 +697,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                 </button>
 
                 {mobileQuickSwitchOpen && (
-                  <div style={{ marginTop: '8px', maxHeight: '200px', overflowY: 'auto', border: '1px solid #eedec4', borderRadius: '4px' }}>
+                  <div style={{ marginTop: '8px', maxHeight: '200px', overflowY: 'auto', border: '1px solid rgba(0, 0, 0, 0.08)', borderRadius: '4px' }}>
                     {DEMO_ACCOUNTS.map((acc) => {
                       const isCurrent = currentUser?.email === acc.email;
                       return (
@@ -717,15 +717,15 @@ export const Navbar: React.FC<NavbarProps> = ({
                             alignItems: 'center',
                             gap: '8px',
                             border: 'none',
-                            backgroundColor: isCurrent ? '#f5efe5' : '#fffdf9',
-                            borderBottom: '1px solid #faf4eb',
+                            backgroundColor: isCurrent ? '#f5f5f7' : '#ffffff',
+                            borderBottom: '1px solid #f5f5f7',
                             cursor: 'pointer',
                           }}
                         >
                           <span>{acc.icon}</span>
                           <div style={{ flex: 1, minWidth: 0 }}>
-                            <div style={{ fontSize: '12px', fontWeight: isCurrent ? 700 : 600, color: '#121a29' }}>{acc.name}</div>
-                            <div style={{ fontSize: '10.5px', color: '#7a5c2e' }}>{acc.badge} • {acc.firm}</div>
+                            <div style={{ fontSize: '12px', fontWeight: isCurrent ? 700 : 600, color: '#0f172a' }}>{acc.name}</div>
+                            <div style={{ fontSize: '10.5px', color: '#0066cc' }}>{acc.badge} • {acc.firm}</div>
                           </div>
                           {isCurrent && <span style={{ color: '#15803d', fontWeight: 700 }}>✓</span>}
                         </button>
@@ -736,7 +736,7 @@ export const Navbar: React.FC<NavbarProps> = ({
               </div>
 
               {/* Sign out button */}
-              <div style={{ borderTop: '1px solid #eedec4', paddingTop: '12px' }}>
+              <div style={{ borderTop: '1px solid rgba(0, 0, 0, 0.08)', paddingTop: '12px' }}>
                 <button
                   type="button"
                   onClick={() => {
@@ -776,19 +776,10 @@ export const Navbar: React.FC<NavbarProps> = ({
   // Preserves existing layout and container structure exactly as before
   // --------------------------------------------------------------------------
   return (
-    <nav
-      style={{
-        backgroundColor: '#fffdf9',
-        borderBottom: '1px solid #d6c9b2',
-        position: 'sticky',
-        top: 0,
-        zIndex: 100,
-        fontFamily: "-apple-system, BlinkMacSystemFont, 'Inter', sans-serif",
-      }}
-    >
+    <nav className="nv-navbar" role="navigation" aria-label="Main Navigation">
       <div
         style={{
-          maxWidth: '1240px',
+          maxWidth: '1200px',
           margin: '0 auto',
           padding: '12px 24px',
           display: 'flex',
@@ -805,16 +796,17 @@ export const Navbar: React.FC<NavbarProps> = ({
         >
           <div
             style={{
-              width: '32px',
-              height: '32px',
-              backgroundColor: '#0c1826',
-              color: '#f5efe5',
+              width: '34px',
+              height: '34px',
+              backgroundColor: '#0f172a',
+              color: '#ffffff',
+              borderRadius: '10px',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               fontWeight: 700,
               fontSize: '16px',
-              fontFamily: "Newsreader, Georgia, 'Times New Roman', serif",
+              fontFamily: 'var(--font-sans)',
             }}
           >
             N
@@ -822,35 +814,26 @@ export const Navbar: React.FC<NavbarProps> = ({
           <div>
             <div
               style={{
-                fontSize: '18px',
-                fontWeight: 600,
-                color: '#121a29',
-                letterSpacing: '-0.01em',
-                fontFamily: "Newsreader, Georgia, 'Times New Roman', serif",
+                fontSize: '17px',
+                fontWeight: 700,
+                color: '#0f172a',
+                letterSpacing: '-0.02em',
+                fontFamily: 'var(--font-sans)',
               }}
             >
               Nivesha Ventures
             </div>
-            <div style={{ fontSize: '10px', color: '#7a5c2e', letterSpacing: '0.12em', textTransform: 'uppercase' }}>
-              Capital Facilitation & Due Diligence
+            <div className="nv-navbar-tagline">
+              Capital Facilitation &amp; Due Diligence
             </div>
           </div>
         </div>
 
-        {/* Center Nav Links - Clear Distinction between Public Home and Private Dashboards */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+        {/* Center Nav Links */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '4px', flexWrap: 'wrap' }}>
           <button
             onClick={() => onNavigate('LANDING')}
-            style={{
-              padding: '6px 12px',
-              border: 'none',
-              background: 'none',
-              fontSize: '13.5px',
-              fontWeight: activeTab === 'LANDING' ? 600 : 500,
-              color: activeTab === 'LANDING' ? '#0c1826' : '#4c5262',
-              cursor: 'pointer',
-              borderBottom: activeTab === 'LANDING' ? '2px solid #7a5c2e' : '2px solid transparent',
-            }}
+            className={`nv-nav-link nv-nav-focus ${activeTab === 'LANDING' ? 'active' : ''}`}
           >
             Home
           </button>
@@ -860,30 +843,13 @@ export const Navbar: React.FC<NavbarProps> = ({
             <>
               <button
                 onClick={() => onNavigate('INVESTOR_DISCOVERY')}
-                style={{
-                  padding: '6px 12px',
-                  border: 'none',
-                  background: 'none',
-                  fontSize: '13.5px',
-                  fontWeight: activeTab === 'INVESTOR_DISCOVERY' ? 600 : 500,
-                  color: activeTab === 'INVESTOR_DISCOVERY' ? '#0c1826' : '#4c5262',
-                  cursor: 'pointer',
-                  borderBottom: activeTab === 'INVESTOR_DISCOVERY' ? '2px solid #7a5c2e' : '2px solid transparent',
-                }}
+                className={`nv-nav-link nv-nav-focus ${activeTab === 'INVESTOR_DISCOVERY' ? 'active' : ''}`}
               >
                 Verified Opportunities
               </button>
               <button
                 onClick={() => onOpenLogin('FOUNDER', true)}
-                style={{
-                  padding: '6px 12px',
-                  border: 'none',
-                  background: 'none',
-                  fontSize: '13.5px',
-                  fontWeight: 500,
-                  color: '#4c5262',
-                  cursor: 'pointer',
-                }}
+                className="nv-nav-link nv-nav-focus"
               >
                 For Founders
               </button>
@@ -894,16 +860,7 @@ export const Navbar: React.FC<NavbarProps> = ({
           {currentUser?.role === 'REVIEWER' && (
             <button
               onClick={() => onNavigate('INVESTOR_DISCOVERY')}
-              style={{
-                padding: '6px 12px',
-                border: 'none',
-                background: 'none',
-                fontSize: '13.5px',
-                fontWeight: activeTab === 'INVESTOR_DISCOVERY' ? 600 : 500,
-                color: activeTab === 'INVESTOR_DISCOVERY' ? '#0c1826' : '#4c5262',
-                cursor: 'pointer',
-                borderBottom: activeTab === 'INVESTOR_DISCOVERY' ? '2px solid #7a5c2e' : '2px solid transparent',
-              }}
+              className={`nv-nav-link nv-nav-focus ${activeTab === 'INVESTOR_DISCOVERY' ? 'active' : ''}`}
             >
               Verified Opportunities
             </button>
@@ -914,35 +871,13 @@ export const Navbar: React.FC<NavbarProps> = ({
             <>
               <button
                 onClick={() => onNavigate('FOUNDER_DASHBOARD')}
-                style={{
-                  padding: '6px 12px',
-                  border: 'none',
-                  background: 'none',
-                  fontSize: '13.5px',
-                  fontWeight: activeTab === 'FOUNDER_DASHBOARD' ? 600 : 500,
-                  color: activeTab === 'FOUNDER_DASHBOARD' ? '#0c1826' : '#4c5262',
-                  cursor: 'pointer',
-                  borderBottom: activeTab === 'FOUNDER_DASHBOARD' ? '2px solid #7a5c2e' : '2px solid transparent',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '6px',
-                }}
+                className={`nv-nav-link nv-nav-focus ${activeTab === 'FOUNDER_DASHBOARD' ? 'active' : ''}`}
               >
-                <span style={{ fontSize: '12px' }}>🏢</span>
-                <span>Founder Dashboard</span>
+                Founder Dashboard
               </button>
               <button
                 onClick={() => onNavigate('FOUNDER_JOURNEY')}
-                style={{
-                  padding: '6px 12px',
-                  border: 'none',
-                  background: 'none',
-                  fontSize: '13.5px',
-                  fontWeight: activeTab === 'FOUNDER_JOURNEY' ? 600 : 500,
-                  color: activeTab === 'FOUNDER_JOURNEY' ? '#0c1826' : '#4c5262',
-                  cursor: 'pointer',
-                  borderBottom: activeTab === 'FOUNDER_JOURNEY' ? '2px solid #7a5c2e' : '2px solid transparent',
-                }}
+                className={`nv-nav-link nv-nav-focus ${activeTab === 'FOUNDER_JOURNEY' ? 'active' : ''}`}
               >
                 Story Builder
               </button>
@@ -954,35 +889,13 @@ export const Navbar: React.FC<NavbarProps> = ({
             <>
               <button
                 onClick={() => onNavigate('PLATFORM_REVIEW')}
-                style={{
-                  padding: '6px 12px',
-                  border: 'none',
-                  background: 'none',
-                  fontSize: '13.5px',
-                  fontWeight: activeTab === 'PLATFORM_REVIEW' ? 600 : 500,
-                  color: activeTab === 'PLATFORM_REVIEW' ? '#0c1826' : '#4c5262',
-                  cursor: 'pointer',
-                  borderBottom: activeTab === 'PLATFORM_REVIEW' ? '2px solid #7a5c2e' : '2px solid transparent',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '6px',
-                }}
+                className={`nv-nav-link nv-nav-focus ${activeTab === 'PLATFORM_REVIEW' ? 'active' : ''}`}
               >
-                <span style={{ fontSize: '12px' }}>⚖️</span>
-                <span>Review Desk</span>
+                Review Desk
               </button>
               <button
                 onClick={() => onNavigate('INVESTOR_DISCOVERY')}
-                style={{
-                  padding: '6px 12px',
-                  border: 'none',
-                  background: 'none',
-                  fontSize: '13.5px',
-                  fontWeight: activeTab === 'INVESTOR_DISCOVERY' ? 600 : 500,
-                  color: activeTab === 'INVESTOR_DISCOVERY' ? '#0c1826' : '#4c5262',
-                  cursor: 'pointer',
-                  borderBottom: activeTab === 'INVESTOR_DISCOVERY' ? '2px solid #7a5c2e' : '2px solid transparent',
-                }}
+                className={`nv-nav-link nv-nav-focus ${activeTab === 'INVESTOR_DISCOVERY' ? 'active' : ''}`}
               >
                 All Ventures
               </button>
@@ -993,32 +906,19 @@ export const Navbar: React.FC<NavbarProps> = ({
           {currentUser && (
             <button
               onClick={() => onNavigate('MESSAGES')}
-              style={{
-                padding: '6px 12px',
-                border: 'none',
-                background: 'none',
-                fontSize: '13.5px',
-                fontWeight: activeTab === 'MESSAGES' ? 600 : 500,
-                color: activeTab === 'MESSAGES' ? '#0c1826' : '#4c5262',
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '6px',
-                borderBottom: activeTab === 'MESSAGES' ? '2px solid #7a5c2e' : '2px solid transparent',
-              }}
+              className={`nv-nav-link nv-nav-focus ${activeTab === 'MESSAGES' ? 'active' : ''}`}
+              style={{ gap: '6px' }}
             >
-              <span>💬</span>
               <span>Direct DM</span>
               {unreadCount > 0 && (
                 <span
                   style={{
-                    backgroundColor: '#15803d',
+                    backgroundColor: '#16a34a',
                     color: '#fff',
-                    borderRadius: '10px',
+                    borderRadius: '980px',
                     fontSize: '10px',
                     fontWeight: 700,
                     padding: '1px 7px',
-                    boxShadow: '0 0 6px rgba(21, 128, 61, 0.5)',
                   }}
                   title={`${unreadCount} unread message(s)`}
                 >
@@ -1029,40 +929,48 @@ export const Navbar: React.FC<NavbarProps> = ({
           )}
         </div>
 
-        {/* Right: Quick Switcher + Authenticated User Profile / Real Sign In */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-          {/* ⚡ Quick Switch Dropdown for Demo */}
+        {/* Right: Quick Switcher + Authenticated User Profile / Sign In */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+          {/* Quick Switch Dropdown for Demo */}
           <div ref={dropdownRef} style={{ position: 'relative' }}>
             <button
               type="button"
               onClick={() => setQuickSwitchOpen(!quickSwitchOpen)}
+              className="nv-nav-focus"
               style={{
-                display: 'flex',
+                display: 'inline-flex',
                 alignItems: 'center',
                 gap: '6px',
-                padding: '6px 12px',
-                backgroundColor: '#f5efe5',
-                border: '1px solid #c5b59b',
-                color: '#7a5c2e',
+                padding: '7px 13px',
+                backgroundColor: '#f5f5f7',
+                border: '1px solid rgba(15, 23, 42, 0.08)',
+                color: '#0f172a',
                 fontSize: '12.5px',
                 fontWeight: 600,
                 cursor: 'pointer',
-                borderRadius: '4px',
+                borderRadius: '8px',
                 transition: 'all 0.15s ease',
               }}
               title="1-Click Demo Persona Switcher"
             >
-              <span>⚡</span>
-              <span>Quick Demo Switch</span>
-              <span
+              <span>Demo Accounts</span>
+              <svg
+                width="12"
+                height="12"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.4"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                aria-hidden="true"
                 style={{
-                  fontSize: '9px',
-                  display: 'inline-block',
                   transform: quickSwitchOpen ? 'rotate(180deg)' : 'none',
+                  transition: 'transform 0.18s ease',
                 }}
               >
-                ▼
-              </span>
+                <path d="m6 9 6 6 6-6" />
+              </svg>
             </button>
 
             {quickSwitchOpen && (
@@ -1073,17 +981,17 @@ export const Navbar: React.FC<NavbarProps> = ({
                   right: 0,
                   marginTop: '8px',
                   width: '320px',
-                  backgroundColor: '#fffdf9',
-                  border: '1px solid #d6c9b2',
-                  boxShadow: '0 12px 30px rgba(12, 24, 38, 0.18)',
-                  borderRadius: '4px',
+                  backgroundColor: '#ffffff',
+                  border: '1px solid rgba(15, 23, 42, 0.1)',
+                  boxShadow: '0 16px 40px rgba(15, 23, 42, 0.16)',
+                  borderRadius: '16px',
                   zIndex: 200,
                   maxHeight: '440px',
                   overflowY: 'auto',
                 }}
               >
-                <div style={{ padding: '10px 14px', borderBottom: '1px solid #eedec4', backgroundColor: '#faf4eb' }}>
-                  <div style={{ fontSize: '12px', fontWeight: 700, color: '#121a29' }}>Switch Demo Account</div>
+                <div style={{ padding: '10px 14px', borderBottom: '1px solid rgba(0, 0, 0, 0.08)', backgroundColor: '#f5f5f7' }}>
+                  <div style={{ fontSize: '12px', fontWeight: 700, color: '#0f172a' }}>Switch Demo Account</div>
                   <div style={{ fontSize: '11px', color: '#685d4d' }}>Instant login to demonstrate any persona without re-typing credentials</div>
                 </div>
                 <div style={{ padding: '6px 0' }}>
@@ -1104,7 +1012,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                           alignItems: 'center',
                           gap: '10px',
                           border: 'none',
-                          background: isCurrent ? '#f5efe5' : 'transparent',
+                          background: isCurrent ? '#f5f5f7' : 'transparent',
                           cursor: isSwitching ? 'wait' : 'pointer',
                           transition: 'background 0.1s ease',
                         }}
@@ -1122,7 +1030,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                               style={{
                                 fontSize: '12.5px',
                                 fontWeight: isCurrent ? 700 : 600,
-                                color: '#121a29',
+                                color: '#0f172a',
                                 whiteSpace: 'nowrap',
                                 overflow: 'hidden',
                                 textOverflow: 'ellipsis',
@@ -1153,7 +1061,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                               {acc.badge}
                             </span>
                           </div>
-                          <div style={{ fontSize: '11px', color: '#7a5c2e', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                          <div style={{ fontSize: '11px', color: '#0066cc', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                             {acc.subtitle}
                           </div>
                         </div>
@@ -1161,7 +1069,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                           <span style={{ fontSize: '12px', color: '#15803d', fontWeight: 700 }}>✓</span>
                         )}
                         {isSwitching && (
-                          <span style={{ fontSize: '11px', color: '#7a5c2e' }}>...</span>
+                          <span style={{ fontSize: '11px', color: '#0066cc' }}>...</span>
                         )}
                       </button>
                     );
@@ -1174,10 +1082,10 @@ export const Navbar: React.FC<NavbarProps> = ({
           {currentUser ? (
             <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
               <div style={{ textAlign: 'right' }}>
-                <div style={{ fontSize: '13px', fontWeight: 600, color: '#121a29' }}>
+                <div style={{ fontSize: '13px', fontWeight: 600, color: '#0f172a' }}>
                   {currentUser.full_name}
                 </div>
-                <div style={{ fontSize: '11px', color: '#7a5c2e', display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '4px' }}>
+                <div style={{ fontSize: '11px', color: '#0066cc', display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '4px' }}>
                   <span
                     style={{
                       display: 'inline-block',
@@ -1194,29 +1102,26 @@ export const Navbar: React.FC<NavbarProps> = ({
 
               <button
                 onClick={handleLogout}
+                className="nv-btn-secondary"
                 style={{
-                  padding: '6px 12px',
-                  backgroundColor: '#fffdf9',
-                  border: '1px solid #d6c9b2',
+                  padding: '6px 14px',
                   fontSize: '12px',
-                  color: '#4c5262',
-                  cursor: 'pointer',
-                  fontWeight: 500,
                 }}
               >
                 Sign out
               </button>
             </div>
           ) : (
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
               <button
                 onClick={() => onOpenLogin('INVESTOR', false)}
+                className="nv-nav-focus"
                 style={{
-                  padding: '7px 16px',
-                  backgroundColor: '#fffdf9',
-                  border: '1px solid #8a8070',
-                  color: '#121a29',
-                  fontSize: '13px',
+                  padding: '6px 8px',
+                  backgroundColor: 'transparent',
+                  border: 'none',
+                  color: '#0066cc',
+                  fontSize: '13.5px',
                   fontWeight: 600,
                   cursor: 'pointer',
                 }}
@@ -1225,14 +1130,10 @@ export const Navbar: React.FC<NavbarProps> = ({
               </button>
               <button
                 onClick={() => onOpenLogin('FOUNDER', true)}
+                className="nv-btn-dark nv-nav-focus"
                 style={{
-                  padding: '7px 16px',
-                  backgroundColor: '#0c1826',
-                  color: '#f5efe5',
-                  border: 'none',
+                  padding: '8px 18px',
                   fontSize: '13px',
-                  fontWeight: 600,
-                  cursor: 'pointer',
                 }}
               >
                 Join Platform

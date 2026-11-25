@@ -190,9 +190,11 @@ export function App() {
       {/* Toast Notification */}
       {notification && (
         <div
+          role="status"
+          aria-live="polite"
           style={{
             position: 'fixed',
-            top: '72px',
+            top: '76px',
             right: '24px',
             background: 'var(--bg-dark)',
             color: '#ffffff',
@@ -204,6 +206,7 @@ export function App() {
             fontWeight: 500,
             borderLeft: '4px solid var(--accent-gold)',
             animation: 'fadeIn 0.2s ease',
+            maxWidth: '420px',
           }}
         >
           {notification}

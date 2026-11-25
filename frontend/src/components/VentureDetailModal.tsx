@@ -85,8 +85,9 @@ export const VentureDetailModal: React.FC<VentureDetailModalProps> = ({
       style={{
         position: 'fixed',
         inset: 0,
-        backgroundColor: 'rgba(12, 24, 38, 0.72)',
-        backdropFilter: 'blur(4px)',
+        backgroundColor: 'rgba(29, 29, 31, 0.48)',
+        backdropFilter: 'blur(16px)',
+        WebkitBackdropFilter: 'blur(16px)',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
@@ -100,9 +101,10 @@ export const VentureDetailModal: React.FC<VentureDetailModalProps> = ({
           width: '100%',
           maxWidth: '880px',
           maxHeight: '92vh',
-          backgroundColor: '#fffdf9',
-          border: '1px solid #d6c9b2',
-          boxShadow: '0 30px 60px -20px rgba(12, 24, 38, 0.45)',
+          backgroundColor: '#ffffff',
+          border: '1px solid rgba(0, 0, 0, 0.08)',
+          borderRadius: '24px',
+          boxShadow: '0 30px 70px -15px rgba(0, 0, 0, 0.28)',
           display: 'flex',
           flexDirection: 'column',
           overflow: 'hidden',
@@ -114,15 +116,15 @@ export const VentureDetailModal: React.FC<VentureDetailModalProps> = ({
         <div
           style={{
             padding: '16px 24px',
-            borderBottom: '1px solid #e3d6bf',
+            borderBottom: '1px solid rgba(0, 0, 0, 0.06)',
             display: 'flex',
             justifyContent: 'space-between',
             alignItems: 'center',
-            backgroundColor: '#fbf8f2',
+            backgroundColor: '#fbfbfd',
           }}
         >
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-            <span style={{ fontSize: '11px', fontWeight: 600, letterSpacing: '0.14em', textTransform: 'uppercase', color: '#7a5c2e' }}>
+            <span className="eyebrow" style={{ fontSize: '11px' }}>
               Standardized 10-Section Dossier & Evidence
             </span>
             <span
@@ -130,8 +132,8 @@ export const VentureDetailModal: React.FC<VentureDetailModalProps> = ({
                 fontSize: '11px',
                 fontWeight: 600,
                 padding: '2px 8px',
-                backgroundColor: venture.verification_status === 'VERIFIED' ? '#15803d' : '#0c1826',
-                color: '#f5efe5',
+                backgroundColor: venture.verification_status === 'VERIFIED' ? '#15803d' : '#0f172a',
+                color: '#f5f5f7',
               }}
             >
               {venture.verification_status}
@@ -159,7 +161,7 @@ export const VentureDetailModal: React.FC<VentureDetailModalProps> = ({
           {/* Visual Showcase Banner */}
           {galleryUrls.length > 0 && (
             <div style={{ borderRadius: '8px', overflow: 'hidden', border: '1px solid #e6decb' }}>
-              <div style={{ position: 'relative', width: '100%', height: '220px', backgroundColor: '#0c1826' }}>
+              <div style={{ position: 'relative', width: '100%', height: '220px', backgroundColor: '#0f172a' }}>
                 <img
                   src={activeModalImage}
                   alt={venture.company_name}
@@ -189,7 +191,7 @@ export const VentureDetailModal: React.FC<VentureDetailModalProps> = ({
                       border: 'none',
                       fontSize: '11.5px',
                       fontWeight: 600,
-                      color: '#0c1826',
+                      color: '#0f172a',
                       cursor: 'pointer',
                     }}
                   >
@@ -200,7 +202,7 @@ export const VentureDetailModal: React.FC<VentureDetailModalProps> = ({
 
               {/* Thumbnails row */}
               {galleryUrls.length > 1 && (
-                <div style={{ display: 'flex', gap: '8px', padding: '8px 12px', backgroundColor: '#fbf8f2', overflowX: 'auto', alignItems: 'center' }}>
+                <div style={{ display: 'flex', gap: '8px', padding: '8px 12px', backgroundColor: '#fbfbfd', overflowX: 'auto', alignItems: 'center' }}>
                   {galleryUrls.map((url, idx) => (
                     <button
                       key={idx}
@@ -211,7 +213,7 @@ export const VentureDetailModal: React.FC<VentureDetailModalProps> = ({
                         borderRadius: '3px',
                         padding: 0,
                         overflow: 'hidden',
-                        border: selectedImgIndex === idx ? '2px solid #7a5c2e' : '1px solid #d6c9b2',
+                        border: selectedImgIndex === idx ? '2px solid #0066cc' : '1px solid rgba(0, 0, 0, 0.1)',
                         cursor: 'pointer',
                         opacity: selectedImgIndex === idx ? 1 : 0.65,
                         flexShrink: 0,
@@ -230,15 +232,15 @@ export const VentureDetailModal: React.FC<VentureDetailModalProps> = ({
             <h2
               style={{
                 margin: '0 0 4px 0',
-                fontFamily: "Newsreader, Georgia, 'Times New Roman', serif",
+                fontFamily: "var(--font-sans)",
                 fontSize: '30px',
                 fontWeight: 400,
-                color: '#121a29',
+                color: '#0f172a',
               }}
             >
               {venture.company_name}
             </h2>
-            <div style={{ fontSize: '13.5px', color: '#7a5c2e', fontWeight: 600, marginBottom: '10px' }}>
+            <div style={{ fontSize: '13.5px', color: '#0066cc', fontWeight: 600, marginBottom: '10px' }}>
               {venture.founder_name} {venture.founder_title ? `· ${venture.founder_title}` : ''} · {venture.location}
             </div>
             <p style={{ margin: 0, fontSize: '14.5px', lineHeight: 1.6, color: '#4c5262' }}>
@@ -252,28 +254,28 @@ export const VentureDetailModal: React.FC<VentureDetailModalProps> = ({
               display: 'grid',
               gridTemplateColumns: 'repeat(4, 1fr)',
               gap: '12px',
-              backgroundColor: '#f5efe5',
-              border: '1px solid #d6c9b2',
+              backgroundColor: '#f5f5f7',
+              border: '1px solid rgba(0, 0, 0, 0.1)',
               padding: '14px 18px',
             }}
           >
             <div>
-              <div style={{ fontSize: '10.5px', fontWeight: 600, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#7a5c2e' }}>Sector</div>
-              <div style={{ fontSize: '14px', fontWeight: 600, color: '#121a29', marginTop: '4px' }}>{venture.sector}</div>
+              <div style={{ fontSize: '10.5px', fontWeight: 600, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#0066cc' }}>Sector</div>
+              <div style={{ fontSize: '14px', fontWeight: 600, color: '#0f172a', marginTop: '4px' }}>{venture.sector}</div>
             </div>
             <div>
-              <div style={{ fontSize: '10.5px', fontWeight: 600, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#7a5c2e' }}>Arrangement</div>
-              <div style={{ fontSize: '14px', fontWeight: 600, color: '#121a29', marginTop: '4px' }}>
+              <div style={{ fontSize: '10.5px', fontWeight: 600, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#0066cc' }}>Arrangement</div>
+              <div style={{ fontSize: '14px', fontWeight: 600, color: '#0f172a', marginTop: '4px' }}>
                 {(venture.proposed_arrangement || 'Direct').replace(/_/g, ' ')}
               </div>
             </div>
             <div>
-              <div style={{ fontSize: '10.5px', fontWeight: 600, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#7a5c2e' }}>Capital Target</div>
-              <div style={{ fontSize: '16px', fontWeight: 700, color: '#121a29', marginTop: '4px' }}>{formatINR(venture.capital_target)}</div>
+              <div style={{ fontSize: '10.5px', fontWeight: 600, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#0066cc' }}>Capital Target</div>
+              <div style={{ fontSize: '16px', fontWeight: 700, color: '#0f172a', marginTop: '4px' }}>{formatINR(venture.capital_target)}</div>
             </div>
             <div>
-              <div style={{ fontSize: '10.5px', fontWeight: 600, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#7a5c2e' }}>Ticket Range</div>
-              <div style={{ fontSize: '13.5px', fontWeight: 600, color: '#121a29', marginTop: '4px' }}>
+              <div style={{ fontSize: '10.5px', fontWeight: 600, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#0066cc' }}>Ticket Range</div>
+              <div style={{ fontSize: '13.5px', fontWeight: 600, color: '#0f172a', marginTop: '4px' }}>
                 {formatINR(venture.ticket_min)} – {formatINR(venture.ticket_max)}
               </div>
             </div>
@@ -281,11 +283,11 @@ export const VentureDetailModal: React.FC<VentureDetailModalProps> = ({
 
           {/* Platform Derived Calculations Banner (if available) */}
           {(arrDetails.calculated_budget_contribution || arrDetails.collateral_coverage_ratio || arrDetails.calculated_margin_impact) && (
-            <div style={{ backgroundColor: '#fff', border: '1px solid #7a5c2e', padding: '14px 18px' }}>
-              <div style={{ fontSize: '11px', fontWeight: 700, color: '#7a5c2e', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '6px' }}>
+            <div style={{ backgroundColor: '#fff', border: '1px solid #0066cc', padding: '14px 18px' }}>
+              <div style={{ fontSize: '11px', fontWeight: 700, color: '#0066cc', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '6px' }}>
                 🧮 Platform Calculated Metrics & Epistemic Separation
               </div>
-              <div style={{ fontSize: '13px', color: '#121a29', lineHeight: 1.5 }}>
+              <div style={{ fontSize: '13px', color: '#0f172a', lineHeight: 1.5 }}>
                 {arrDetails.calculated_budget_contribution && (
                   <div style={{ marginBottom: '4px' }}>
                     <strong>Budget Ratio:</strong> {arrDetails.calculated_budget_contribution}. <em>{arrDetails.calculation_note}</em>
@@ -306,13 +308,13 @@ export const VentureDetailModal: React.FC<VentureDetailModalProps> = ({
           )}
 
           {/* Subtabs for View: 10-Section Dossier vs Evidence Checklist vs Media */}
-          <div style={{ display: 'flex', gap: '8px', borderBottom: '1px solid #d6c9b2', paddingBottom: '8px', flexWrap: 'wrap' }}>
+          <div style={{ display: 'flex', gap: '8px', borderBottom: '1px solid rgba(0, 0, 0, 0.1)', paddingBottom: '8px', flexWrap: 'wrap' }}>
             <button
               onClick={() => setActiveTab('DOSSIER')}
               style={{
                 padding: '6px 14px',
                 border: 'none',
-                background: activeTab === 'DOSSIER' ? '#0c1826' : 'transparent',
+                background: activeTab === 'DOSSIER' ? '#0f172a' : 'transparent',
                 color: activeTab === 'DOSSIER' ? '#fff' : '#4c5262',
                 fontSize: '12.5px',
                 fontWeight: 600,
@@ -326,7 +328,7 @@ export const VentureDetailModal: React.FC<VentureDetailModalProps> = ({
               style={{
                 padding: '6px 14px',
                 border: 'none',
-                background: activeTab === 'FINDINGS' ? '#0c1826' : 'transparent',
+                background: activeTab === 'FINDINGS' ? '#0f172a' : 'transparent',
                 color: activeTab === 'FINDINGS' ? '#fff' : '#4c5262',
                 fontSize: '12.5px',
                 fontWeight: 600,
@@ -340,7 +342,7 @@ export const VentureDetailModal: React.FC<VentureDetailModalProps> = ({
               style={{
                 padding: '6px 14px',
                 border: 'none',
-                background: activeTab === 'GALLERY' ? '#0c1826' : 'transparent',
+                background: activeTab === 'GALLERY' ? '#0f172a' : 'transparent',
                 color: activeTab === 'GALLERY' ? '#fff' : '#4c5262',
                 fontSize: '12.5px',
                 fontWeight: 600,
@@ -362,20 +364,20 @@ export const VentureDetailModal: React.FC<VentureDetailModalProps> = ({
                   key={sec.num}
                   style={{
                     padding: '14px 18px',
-                    backgroundColor: '#fbf8f2',
-                    border: '1px solid #e3d6bf',
+                    backgroundColor: '#fbfbfd',
+                    border: '1px solid rgba(0, 0, 0, 0.08)',
                   }}
                 >
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                      <span style={{ fontSize: '11px', fontWeight: 700, color: '#7a5c2e', fontFamily: 'monospace' }}>{sec.num}</span>
-                      <span style={{ fontSize: '13.5px', fontWeight: 600, color: '#121a29' }}>{sec.title}</span>
+                      <span style={{ fontSize: '11px', fontWeight: 700, color: '#0066cc', fontFamily: 'monospace' }}>{sec.num}</span>
+                      <span style={{ fontSize: '13.5px', fontWeight: 600, color: '#0f172a' }}>{sec.title}</span>
                     </div>
-                    <span style={{ fontSize: '10px', color: '#7a5c2e', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.08em', backgroundColor: '#fff', padding: '1px 6px', border: '1px solid #d6c9b2' }}>
+                    <span style={{ fontSize: '10px', color: '#0066cc', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.08em', backgroundColor: '#fff', padding: '1px 6px', border: '1px solid rgba(0, 0, 0, 0.1)' }}>
                       {sec.source}
                     </span>
                   </div>
-                  <div style={{ fontSize: '13.5px', color: '#121a29', lineHeight: 1.55 }}>
+                  <div style={{ fontSize: '13.5px', color: '#0f172a', lineHeight: 1.55 }}>
                     {sec.content}
                   </div>
                 </div>
@@ -397,14 +399,14 @@ export const VentureDetailModal: React.FC<VentureDetailModalProps> = ({
                     style={{
                       padding: '12px 16px',
                       backgroundColor: item.status === 'VERIFIED' ? '#f0fdf4' : item.status === 'UNRESOLVED_CHECK' ? '#fffbeb' : '#fff',
-                      border: '1px solid #d6c9b2',
+                      border: '1px solid rgba(0, 0, 0, 0.1)',
                       display: 'flex',
                       justifyContent: 'space-between',
                       alignItems: 'center',
                     }}
                   >
                     <div>
-                      <div style={{ fontSize: '13.5px', fontWeight: 600, color: '#121a29' }}>{item.label}</div>
+                      <div style={{ fontSize: '13.5px', fontWeight: 600, color: '#0f172a' }}>{item.label}</div>
                       <div style={{ fontSize: '12px', color: '#4c5262', marginTop: '2px' }}>{item.note}</div>
                     </div>
                     <span
@@ -412,7 +414,7 @@ export const VentureDetailModal: React.FC<VentureDetailModalProps> = ({
                         fontSize: '11px',
                         fontWeight: 700,
                         padding: '3px 8px',
-                        backgroundColor: item.status === 'VERIFIED' ? '#15803d' : item.status === 'UNRESOLVED_CHECK' ? '#b45309' : '#0c1826',
+                        backgroundColor: item.status === 'VERIFIED' ? '#15803d' : item.status === 'UNRESOLVED_CHECK' ? '#b45309' : '#0f172a',
                         color: '#fff',
                       }}
                     >
@@ -421,7 +423,7 @@ export const VentureDetailModal: React.FC<VentureDetailModalProps> = ({
                   </div>
                 ))
               ) : (
-                <div style={{ padding: '20px', textAlign: 'center', color: '#7a5c2e' }}>
+                <div style={{ padding: '20px', textAlign: 'center', color: '#0066cc' }}>
                   Standard evidence review pending platform desk dispatch.
                 </div>
               )}
@@ -443,11 +445,11 @@ export const VentureDetailModal: React.FC<VentureDetailModalProps> = ({
                     style={{
                       borderRadius: '8px',
                       overflow: 'hidden',
-                      border: '1px solid #e3d6bf',
-                      backgroundColor: '#fbf8f2',
+                      border: '1px solid rgba(0, 0, 0, 0.08)',
+                      backgroundColor: '#fbfbfd',
                     }}
                   >
-                    <div style={{ height: '170px', overflow: 'hidden', backgroundColor: '#0c1826' }}>
+                    <div style={{ height: '170px', overflow: 'hidden', backgroundColor: '#0f172a' }}>
                       <img
                         src={imgUrl}
                         alt={`Venture media ${idx + 1}`}
@@ -459,14 +461,14 @@ export const VentureDetailModal: React.FC<VentureDetailModalProps> = ({
                       />
                     </div>
                     <div style={{ padding: '10px 12px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                      <span style={{ fontSize: '12px', fontWeight: 600, color: '#121a29' }}>
+                      <span style={{ fontSize: '12px', fontWeight: 600, color: '#0f172a' }}>
                         Image {idx + 1}
                       </span>
                       <a
                         href={imgUrl}
                         target="_blank"
                         rel="noreferrer"
-                        style={{ fontSize: '11px', color: '#7a5c2e', textDecoration: 'none', fontWeight: 600 }}
+                        style={{ fontSize: '11px', color: '#0066cc', textDecoration: 'none', fontWeight: 600 }}
                       >
                         Open Full ↗
                       </a>
@@ -482,15 +484,15 @@ export const VentureDetailModal: React.FC<VentureDetailModalProps> = ({
         <div
           style={{
             padding: '16px 24px',
-            borderTop: '1px solid #e3d6bf',
-            backgroundColor: '#fbf8f2',
+            borderTop: '1px solid rgba(0, 0, 0, 0.08)',
+            backgroundColor: '#fbfbfd',
             display: 'flex',
             justifyContent: 'space-between',
             alignItems: 'center',
             gap: '12px',
           }}
         >
-          <div style={{ fontSize: '12px', color: '#7a5c2e' }}>
+          <div style={{ fontSize: '12px', color: '#0066cc' }}>
             Nivesha Ventures · Capital Facilitation Platform
           </div>
 
@@ -503,8 +505,8 @@ export const VentureDetailModal: React.FC<VentureDetailModalProps> = ({
                 }}
                 style={{
                   padding: '10px 20px',
-                  backgroundColor: '#0c1826',
-                  color: '#f5efe5',
+                  backgroundColor: '#0f172a',
+                  color: '#f5f5f7',
                   border: 'none',
                   fontSize: '13px',
                   fontWeight: 600,
@@ -534,8 +536,8 @@ export const VentureDetailModal: React.FC<VentureDetailModalProps> = ({
                   onClick={handleSendRequest}
                   style={{
                     padding: '9px 16px',
-                    backgroundColor: '#0c1826',
-                    color: '#f5efe5',
+                    backgroundColor: '#0f172a',
+                    color: '#f5f5f7',
                     border: 'none',
                     fontSize: '13px',
                     fontWeight: 600,
@@ -554,8 +556,8 @@ export const VentureDetailModal: React.FC<VentureDetailModalProps> = ({
                 onClick={() => setShowNoteInput(true)}
                 style={{
                   padding: '10px 22px',
-                  backgroundColor: '#0c1826',
-                  color: '#f5efe5',
+                  backgroundColor: '#0f172a',
+                  color: '#f5f5f7',
                   border: 'none',
                   fontSize: '13px',
                   fontWeight: 600,

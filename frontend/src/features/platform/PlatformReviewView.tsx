@@ -89,7 +89,7 @@ export const PlatformReviewView: React.FC<PlatformReviewViewProps> = ({
       {/* Header */}
       <div style={{ marginBottom: '28px' }}>
         <div className="eyebrow" style={{ marginBottom: '6px' }}>PLATFORM CORE DESK</div>
-        <h1 style={{ fontSize: '34px', color: '#0c1826', marginBottom: '8px' }}>
+        <h1 style={{ fontSize: '34px', color: '#0f172a', marginBottom: '8px' }}>
           Platform Facilitation & Review Workspace
         </h1>
         <p style={{ fontSize: '15px', color: '#536074', maxWidth: '780px' }}>
@@ -125,7 +125,7 @@ export const PlatformReviewView: React.FC<PlatformReviewViewProps> = ({
                 borderBottom: isActive ? '2px solid #856127' : '2px solid transparent',
                 fontWeight: isActive ? 600 : 500,
                 fontSize: '13.5px',
-                color: isActive ? '#0c1826' : '#536074',
+                color: isActive ? '#0f172a' : '#536074',
                 cursor: 'pointer',
                 whiteSpace: 'nowrap',
               }}
@@ -166,7 +166,7 @@ export const PlatformReviewView: React.FC<PlatformReviewViewProps> = ({
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '12px', marginBottom: '14px' }}>
                     <div>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '4px' }}>
-                        <span style={{ fontSize: '18px', fontWeight: 600, color: '#0c1826' }}>
+                        <span style={{ fontSize: '18px', fontWeight: 600, color: '#0f172a' }}>
                           {mc.venture_name || 'Venture'}
                         </span>
                         <span style={{ color: '#536074' }}>&harr;</span>
@@ -273,7 +273,7 @@ export const PlatformReviewView: React.FC<PlatformReviewViewProps> = ({
               >
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '12px', marginBottom: '14px' }}>
                   <div>
-                    <div style={{ fontSize: '18px', fontWeight: 600, color: '#0c1826', marginBottom: '4px' }}>
+                    <div style={{ fontSize: '18px', fontWeight: 600, color: '#0f172a', marginBottom: '4px' }}>
                       {appt.meeting_purpose}
                     </div>
                     <div style={{ fontSize: '13px', color: '#536074' }}>
@@ -323,7 +323,7 @@ export const PlatformReviewView: React.FC<PlatformReviewViewProps> = ({
               }}
             >
               <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
-                <h3 style={{ fontSize: '18px', color: '#0c1826', margin: 0 }}>{v.company_name}</h3>
+                <h3 style={{ fontSize: '18px', color: '#0f172a', margin: 0 }}>{v.company_name}</h3>
                 <span style={{ fontSize: '11px', fontWeight: 600, color: '#856127', background: '#fdf4e7', padding: '2px 6px', borderRadius: '3px' }}>
                   {v.proposed_arrangement || 'LOAN'}
                 </span>
@@ -331,7 +331,7 @@ export const PlatformReviewView: React.FC<PlatformReviewViewProps> = ({
               <p style={{ fontSize: '13px', color: '#536074', lineHeight: 1.5, marginBottom: '14px' }}>
                 {v.tag_line}
               </p>
-              <div style={{ fontSize: '14px', fontWeight: 700, color: '#0c1826', marginBottom: '10px' }}>
+              <div style={{ fontSize: '14px', fontWeight: 700, color: '#0f172a', marginBottom: '10px' }}>
                 Target: {formatINR(v.capital_target)}
               </div>
               <div style={{ fontSize: '12px', color: '#536074', borderTop: '1px solid #f2ede1', paddingTop: '10px' }}>
@@ -356,12 +356,12 @@ export const PlatformReviewView: React.FC<PlatformReviewViewProps> = ({
               }}
             >
               <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
-                <h3 style={{ fontSize: '18px', color: '#0c1826', margin: 0 }}>{m.firm_name}</h3>
+                <h3 style={{ fontSize: '18px', color: '#0f172a', margin: 0 }}>{m.firm_name}</h3>
               </div>
               <p style={{ fontSize: '13px', color: '#536074', lineHeight: 1.5, marginBottom: '14px' }}>
                 {m.thesis_summary || 'Targeting high-margin expansion opportunities.'}
               </p>
-              <div style={{ fontSize: '13.5px', fontWeight: 600, color: '#0c1826', marginBottom: '6px' }}>
+              <div style={{ fontSize: '13.5px', fontWeight: 600, color: '#0f172a', marginBottom: '6px' }}>
                 Tickets: {m.ticket_min ? formatINR(m.ticket_min) : '₹5L'} – {m.ticket_max ? formatINR(m.ticket_max) : '₹20L'}
               </div>
               <div style={{ fontSize: '12px', color: '#856127' }}>
@@ -375,7 +375,7 @@ export const PlatformReviewView: React.FC<PlatformReviewViewProps> = ({
       {/* TAB 5: PLATFORM ASSUMPTIONS */}
       {activeTab === 'ASSUMPTIONS' && config && (
         <div style={{ background: '#fff', border: '1px solid #e6decb', borderRadius: '12px', padding: '32px' }}>
-          <h2 style={{ fontSize: '22px', color: '#0c1826', marginBottom: '16px' }}>
+          <h2 style={{ fontSize: '22px', color: '#0f172a', marginBottom: '16px' }}>
             Centralized Platform Working Assumptions
           </h2>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', fontSize: '14px', lineHeight: 1.6, color: '#536074' }}>

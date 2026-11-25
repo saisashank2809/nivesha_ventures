@@ -17,14 +17,15 @@ export const VentureCard: React.FC<VentureCardProps> = ({
 }) => {
   return (
     <article
+      className="nv-card-interactive"
       style={{
-        backgroundColor: '#fffdf9',
-        border: '1px solid #d6c9b2',
-        boxShadow: '0 8px 24px -12px rgba(12, 24, 38, 0.12)',
+        backgroundColor: '#ffffff',
+        border: '1px solid rgba(0, 0, 0, 0.08)',
+        borderRadius: '20px',
+        overflow: 'hidden',
         display: 'flex',
         flexDirection: 'column',
         justifyContent: 'space-between',
-        transition: 'transform 0.18s ease, box-shadow 0.18s ease',
         boxSizing: 'border-box',
       }}
     >
@@ -33,20 +34,21 @@ export const VentureCard: React.FC<VentureCardProps> = ({
         <div
           style={{
             padding: '14px 20px',
-            borderBottom: '1px solid #e3d6bf',
+            borderBottom: '1px solid rgba(0, 0, 0, 0.06)',
             display: 'flex',
             justifyContent: 'space-between',
             alignItems: 'center',
-            backgroundColor: '#fbf8f2',
+            backgroundColor: '#fbfbfd',
           }}
         >
           <span
+            className="mono-label"
             style={{
               fontSize: '11px',
               fontWeight: 600,
-              letterSpacing: '0.14em',
+              letterSpacing: '0.06em',
               textTransform: 'uppercase',
-              color: '#7a5c2e',
+              color: '#0066cc',
             }}
           >
             {venture.sector} · {venture.stage}
@@ -54,17 +56,15 @@ export const VentureCard: React.FC<VentureCardProps> = ({
 
           <span
             style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '5px',
               fontSize: '11px',
               fontWeight: 600,
-              padding: '3px 8px',
-              backgroundColor: venture.verification_status === 'VERIFIED' ? '#0c1826' : '#7a5c2e',
-              color: '#f5efe5',
+              padding: '3px 9px',
+              borderRadius: '6px',
+              backgroundColor: venture.verification_status === 'VERIFIED' ? '#ecfdf5' : '#f5f5f7',
+              color: venture.verification_status === 'VERIFIED' ? '#16a34a' : '#475569',
             }}
           >
-            {venture.verification_status === 'VERIFIED' ? '✓ Verified Diligence' : 'In Diligence'}
+            {venture.verification_status === 'VERIFIED' ? 'Verified Diligence' : 'In Diligence'}
           </span>
         </div>
 
@@ -189,53 +189,41 @@ export const VentureCard: React.FC<VentureCardProps> = ({
           <button
             type="button"
             onClick={() => onOpenChat && venture.connection_id && onOpenChat(venture.connection_id)}
+            className="nv-btn-primary"
             style={{
               padding: '6px 14px',
-              backgroundColor: '#0c1826',
-              color: '#f5efe5',
-              border: 'none',
               fontSize: '12px',
-              fontWeight: 600,
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '6px',
+              borderRadius: '8px',
             }}
           >
-            <span>💬</span> Message Founder
+            Message Founder
           </button>
         ) : venture.connection_status === 'REQUESTED' ? (
           <span
             style={{
               padding: '6px 10px',
-              backgroundColor: '#f5efe5',
-              border: '1px solid #b39463',
-              color: '#7a5c2e',
+              backgroundColor: '#f5f5f7',
+              border: '1px solid rgba(0, 0, 0, 0.12)',
+              borderRadius: '6px',
+              color: '#475569',
               fontSize: '12px',
               fontWeight: 600,
             }}
           >
-            ⌛ Requested
+            Requested
           </span>
         ) : (
           <button
             type="button"
             onClick={() => onRequestConnection && onRequestConnection(venture)}
+            className="nv-btn-primary"
             style={{
               padding: '6px 14px',
-              backgroundColor: '#121a29',
-              color: '#f5efe5',
-              border: 'none',
               fontSize: '12px',
-              fontWeight: 600,
-              cursor: 'pointer',
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '4px',
+              borderRadius: '8px',
             }}
           >
-            <span>💬</span>
-            <span>Direct DM</span>
+            Direct DM
           </button>
         )}
       </div>
