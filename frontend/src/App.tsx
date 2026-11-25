@@ -15,7 +15,11 @@ import { PlatformReviewView } from './features/platform/PlatformReviewView';
 
 export function App() {
   const [currentUser, setCurrentUser] = useState<User | null>(Api.getCurrentUser());
-  const [activeTab, setActiveTab] = useState<string>('LANDING');
+  const [activeTab, setActiveTab] = useState<string>(() => {
+    const user = Api.getCurrentUser();
+    if (user?.role === 'INVESTOR') return 'INVESTOR_DISCOVERY';
+    return 'LANDING';
+  });
   const [loginModalOpen, setLoginModalOpen] = useState(false);
   const [loginModalRole, setLoginModalRole] = useState<UserRole>('INVESTOR');
   const [loginModalIsRegister, setLoginModalIsRegister] = useState(false);

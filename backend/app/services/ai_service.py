@@ -1,6 +1,18 @@
+import os
+import json
+import logging
+import re
 from typing import List, Dict, Any, Optional
 from sqlalchemy.orm import Session
+import httpx
+from dotenv import load_dotenv
+
 from app.models.models import Venture, User, InvestorMandate
+
+# Load environment variables from .env
+load_dotenv()
+
+logger = logging.getLogger("nivesha.ai_service")
 
 
 class AIAssistantService:
@@ -14,18 +26,319 @@ class AIAssistantService:
         venture_id: Optional[str] = None,
         history: List[Dict[str, str]] = None,
     ) -> Dict[str, Any]:
-        msg_lower = message.lower().strip()
-        ventures = db.query(Venture).all()
+        """
+        Generates dynamic AI response using configured LLM API (Google Gemini or OpenAI).
+        Falls back seamlessly to local diligence heuristics if API is unavailable or fails.
+        """
+        api_key = os.getenv("NIVESHA_DILIGENCE_ASSISTANT_API_KEY") or os.getenv("OPENAI_API_KEY")
+        api_url = os.getenv("NIVESHA_DILIGENCE_ASSISTANT_API_URL", "https://generativelanguage.googleapis.com/v1beta").rstrip("/")
+        model = os.getenv("NIVESHA_DILIGENCE_ASSISTANT_MODEL", "gemini-3-flash-preview")
 
+        # Fetch platform context
+        ventures = db.query(Venture).all()
+        mandate = None
+        if context_type == "INVESTOR":
+            mandate = db.query(InvestorMandate).filter(InvestorMandate.investor_id == user.id).first()
+
+        current_venture = None
+        if venture_id:
+            current_venture = db.query(Venture).filter(Venture.id == venture_id).first()
+
+        # If API key is present, attempt dynamic LLM call
+        if api_key and api_key.strip():
+            clean_key = api_key.strip()
+            try:
+                # Detect whether key/URL corresponds to Gemini or OpenAI
+                is_gemini = (
+                    clean_key.startswith("AQ.")
+                    or clean_key.startswith("AIza")
+                    or "googleapis.com" in api_url
+                    or "gemini" in model.lower()
+                )
+
+                if is_gemini:
+                    dynamic_res = cls._call_gemini(
+                        api_key=clean_key,
+                        api_url=api_url,
+                        model=model,
+                        user=user,
+                        context_type=context_type,
+                        message=message,
+                        ventures=ventures,
+                        mandate=mandate,
+                        current_venture=current_venture,
+                        history=history or [],
+                    )
+                else:
+                    dynamic_res = cls._call_openai(
+                        api_key=clean_key,
+                        api_url=api_url,
+                        model=model,
+                        user=user,
+                        context_type=context_type,
+                        message=message,
+                        ventures=ventures,
+                        mandate=mandate,
+                        current_venture=current_venture,
+                        history=history or [],
+                    )
+
+                if dynamic_res:
+                    return dynamic_res
+            except Exception as e:
+                logger.warning(f"Dynamic AI call failed: {e}. Falling back to local intelligence.", exc_info=True)
+
+        # Fallback to local intelligence heuristics
+        return cls._fallback_response(
+            db=db,
+            user=user,
+            message=message,
+            context_type=context_type,
+            ventures=ventures,
+            mandate=mandate,
+        )
+
+    @classmethod
+    def _call_gemini(
+        cls,
+        api_key: str,
+        api_url: str,
+        model: str,
+        user: User,
+        context_type: str,
+        message: str,
+        ventures: List[Venture],
+        mandate: Optional[InvestorMandate],
+        current_venture: Optional[Venture],
+        history: List[Dict[str, str]],
+    ) -> Optional[Dict[str, Any]]:
+        """Invokes Google Gemini generateContent API with structured JSON output."""
+        system_prompt = cls._build_system_prompt(
+            user=user,
+            context_type=context_type,
+            ventures=ventures,
+            mandate=mandate,
+            current_venture=current_venture,
+        )
+
+        contents = []
+        for h in history[-8:]:
+            role = "user" if h.get("role") == "user" else "model"
+            content = h.get("content")
+            if content:
+                contents.append({"role": role, "parts": [{"text": content}]})
+
+        contents.append({"role": "user", "parts": [{"text": message}]})
+
+        # Ensure model name without "models/" prefix for the path
+        clean_model = model.replace("models/", "")
+        endpoint = f"{api_url}/models/{clean_model}:generateContent?key={api_key}"
+
+        payload = {
+            "system_instruction": {"parts": [{"text": system_prompt}]},
+            "contents": contents,
+            "generationConfig": {
+                "response_mime_type": "application/json",
+                "temperature": 0.2,
+            },
+        }
+
+        with httpx.Client(timeout=25.0) as client:
+            resp = client.post(endpoint, json=payload)
+            if resp.status_code != 200:
+                logger.error(f"Gemini API error {resp.status_code}: {resp.text}")
+                return None
+
+            data = resp.json()
+            candidates = data.get("candidates", [])
+            if not candidates:
+                return None
+
+            raw_text = candidates[0]["content"]["parts"][0]["text"]
+            return cls._parse_llm_json(raw_text)
+
+    @classmethod
+    def _call_openai(
+        cls,
+        api_key: str,
+        api_url: str,
+        model: str,
+        user: User,
+        context_type: str,
+        message: str,
+        ventures: List[Venture],
+        mandate: Optional[InvestorMandate],
+        current_venture: Optional[Venture],
+        history: List[Dict[str, str]],
+    ) -> Optional[Dict[str, Any]]:
+        """Invokes OpenAI Chat Completions API with injected diligence knowledge."""
+        system_prompt = cls._build_system_prompt(
+            user=user,
+            context_type=context_type,
+            ventures=ventures,
+            mandate=mandate,
+            current_venture=current_venture,
+        )
+
+        messages = [{"role": "system", "content": system_prompt}]
+
+        for h in history[-8:]:
+            role = h.get("role")
+            content = h.get("content")
+            if role in ["user", "assistant"] and content:
+                messages.append({"role": role, "content": content})
+
+        messages.append({"role": "user", "content": message})
+
+        endpoint = f"{api_url}/chat/completions"
+        headers = {
+            "Authorization": f"Bearer {api_key}",
+            "Content-Type": "application/json",
+        }
+        payload = {
+            "model": model,
+            "messages": messages,
+            "temperature": 0.3,
+            "response_format": {"type": "json_object"},
+        }
+
+        with httpx.Client(timeout=25.0) as client:
+            resp = client.post(endpoint, headers=headers, json=payload)
+            if resp.status_code != 200:
+                logger.error(f"OpenAI API error {resp.status_code}: {resp.text}")
+                return None
+
+            data = resp.json()
+            content = data["choices"][0]["message"]["content"]
+            return cls._parse_llm_json(content)
+
+    @classmethod
+    def _parse_llm_json(cls, raw_content: str) -> Dict[str, Any]:
+        """Safely parses JSON from LLM output with robust regex fallbacks."""
+        cleaned = raw_content.strip()
+        if cleaned.startswith("```"):
+            cleaned = re.sub(r"^```(?:json)?\s*", "", cleaned)
+            cleaned = re.sub(r"\s*```$", "", cleaned)
+
+        try:
+            data = json.loads(cleaned)
+            return {
+                "reply": data.get("reply", cleaned),
+                "recommended_venture_ids": data.get("recommended_venture_ids", []),
+                "suggested_actions": data.get("suggested_actions", []),
+            }
+        except Exception:
+            return {
+                "reply": raw_content,
+                "recommended_venture_ids": [],
+                "suggested_actions": ["Review Diligence Brief", "Show Verified Ventures"],
+            }
+
+    @classmethod
+    def _build_system_prompt(
+        cls,
+        user: User,
+        context_type: str,
+        ventures: List[Venture],
+        mandate: Optional[InvestorMandate],
+        current_venture: Optional[Venture],
+    ) -> str:
+        """Constructs an institutional-grade domain prompt with live database records."""
+        is_investor = context_type == "INVESTOR"
+
+        # Summarize catalog ventures
+        venture_catalog = []
+        for v in ventures:
+            venture_catalog.append({
+                "id": v.id,
+                "company_name": v.company_name,
+                "tag_line": v.tag_line,
+                "sector": v.sector,
+                "location": v.location,
+                "stage": v.stage,
+                "capital_target_inr": v.capital_target,
+                "ticket_min_inr": v.ticket_min,
+                "ticket_max_inr": v.ticket_max,
+                "proposed_arrangement": v.proposed_arrangement,
+                "verification_status": v.verification_status.value if hasattr(v.verification_status, "value") else str(v.verification_status),
+                "traction_summary": v.traction_metrics or [],
+                "diligence_summary": v.diligence_brief or {},
+                "findings": v.due_diligence_findings or {},
+            })
+
+        user_context = {
+            "name": user.full_name,
+            "email": user.email,
+            "role": user.role.value if hasattr(user.role, "value") else str(user.role),
+        }
+
+        mandate_context = {}
+        if mandate:
+            mandate_context = {
+                "firm_name": getattr(mandate, "firm_name", ""),
+                "target_sectors": getattr(mandate, "target_sectors", []) or [],
+                "ticket_min_inr": getattr(mandate, "ticket_min", None),
+                "ticket_max_inr": getattr(mandate, "ticket_max", None),
+                "target_stages": getattr(mandate, "target_stages", []) or [],
+                "acceptable_structures": getattr(mandate, "acceptable_structures", []) or [],
+                "accepted_arrangements": getattr(mandate, "accepted_arrangements", []) or [],
+                "locations": getattr(mandate, "locations", []) or [],
+                "desired_involvement": getattr(mandate, "desired_involvement", "PASSIVE"),
+                "time_horizon": getattr(mandate, "time_horizon", "3_TO_5_YEARS"),
+            }
+
+        persona = (
+            "You are the Nivesha Diligence Assistant, an institutional-grade AI advisor for HNIs, angel syndicates, and family offices in India.\n"
+            "Your tone is professional, objective, analytical, and grounded strictly in verified evidence (GST filings, bank reconciliations, MCA cap tables).\n"
+            "Always format currency in Indian numbering (₹ Lakhs and ₹ Crores). Never invent unverified traction.\n"
+            "When recommending ventures, choose only from the Platform Ventures Catalog provided below.\n"
+            if is_investor
+            else
+            "You are the Nivesha Founder Co-pilot, an expert venture advisor helping early-stage Indian founders prepare institutional-grade showcases.\n"
+            "You help founders structure check sizes, model instruments (CCPS, iSAFE, Revenue Share), and prepare for rigorous financial diligence (GST/bank reconciliation)."
+        )
+
+        prompt = f"""
+{persona}
+
+Current User:
+{json.dumps(user_context, indent=2)}
+
+Investor Mandate (Active Criteria):
+{json.dumps(mandate_context, indent=2) if mandate_context else "None configured yet"}
+
+Platform Ventures Catalog:
+{json.dumps(venture_catalog, indent=2)}
+
+Current Focused Venture:
+{json.dumps({'id': current_venture.id, 'company_name': current_venture.company_name, 'sector': current_venture.sector, 'diligence': current_venture.diligence_brief} if current_venture else None, indent=2)}
+
+OUTPUT FORMAT REQUIREMENTS:
+You MUST respond with a single valid JSON object containing:
+{{
+  "reply": "Your markdown-formatted response to the user. Use concise bullet points, bold key figures, and reference verified diligence metrics from the catalog.",
+  "recommended_venture_ids": ["array of exact matching venture UUID strings from the catalog above"],
+  "suggested_actions": ["2 to 4 short, actionable chip prompts (e.g., 'Inspect BharatPay Brief', 'Check Ticket Fit', 'Filter FinTech')"]
+}}
+"""
+        return prompt
+
+    @classmethod
+    def _fallback_response(
+        cls,
+        db: Session,
+        user: User,
+        message: str,
+        context_type: str,
+        ventures: List[Venture],
+        mandate: Optional[InvestorMandate],
+    ) -> Dict[str, Any]:
+        """Deterministic heuristic response engine when external LLM is offline."""
+        msg_lower = message.lower().strip()
         recommended_ids = []
         suggested_actions = []
 
         if context_type == "INVESTOR":
-            # Investor Assistant
-            mandate = db.query(InvestorMandate).filter(InvestorMandate.investor_id == user.id).first()
-            firm_name = mandate.firm_name if mandate else "Your Investment Firm"
-
-            # Check if user is asking about specific sector or metric
             if any(w in msg_lower for w in ["fintech", "payments", "bharatpay"]):
                 matching_v = [v for v in ventures if "fintech" in v.sector.lower()]
                 recommended_ids = [v.id for v in matching_v]
@@ -68,7 +381,6 @@ class AIAssistantService:
                 suggested_actions = ["Filter by FinTech", "Show Seed Stage Deals", "Compare Ticket Ranges"]
 
             elif any(w in msg_lower for w in ["mandate", "fit", "match", "align"]):
-                # Mandate fit check
                 if mandate:
                     sec_str = ", ".join(mandate.target_sectors) if mandate.target_sectors else "All Sectors"
                     reply = (
@@ -89,7 +401,6 @@ class AIAssistantService:
                 suggested_actions = ["Show Verified FinTechs", "Explain Diligence Standards", "Check Mandate Overlap"]
 
         else:
-            # Founder Assistant
             v = db.query(Venture).filter(Venture.founder_id == user.id).first()
             company = v.company_name if v else "Your Venture"
 

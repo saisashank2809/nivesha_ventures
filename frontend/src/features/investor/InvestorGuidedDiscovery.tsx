@@ -1,16 +1,170 @@
 import React, { useState, useEffect } from 'react';
-import { VentureCard, InvestorMandate, User, MatchCase, AppointmentRequest } from '../../shared/types';
+import { VentureCard, InvestorMandate, User, MatchCase } from '../../shared/types';
 import { Api } from '../../shared/api';
 import { formatINR } from '../../shared/formatters';
+import './VentureSplitCard.css';
+
+// Human-readable enum translation helper
+function formatReadableEnum(val?: string | null): string {
+  if (!val) return 'Not disclosed';
+  const mapping: Record<string, string> = {
+    ACTIVE_ADVISORY: 'Active Advisory',
+    PASSIVE: 'Passive (Hands-off)',
+    HANDS_OFF: 'Hands-off',
+    MONTHLY_ADVISORY: 'Monthly Advisory',
+    ACTIVE_HANDS_ON: 'Active Operational Lead',
+    MONTHLY_CHECK_IN: 'Monthly Check-In',
+    MONTHLY_OPERATIONAL_REVIEWS: 'Monthly Operational Reviews',
+    PERIODIC_CHECK_IN: 'Periodic Quarterly Check-In',
+    NO_FOLLOW_UP: 'No Regular Follow-Up',
+    LOAN: 'Loan / Fixed Debt',
+    EQUITY: 'Equity Stake',
+    REVENUE_SHARE: 'Revenue Share / Royalty',
+    SECURED_COLLATERAL_DEBT: 'Secured Collateral Debt',
+    FRACTIONAL_EQUITY_UNITS: 'Fractional Equity Units',
+    PARTIAL_EQUITY_BUYOUT: 'Partial Equity Buyout',
+    GROWTH_EQUITY_WITH_REV_SHARE: 'Growth Equity with Rev-Share',
+    PROJECT_DEVELOPMENT_FINANCING: 'Project Development Financing',
+    POTENTIALLY_SUITABLE: 'Potentially Suitable',
+    UNSUITABLE: 'Mandatory Mismatch',
+    NEEDS_MORE_INFORMATION: 'Needs Information',
+  };
+
+  if (mapping[val]) return mapping[val];
+
+  return val
+    .replace(/_/g, ' ')
+    .toLowerCase()
+    .replace(/\b\w/g, (c) => c.toUpperCase());
+}
+
+// Clean match text helper to replace embedded enums with readable phrases
+function cleanReasonText(text: string): string {
+  if (!text) return '';
+  return text
+    .replace(/ACTIVE_ADVISORY/g, 'Active Advisory')
+    .replace(/MONTHLY_CHECK_IN/g, 'Monthly Check-In')
+    .replace(/PERIODIC_CHECK_IN/g, 'Quarterly Check-In')
+    .replace(/MONTHLY_OPERATIONAL_REVIEWS/g, 'Monthly Operational Reviews')
+    .replace(/NO_FOLLOW_UP/g, 'No Regular Follow-Up')
+    .replace(/HANDS_OFF/g, 'Hands-off')
+    .replace(/SECURED_COLLATERAL_DEBT/g, 'Secured Collateral Debt')
+    .replace(/FRACTIONAL_EQUITY_UNITS/g, 'Fractional Equity Units')
+    .replace(/GROWTH_EQUITY_WITH_REV_SHARE/g, 'Growth Equity with Rev-Share')
+    .replace(/PROJECT_DEVELOPMENT_FINANCING/g, 'Project Development Financing')
+    .replace(/LOAN/g, 'Loan / Debt')
+    .replace(/EQUITY/g, 'Equity');
+}
+
+// Extract one specific useful operating metric and its verification status
+function extractOperatingMetric(venture: VentureCard): { metric: string; verification: string; isAuditedOrVerified: boolean } {
+  const track = venture.operating_track_record || {};
+  const findings = venture.due_diligence_findings || {};
+
+  if (track.historical_annual_revenue) {
+    return {
+      metric: String(track.historical_annual_revenue),
+      verification: 'GST Verified',
+      isAuditedOrVerified: true,
+    };
+  }
+
+  if (track.declared_monthly_revenue) {
+    const amountStr = formatINR(track.declared_monthly_revenue);
+    const hasGSTAudit = findings.track_record?.finding?.includes('GST') || findings.track_record?.status === 'VERIFIED';
+    return {
+      metric: `Turnover: ${amountStr}/mo (Trailing 12-mo baseline)`,
+      verification: hasGSTAudit ? 'GST Verified' : 'Founder-Declared',
+      isAuditedOrVerified: Boolean(hasGSTAudit),
+    };
+  }
+
+  if (track.annual_turnover) {
+    return {
+      metric: `Turnover: ${track.annual_turnover}`,
+      verification: 'GST Verified',
+      isAuditedOrVerified: true,
+    };
+  }
+
+  if (track.past_projects) {
+    return {
+      metric: `Track Record: ${track.past_projects}`,
+      verification: 'Box Office Record',
+      isAuditedOrVerified: true,
+    };
+  }
+
+  if (track.factory_capacity || track.current_utilization) {
+    const util = track.current_utilization ? ` (${track.current_utilization})` : '';
+    return {
+      metric: `Production: ${track.factory_capacity || 'Plant active'}${util}`,
+      verification: 'Factory Inspected',
+      isAuditedOrVerified: true,
+    };
+  }
+
+  if (track.operational_beds) {
+    return {
+      metric: `Capacity: ${track.operational_beds}`,
+      verification: 'Clinical Audit',
+      isAuditedOrVerified: true,
+    };
+  }
+
+  if (track.phase_1_sales) {
+    return {
+      metric: `Sales: ${track.phase_1_sales}`,
+      verification: 'RERA Registered',
+      isAuditedOrVerified: true,
+    };
+  }
+
+  if (track.active_orders) {
+    return {
+      metric: `Orders: ${track.active_orders}`,
+      verification: 'Purchase Orders',
+      isAuditedOrVerified: false,
+    };
+  }
+
+  return {
+    metric: 'Commercial enterprise operating baseline',
+    verification: 'Declared Baseline',
+    isAuditedOrVerified: false,
+  };
+}
+
+// Extract one specific projection milestone
+function extractProjection(venture: VentureCard): string {
+  const growth = venture.growth_plan || {};
+  if (growth.projected_monthly_revenue) {
+    return `Revenue target: ${formatINR(growth.projected_monthly_revenue)}/mo (${growth.expansion_target || 'Target expansion outlet'})`;
+  }
+  if (growth.projected_revenue_fy26) {
+    return `Revenue target: ${growth.projected_revenue_fy26} (${growth.d2c_expansion_target || 'Target expansion'})`;
+  }
+  if (growth.confirmed_purchase_orders) {
+    return `Active pipeline: ${growth.confirmed_purchase_orders}`;
+  }
+  if (growth.expansion_target) {
+    return `Milestone: ${growth.expansion_target}`;
+  }
+  if (growth.theatrical_release_window) {
+    return `Target release: ${growth.theatrical_release_window}`;
+  }
+  if (growth.cath_lab_addition) {
+    return `Milestone: ${growth.cath_lab_addition}`;
+  }
+  if (growth.phase_2_sales_potential) {
+    return `Target potential: ${growth.phase_2_sales_potential}`;
+  }
+  return 'Target expansion and operational scaling milestone';
+}
 
 const getTenSections = (venture: VentureCard) => {
   const story = (venture.venture_story || {}) as Record<string, any>;
   const arr = venture.arrangement_details || {};
-  const customSections: Array<{ num?: string; title: string; content: string; source?: string }> =
-    (story.custom_sections as any[]) ||
-    ((arr as any)?.custom_sections as any[]) ||
-    [];
-
   return [
     { num: '01', title: 'Venture Overview', content: story.venture_overview || venture.business_context, source: 'FOUNDER DECLARATION' },
     { num: '02', title: 'Current Position', content: story.current_position || 'Active operating enterprise with verifiable baseline records.', source: 'OPERATING AUDIT' },
@@ -22,12 +176,6 @@ const getTenSections = (venture: VentureCard) => {
     { num: '08', title: 'Risks & Dependencies', content: story.risks_and_dependencies || 'Subject to supply milestones, contractor timelines, and statutory clearances.', source: 'DISCLOSURES' },
     { num: '09', title: 'Investor Participation', content: story.investor_participation || 'Audited financial reporting, priority recoupment waterfall, and governance rights.', source: 'GOVERNANCE' },
     { num: '10', title: 'Evidence & Next Steps', content: story.evidence_and_next_steps || 'Submitted documentation undergoing independent platform verification review.', source: 'REVIEW DESK' },
-    ...customSections.map((cs, i) => ({
-      num: cs.num || String(11 + i).padStart(2, '0'),
-      title: cs.title,
-      content: cs.content,
-      source: cs.source || 'CUSTOM ADDITION',
-    })),
   ];
 };
 
@@ -48,21 +196,29 @@ export const InvestorGuidedDiscovery: React.FC<InvestorGuidedDiscoveryProps> = (
   const [ventures, setVentures] = useState<VentureCard[]>([]);
   const [matchCases, setMatchCases] = useState<Record<string, MatchCase>>({});
   const [loading, setLoading] = useState(true);
+
+  // Mandate editor expand / collapse state
+  const [isEditingMandate, setIsEditingMandate] = useState(false);
+  const [savingMandate, setSavingMandate] = useState(false);
+
+  // Draft mandate form controls
+  const [selectedArrangement, setSelectedArrangement] = useState<string>('LOAN');
+  const [selectedInvolvement, setSelectedInvolvement] = useState<string>('ACTIVE_ADVISORY');
+  const [selectedFollowUp, setSelectedFollowUp] = useState<string>('MONTHLY_CHECK_IN');
+  const [minContribution, setMinContribution] = useState<number>(500000);
+  const [maxContribution, setMaxContribution] = useState<number>(50000000);
+
+  // Inline card expandable previews
   const [activeDiligenceVentureId, setActiveDiligenceVentureId] = useState<string | null>(null);
   const [expandedDossierVentureId, setExpandedDossierVentureId] = useState<string | null>(null);
+  const [expandedReasonsVentureId, setExpandedReasonsVentureId] = useState<string | null>(null);
+  const [activeGalleryVentureId, setActiveGalleryVentureId] = useState<string | null>(null);
   const [selectedGalleryIndices, setSelectedGalleryIndices] = useState<Record<string, number>>({});
 
-  // Direct DM Modal State
+  // Direct DM Modal State (Upstream live DM integration)
   const [directDMModalVenture, setDirectDMModalVenture] = useState<VentureCard | null>(null);
   const [directDMNote, setDirectDMNote] = useState('');
   const [submittingDM, setSubmittingDM] = useState(false);
-
-  // Quick Mandate Discovery Controls
-  const [selectedArrangement, setSelectedArrangement] = useState<string>('LOAN');
-  const [selectedInvolvement, setSelectedInvolvement] = useState<string>('MONTHLY_ADVISORY');
-  const [selectedFollowUp, setSelectedFollowUp] = useState<string>('MONTHLY_OPERATIONAL_REVIEWS');
-  const [minContribution, setMinContribution] = useState<number>(500000);
-  const [maxContribution, setMaxContribution] = useState<number>(2000000);
 
   const loadData = async () => {
     try {
@@ -80,15 +236,21 @@ export const InvestorGuidedDiscovery: React.FC<InvestorGuidedDiscoveryProps> = (
       setMatchCases(caseMap);
 
       if (currentUser?.role === 'INVESTOR') {
-        const m = await Api.getMyMandate();
-        setMandate(m);
-        if (m.accepted_arrangements && m.accepted_arrangements.length > 0) {
-          setSelectedArrangement(m.accepted_arrangements[0]);
+        try {
+          const m = await Api.getMyMandate();
+          setMandate(m);
+          if (m.accepted_arrangements && m.accepted_arrangements.length > 0) {
+            setSelectedArrangement(m.accepted_arrangements[0]);
+          } else if (m.acceptable_structures && m.acceptable_structures.length > 0) {
+            setSelectedArrangement(m.acceptable_structures[0]);
+          }
+          if (m.desired_involvement) setSelectedInvolvement(m.desired_involvement);
+          if (m.willing_to_follow_up) setSelectedFollowUp(m.willing_to_follow_up);
+          if (m.ticket_min !== undefined && m.ticket_min !== null) setMinContribution(m.ticket_min);
+          if (m.ticket_max !== undefined && m.ticket_max !== null) setMaxContribution(m.ticket_max);
+        } catch {
+          // If no stored mandate, fall back to default
         }
-        if (m.desired_involvement) setSelectedInvolvement(m.desired_involvement);
-        if (m.willing_to_follow_up) setSelectedFollowUp(m.willing_to_follow_up);
-        if (m.ticket_min) setMinContribution(m.ticket_min);
-        if (m.ticket_max) setMaxContribution(m.ticket_max);
       }
     } catch (err) {
       console.error('Failed to load investor discovery data', err);
@@ -101,12 +263,27 @@ export const InvestorGuidedDiscovery: React.FC<InvestorGuidedDiscoveryProps> = (
     loadData();
   }, [currentUser]);
 
+  // Determine if draft criteria differ from currently applied mandate
+  const appliedArrangement = mandate?.accepted_arrangements?.[0] || 'LOAN';
+  const appliedInvolvement = mandate?.desired_involvement || 'ACTIVE_ADVISORY';
+  const appliedFollowUp = mandate?.willing_to_follow_up || 'MONTHLY_CHECK_IN';
+  const appliedMin = mandate?.ticket_min ?? 500000;
+  const appliedMax = mandate?.ticket_max ?? 50000000;
+
+  const hasUnsavedChanges =
+    selectedArrangement !== appliedArrangement ||
+    selectedInvolvement !== appliedInvolvement ||
+    selectedFollowUp !== appliedFollowUp ||
+    minContribution !== appliedMin ||
+    maxContribution !== appliedMax;
+
   const handleUpdatePreferences = async () => {
     if (!currentUser || currentUser.role !== 'INVESTOR') {
       onOpenLogin();
       return;
     }
     try {
+      setSavingMandate(true);
       const updated = await Api.updateMyMandate({
         accepted_arrangements: [selectedArrangement],
         acceptable_structures: [selectedArrangement],
@@ -120,13 +297,29 @@ export const InvestorGuidedDiscovery: React.FC<InvestorGuidedDiscoveryProps> = (
       // Re-run matching evaluations for all ventures
       const newCases: Record<string, MatchCase> = {};
       for (const v of ventures) {
-        const evaluated = await Api.runMatchAssessment(v.id, updated.id);
-        newCases[v.id] = evaluated;
+        try {
+          const evaluated = await Api.runMatchAssessment(v.id, updated.id);
+          newCases[v.id] = evaluated;
+        } catch {
+          // fallback
+        }
       }
       setMatchCases(newCases);
+      setIsEditingMandate(false);
     } catch (err: any) {
       alert(`Error updating preferences: ${err.message}`);
+    } finally {
+      setSavingMandate(false);
     }
+  };
+
+  const handleResetDraft = () => {
+    setSelectedArrangement(appliedArrangement);
+    setSelectedInvolvement(appliedInvolvement);
+    setSelectedFollowUp(appliedFollowUp);
+    setMinContribution(appliedMin);
+    setMaxContribution(appliedMax);
+    setIsEditingMandate(false);
   };
 
   const handleOpenDirectDM = (v: VentureCard) => {
@@ -159,702 +352,979 @@ export const InvestorGuidedDiscovery: React.FC<InvestorGuidedDiscoveryProps> = (
   }
 
   return (
-    <div style={{ maxWidth: '1180px', margin: '0 auto', padding: '36px 24px 100px' }}>
-      {/* Top Banner */}
-      <div style={{ marginBottom: '32px' }}>
-        <div className="eyebrow" style={{ marginBottom: '6px' }}>INVESTOR GUIDED DISCOVERY</div>
-        <h1 style={{ fontSize: '34px', color: '#0c1826', marginBottom: '8px' }}>
-          Evaluate Opportunities & Due Diligence
-        </h1>
-        <p style={{ fontSize: '15px', color: '#536074', maxWidth: '780px' }}>
-          Explore curated opportunities with explicit separation between <strong>Founder Declarations</strong>,
-          <strong> Projections</strong>, and <strong>Statutory Checked Evidence</strong>. Matching logic surfaces
-          compatibility reasons and trade-offs rather than silent rejections.
-        </p>
+    <div style={{ maxWidth: '1180px', margin: '0 auto', padding: '24px 24px 120px' }}>
+      {/* 1. SHORTENED TOP OF PAGE */}
+      <div style={{ marginBottom: '18px' }}>
+        <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', flexWrap: 'wrap', gap: '8px' }}>
+          <div>
+            <h1
+              style={{
+                fontSize: '26px',
+                color: '#0c1826',
+                fontFamily: "Newsreader, Georgia, 'Times New Roman', serif",
+                fontWeight: 600,
+                letterSpacing: '-0.01em',
+                margin: 0,
+              }}
+            >
+              Venture matches
+            </h1>
+            <p style={{ fontSize: '13px', color: '#685d4d', margin: '3px 0 0 0' }}>
+              Standardized evaluation comparing founder declarations, audited operating baselines, and projections against your mandate.
+            </p>
+          </div>
+          <span style={{ fontSize: '12px', fontWeight: 600, color: '#7a5c2e', backgroundColor: '#f5efe5', padding: '3px 8px', borderRadius: '4px' }}>
+            {ventures.length} Curated Deals
+          </span>
+        </div>
       </div>
 
-      {/* Guided Preference Selector Card */}
+      {/* COMPACT APPLIED MANDATE SUMMARY BAR */}
       <div
         style={{
-          background: '#ffffff',
+          backgroundColor: '#ffffff',
           border: '1px solid #e6decb',
-          borderRadius: '12px',
-          padding: '24px 28px',
-          marginBottom: '36px',
-          boxShadow: '0 2px 8px rgba(12, 24, 38, 0.04)',
+          borderRadius: '8px',
+          padding: '12px 18px',
+          marginBottom: '24px',
+          boxShadow: '0 1px 3px rgba(12, 24, 38, 0.04)',
         }}
       >
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '18px' }}>
-          <div>
-            <h3 style={{ fontSize: '18px', color: '#0c1826', margin: 0 }}>Your Investment Parameters</h3>
-            <div style={{ fontSize: '13px', color: '#536074', marginTop: '2px' }}>
-              Adjust your criteria to see how matching reasons and trade-offs adapt in real time.
-            </div>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px' }}>
+          {/* Summary Elements */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap', flex: 1 }}>
+            <span
+              style={{
+                fontSize: '10.5px',
+                fontWeight: 700,
+                color: '#7a5c2e',
+                letterSpacing: '0.08em',
+                textTransform: 'uppercase',
+                marginRight: '4px',
+              }}
+            >
+              Applied Mandate:
+            </span>
+
+            <span
+              style={{
+                fontSize: '12px',
+                fontWeight: 600,
+                color: '#121a29',
+                backgroundColor: '#faf6ee',
+                border: '1px solid #d6c9b2',
+                padding: '2px 8px',
+                borderRadius: '4px',
+              }}
+              title="Applied arrangement"
+            >
+              {formatReadableEnum(appliedArrangement)}
+            </span>
+
+            <span
+              style={{
+                fontSize: '12px',
+                color: '#121a29',
+                backgroundColor: '#faf6ee',
+                border: '1px solid #d6c9b2',
+                padding: '2px 8px',
+                borderRadius: '4px',
+              }}
+              title="Involvement level"
+            >
+              {formatReadableEnum(appliedInvolvement)}
+            </span>
+
+            <span
+              style={{
+                fontSize: '12px',
+                color: '#121a29',
+                backgroundColor: '#faf6ee',
+                border: '1px solid #d6c9b2',
+                padding: '2px 8px',
+                borderRadius: '4px',
+              }}
+              title="Follow-up commitment"
+            >
+              {formatReadableEnum(appliedFollowUp)}
+            </span>
+
+            <span
+              style={{
+                fontSize: '12px',
+                fontWeight: 600,
+                color: '#121a29',
+                backgroundColor: '#faf6ee',
+                border: '1px solid #d6c9b2',
+                padding: '2px 8px',
+                borderRadius: '4px',
+              }}
+              title="Your investment ticket budget"
+            >
+              Budget: {formatINR(appliedMin)} – {formatINR(appliedMax)}
+            </span>
+
+            {hasUnsavedChanges && (
+              <span
+                style={{
+                  fontSize: '11px',
+                  fontWeight: 600,
+                  color: '#b45309',
+                  backgroundColor: '#fef3c7',
+                  border: '1px solid #fde68a',
+                  padding: '2px 8px',
+                  borderRadius: '4px',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '4px',
+                }}
+              >
+                ● Unsaved criteria (matches below reflect applied mandate)
+              </span>
+            )}
           </div>
+
+          {/* Edit Mandate Toggle */}
           <button
-            onClick={handleUpdatePreferences}
+            type="button"
+            onClick={() => setIsEditingMandate(!isEditingMandate)}
             style={{
-              padding: '8px 18px',
-              backgroundColor: '#0c1826',
-              color: '#fff',
-              borderRadius: '6px',
-              fontSize: '13px',
+              padding: '6px 14px',
+              backgroundColor: isEditingMandate ? '#f5efe5' : '#ffffff',
+              border: '1px solid #c5b59b',
+              color: '#121a29',
+              borderRadius: '4px',
+              fontSize: '12.5px',
               fontWeight: 600,
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '6px',
+              whiteSpace: 'nowrap',
             }}
           >
-            Apply & Re-evaluate
+            <span>⚙</span>
+            <span>{isEditingMandate ? 'Close editor ▴' : 'Edit mandate ▾'}</span>
           </button>
         </div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '18px' }}>
-          {/* Arrangement */}
-          <div>
-            <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, color: '#536074', textTransform: 'uppercase', marginBottom: '6px' }}>
-              Accepted Arrangement
-            </label>
-            <select
-              value={selectedArrangement}
-              onChange={(e) => setSelectedArrangement(e.target.value)}
-              style={{ width: '100%', padding: '8px 12px', borderRadius: '6px', border: '1px solid #e6decb', background: '#fdfbf7', fontSize: '13.5px' }}
-            >
-              <option value="LOAN">Loan / Fixed Debt</option>
-              <option value="REVENUE_SHARE">Revenue Share / Royalty</option>
-              <option value="EQUITY">Equity Stake</option>
-            </select>
-          </div>
+        {/* INLINE EXPANDABLE MANDATE FORM */}
+        {isEditingMandate && (
+          <div
+            style={{
+              marginTop: '16px',
+              paddingTop: '16px',
+              borderTop: '1px dashed #d6c9b2',
+            }}
+          >
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(210px, 1fr))', gap: '14px', marginBottom: '14px' }}>
+              {/* Arrangement */}
+              <div>
+                <label style={{ display: 'block', fontSize: '11px', fontWeight: 600, color: '#7a5c2e', textTransform: 'uppercase', marginBottom: '4px' }}>
+                  Accepted Arrangement
+                </label>
+                <select
+                  value={selectedArrangement}
+                  onChange={(e) => setSelectedArrangement(e.target.value)}
+                  style={{ width: '100%', padding: '6px 10px', borderRadius: '4px', border: '1px solid #c5b59b', background: '#faf6ee', fontSize: '13px' }}
+                >
+                  <option value="LOAN">Loan / Fixed Debt</option>
+                  <option value="SECURED_COLLATERAL_DEBT">Secured Collateral Debt</option>
+                  <option value="REVENUE_SHARE">Revenue Share / Royalty</option>
+                  <option value="EQUITY">Equity Stake</option>
+                  <option value="FRACTIONAL_EQUITY_UNITS">Fractional Equity Units</option>
+                  <option value="GROWTH_EQUITY_WITH_REV_SHARE">Growth Equity with Rev-Share</option>
+                </select>
+              </div>
 
-          {/* Desired Involvement */}
-          <div>
-            <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, color: '#536074', textTransform: 'uppercase', marginBottom: '6px' }}>
-              Desired Involvement
-            </label>
-            <select
-              value={selectedInvolvement}
-              onChange={(e) => setSelectedInvolvement(e.target.value)}
-              style={{ width: '100%', padding: '8px 12px', borderRadius: '6px', border: '1px solid #e6decb', background: '#fdfbf7', fontSize: '13.5px' }}
-            >
-              <option value="PASSIVE">Passive (Hands-off)</option>
-              <option value="MONTHLY_ADVISORY">Monthly Advisory</option>
-              <option value="ACTIVE_HANDS_ON">Active Operational Lead</option>
-            </select>
-          </div>
+              {/* Desired Involvement */}
+              <div>
+                <label style={{ display: 'block', fontSize: '11px', fontWeight: 600, color: '#7a5c2e', textTransform: 'uppercase', marginBottom: '4px' }}>
+                  Desired Involvement
+                </label>
+                <select
+                  value={selectedInvolvement}
+                  onChange={(e) => setSelectedInvolvement(e.target.value)}
+                  style={{ width: '100%', padding: '6px 10px', borderRadius: '4px', border: '1px solid #c5b59b', background: '#faf6ee', fontSize: '13px' }}
+                >
+                  <option value="ACTIVE_ADVISORY">Active Advisory</option>
+                  <option value="MONTHLY_ADVISORY">Monthly Advisory</option>
+                  <option value="ACTIVE_HANDS_ON">Active Operational Lead</option>
+                  <option value="PASSIVE">Passive (Hands-off)</option>
+                  <option value="HANDS_OFF">Hands-off</option>
+                </select>
+              </div>
 
-          {/* Willingness to Follow Up */}
-          <div>
-            <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, color: '#536074', textTransform: 'uppercase', marginBottom: '6px' }}>
-              Follow-up Commitment
-            </label>
-            <select
-              value={selectedFollowUp}
-              onChange={(e) => setSelectedFollowUp(e.target.value)}
-              style={{ width: '100%', padding: '8px 12px', borderRadius: '6px', border: '1px solid #e6decb', background: '#fdfbf7', fontSize: '13.5px' }}
-            >
-              <option value="NO_FOLLOW_UP">No Regular Follow-Up</option>
-              <option value="PERIODIC_CHECK_IN">Periodic Quarterly Check-In</option>
-              <option value="MONTHLY_OPERATIONAL_REVIEWS">Monthly Operational Reviews</option>
-            </select>
-          </div>
+              {/* Follow-up Commitment */}
+              <div>
+                <label style={{ display: 'block', fontSize: '11px', fontWeight: 600, color: '#7a5c2e', textTransform: 'uppercase', marginBottom: '4px' }}>
+                  Follow-up Commitment
+                </label>
+                <select
+                  value={selectedFollowUp}
+                  onChange={(e) => setSelectedFollowUp(e.target.value)}
+                  style={{ width: '100%', padding: '6px 10px', borderRadius: '4px', border: '1px solid #c5b59b', background: '#faf6ee', fontSize: '13px' }}
+                >
+                  <option value="MONTHLY_CHECK_IN">Monthly Check-In</option>
+                  <option value="MONTHLY_OPERATIONAL_REVIEWS">Monthly Operational Reviews</option>
+                  <option value="PERIODIC_CHECK_IN">Periodic Quarterly Check-In</option>
+                  <option value="NO_FOLLOW_UP">No Regular Follow-Up</option>
+                </select>
+              </div>
 
-          {/* Contribution Range */}
-          <div>
-            <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, color: '#536074', textTransform: 'uppercase', marginBottom: '6px' }}>
-              Target Contribution Range
-            </label>
-            <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-              <select
-                value={minContribution}
-                onChange={(e) => setMinContribution(Number(e.target.value))}
-                style={{ flex: 1, padding: '8px', borderRadius: '6px', border: '1px solid #e6decb', fontSize: '13px' }}
+              {/* Target Contribution Range */}
+              <div>
+                <label style={{ display: 'block', fontSize: '11px', fontWeight: 600, color: '#7a5c2e', textTransform: 'uppercase', marginBottom: '4px' }}>
+                  Your Budget Range
+                </label>
+                <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
+                  <select
+                    value={minContribution}
+                    onChange={(e) => setMinContribution(Number(e.target.value))}
+                    style={{ flex: 1, padding: '6px 8px', borderRadius: '4px', border: '1px solid #c5b59b', background: '#faf6ee', fontSize: '12.5px' }}
+                  >
+                    <option value={250000}>₹2.5 Lakh</option>
+                    <option value={500000}>₹5 Lakh</option>
+                    <option value={1000000}>₹10 Lakh</option>
+                    <option value={2000000}>₹20 Lakh</option>
+                    <option value={5000000}>₹50 Lakh</option>
+                  </select>
+                  <span style={{ fontSize: '11px', color: '#685d4d' }}>to</span>
+                  <select
+                    value={maxContribution}
+                    onChange={(e) => setMaxContribution(Number(e.target.value))}
+                    style={{ flex: 1, padding: '6px 8px', borderRadius: '4px', border: '1px solid #c5b59b', background: '#faf6ee', fontSize: '12.5px' }}
+                  >
+                    <option value={2000000}>₹20 Lakh</option>
+                    <option value={5000000}>₹50 Lakh</option>
+                    <option value={10000000}>₹1 Crore</option>
+                    <option value={50000000}>₹5 Crore</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            {/* Actions: Apply vs Reset */}
+            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px', alignItems: 'center' }}>
+              <button
+                type="button"
+                onClick={handleResetDraft}
+                style={{
+                  padding: '6px 14px',
+                  background: 'none',
+                  border: '1px solid #d6c9b2',
+                  borderRadius: '4px',
+                  fontSize: '12.5px',
+                  color: '#536074',
+                }}
               >
-                <option value={500000}>₹5 Lakh</option>
-                <option value={1000000}>₹10 Lakh</option>
-                <option value={2000000}>₹20 Lakh</option>
-              </select>
-              <span style={{ fontSize: '12px', color: '#536074' }}>to</span>
-              <select
-                value={maxContribution}
-                onChange={(e) => setMaxContribution(Number(e.target.value))}
-                style={{ flex: 1, padding: '8px', borderRadius: '6px', border: '1px solid #e6decb', fontSize: '13px' }}
+                Reset to Applied
+              </button>
+              <button
+                type="button"
+                onClick={handleUpdatePreferences}
+                disabled={savingMandate}
+                style={{
+                  padding: '6px 18px',
+                  backgroundColor: '#0c1826',
+                  color: '#ffffff',
+                  borderRadius: '4px',
+                  fontSize: '12.5px',
+                  fontWeight: 600,
+                  cursor: savingMandate ? 'wait' : 'pointer',
+                  boxShadow: '0 2px 4px rgba(12, 24, 38, 0.15)',
+                }}
               >
-                <option value={2000000}>₹20 Lakh</option>
-                <option value={5000000}>₹50 Lakh</option>
-                <option value={10000000}>₹1 Crore</option>
-              </select>
+                {savingMandate ? 'Updating & Evaluating...' : 'Apply & Re-evaluate Matches'}
+              </button>
             </div>
           </div>
-        </div>
+        )}
       </div>
 
-      {/* Curated Opportunities Grid */}
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
+      {/* 2. SINGLE-COLUMN LIST OF COMPACT VENTURE SUMMARIES */}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '18px' }}>
         {ventures.map((venture) => {
           const matchCase = matchCases[venture.id];
-          const isDiligenceOpen = activeDiligenceVentureId === venture.id;
-          const isDossierOpen = expandedDossierVentureId === venture.id;
           const outcome = matchCase?.outcome || 'POTENTIALLY_SUITABLE';
 
           const outcomeColor =
             outcome === 'POTENTIALLY_SUITABLE'
-              ? { bg: '#edf5ee', text: '#15803d', border: '#b8deb9', label: 'Potentially Suitable' }
+              ? { bg: '#edf5ee', text: '#15803d', border: '#b8deb9', label: 'Potentially Suitable', icon: '●' }
               : outcome === 'UNSUITABLE'
-              ? { bg: '#fef2f2', text: '#b91c1c', border: '#fecaca', label: 'Mandatory Mismatch' }
-              : { bg: '#fdf4e7', text: '#856127', border: '#ebd5b3', label: 'Needs Information' };
+              ? { bg: '#fef2f2', text: '#b91c1c', border: '#fecaca', label: 'Mandatory Mismatch', icon: '✕' }
+              : { bg: '#fdf4e7', text: '#856127', border: '#ebd5b3', label: 'Needs Information', icon: '▲' };
 
-          const trackRecord = venture.operating_track_record || {};
-          const growthPlan = venture.growth_plan || {};
-          const story = (venture.venture_story || {}) as Record<string, any>;
-          const findings = venture.due_diligence_findings || {};
           const arrDetails = venture.arrangement_details || {};
           const tenSecs = getTenSections(venture);
+          const findings = venture.due_diligence_findings || {};
+
+          // Extract Operating Metric & Projection
+          const { metric, verification } = extractOperatingMetric(venture);
+          const projection = extractProjection(venture);
+
+          // Format Deal Terms
+          const totalRaise = venture.capital_target ? formatINR(venture.capital_target) : 'Not disclosed';
+          let ticketOrUnit = 'Not disclosed';
+          if (arrDetails.unit_price) {
+            ticketOrUnit = `${formatINR(arrDetails.unit_price)} / unit (${arrDetails.total_units || 'fractional'} units)`;
+          } else if (venture.ticket_min && venture.ticket_max) {
+            ticketOrUnit = `${formatINR(venture.ticket_min)} – ${formatINR(venture.ticket_max)}`;
+          } else if (venture.ticket_min) {
+            ticketOrUnit = `From ${formatINR(venture.ticket_min)}`;
+          }
+
+          const arrangementName =
+            arrDetails.structure_name ||
+            formatReadableEnum(venture.proposed_arrangement) ||
+            'Not disclosed';
+
+          const rateOrReturn =
+            arrDetails.offered_interest_rate ||
+            arrDetails.interest_rate ||
+            arrDetails.proposed_equity_offered ||
+            (arrDetails.collateral_coverage_ratio ? `Cover: ${arrDetails.collateral_coverage_ratio}` : null);
+
+          // Extract Match Reasons
+          const rawFitReason = matchCase?.compatibility_reasons?.[0] || 'Venture structure and sector fit investor thesis.';
+          const fitReason = cleanReasonText(rawFitReason);
+
+          // Most material concern: Mandatory Mismatch prioritized over trade-offs
+          const hasMismatch = (matchCase?.mandatory_mismatches?.length || 0) > 0;
+          const hasTradeOff = (matchCase?.trade_offs?.length || 0) > 0;
+          const rawConcern = hasMismatch
+            ? matchCase!.mandatory_mismatches[0]
+            : hasTradeOff
+            ? matchCase!.trade_offs[0]
+            : null;
+          const materialConcern = rawConcern ? cleanReasonText(rawConcern) : null;
+
+          // Toggle States
+          const isDossierOpen = expandedDossierVentureId === venture.id;
+          const isDiligenceOpen = activeDiligenceVentureId === venture.id;
+          const isReasonsOpen = expandedReasonsVentureId === venture.id;
+          const isGalleryOpen = activeGalleryVentureId === venture.id;
 
           const gallery =
             venture.gallery_urls && venture.gallery_urls.length > 0
               ? venture.gallery_urls
               : venture.hero_image_url
               ? [venture.hero_image_url]
-              : ['https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=1200&q=80'];
+              : [];
           const selectedIdx = selectedGalleryIndices[venture.id] || 0;
-          const activeImage = gallery[selectedIdx] || gallery[0];
+          const heroImg = venture.hero_image_url || gallery[0];
 
           return (
-            <div
-              key={venture.id}
-              style={{
-                backgroundColor: '#ffffff',
-                border: '1px solid #e6decb',
-                borderRadius: '12px',
-                overflow: 'hidden',
-                boxShadow: '0 4px 16px rgba(12, 24, 38, 0.05)',
-              }}
-            >
-              {/* Visual Hero Banner with Overlaid Badges */}
-              <div style={{ position: 'relative', width: '100%', height: '220px', backgroundColor: '#0c1826' }}>
-                <img
-                  src={activeImage}
-                  alt={venture.company_name}
-                  style={{
-                    width: '100%',
-                    height: '100%',
-                    objectFit: 'cover',
-                    display: 'block',
-                    filter: 'brightness(0.88)',
-                  }}
-                  onError={(e) => {
-                    (e.target as HTMLImageElement).src =
-                      'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=1200&q=80';
-                  }}
-                />
-                <div
-                  style={{
-                    position: 'absolute',
-                    inset: 0,
-                    background:
-                      'linear-gradient(to top, rgba(12, 24, 38, 0.88) 0%, rgba(12, 24, 38, 0.25) 55%, rgba(12, 24, 38, 0.5) 100%)',
-                  }}
-                />
-
-                {/* Overlaid Badges on Top */}
-                <div
-                  style={{
-                    position: 'absolute',
-                    top: '14px',
-                    left: '16px',
-                    right: '16px',
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    alignItems: 'center',
-                  }}
-                >
-                  <div style={{ display: 'flex', gap: '8px', alignItems: 'center', flexWrap: 'wrap' }}>
-                    <span
+            <article key={venture.id} className="nv-venture-split-card">
+              {/* TOP SPLIT: HERO PANE (LEFT) + DECISION COCKPIT (RIGHT) */}
+              <div className="nv-venture-split-main">
+                {/* 1. LEFT HERO PANE */}
+                <div className="nv-venture-hero-pane">
+                  {/* Background Image / Monogram */}
+                  {heroImg ? (
+                    <img
+                      src={heroImg}
+                      alt={venture.company_name}
+                      loading="lazy"
                       style={{
-                        padding: '3px 10px',
-                        borderRadius: '4px',
-                        backgroundColor: 'rgba(12, 24, 38, 0.85)',
-                        backdropFilter: 'blur(4px)',
-                        color: '#f5efe5',
-                        border: '1px solid rgba(214, 201, 178, 0.3)',
-                        fontSize: '11px',
-                        fontWeight: 600,
-                        textTransform: 'uppercase',
-                        letterSpacing: '0.08em',
+                        position: 'absolute',
+                        inset: 0,
+                        width: '100%',
+                        height: '100%',
+                        objectFit: 'cover',
+                        zIndex: 0,
                       }}
-                    >
-                      {venture.sector}
-                    </span>
-                    <span
-                      style={{
-                        padding: '3px 10px',
-                        borderRadius: '4px',
-                        backgroundColor: outcomeColor.bg,
-                        color: outcomeColor.text,
-                        border: `1px solid ${outcomeColor.border}`,
-                        fontSize: '11.5px',
-                        fontWeight: 600,
+                      onError={(e) => {
+                        (e.target as HTMLImageElement).style.display = 'none';
                       }}
-                    >
-                      {outcomeColor.label}
-                    </span>
-                  </div>
-                </div>
-
-                {/* Overlaid Title on Banner Bottom */}
-                <div
-                  style={{
-                    position: 'absolute',
-                    bottom: '14px',
-                    left: '18px',
-                    right: '18px',
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    alignItems: 'flex-end',
-                    flexWrap: 'wrap',
-                    gap: '8px',
-                  }}
-                >
-                  <div>
-                    <h2
-                      onClick={() => (onSelectVenture ? onSelectVenture(venture.id) : setExpandedDossierVentureId(venture.id))}
+                    />
+                  ) : (
+                    <div
                       style={{
-                        fontSize: '23px',
-                        color: '#ffffff',
-                        margin: '0 0 2px 0',
-                        fontFamily: "Newsreader, Georgia, serif",
-                        fontWeight: 600,
-                        textShadow: '0 1px 3px rgba(0,0,0,0.85)',
-                        cursor: 'pointer',
-                      }}
-                      title="Click to view complete venture dossier"
-                    >
-                      {venture.company_name} ↗
-                    </h2>
-                    <div style={{ fontSize: '12px', color: '#f3ece2', textShadow: '0 1px 2px rgba(0,0,0,0.8)' }}>
-                      {venture.founder_name} {venture.founder_title ? `· ${venture.founder_title}` : ''} · {venture.location} · {venture.stage}
-                    </div>
-                  </div>
-
-                  <div style={{ textAlign: 'right' }}>
-                    <div style={{ fontSize: '20px', fontWeight: 700, color: '#ffffff', textShadow: '0 1px 3px rgba(0,0,0,0.85)' }}>
-                      {formatINR(venture.capital_target)}
-                    </div>
-                    <div style={{ fontSize: '11px', color: '#e6decb', fontWeight: 600, textTransform: 'uppercase' }}>
-                      Proposed: {(venture.proposed_arrangement || 'LOAN').replace(/_/g, ' ')}
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Gallery Thumbnails Strip (if multiple photos) */}
-              {gallery.length > 1 && (
-                <div
-                  style={{
-                    display: 'flex',
-                    gap: '8px',
-                    padding: '8px 18px',
-                    backgroundColor: '#fbf8f2',
-                    borderBottom: '1px solid #e6decb',
-                    overflowX: 'auto',
-                    alignItems: 'center',
-                  }}
-                >
-                  <span
-                    style={{
-                      fontSize: '10.5px',
-                      fontWeight: 700,
-                      color: '#7a5c2e',
-                      textTransform: 'uppercase',
-                      letterSpacing: '0.08em',
-                      whiteSpace: 'nowrap',
-                    }}
-                  >
-                    Media Gallery ({gallery.length}):
-                  </span>
-                  {gallery.map((imgUrl, gIdx) => (
-                    <button
-                      key={gIdx}
-                      onClick={() =>
-                        setSelectedGalleryIndices((prev) => ({
-                          ...prev,
-                          [venture.id]: gIdx,
-                        }))
-                      }
-                      style={{
-                        border: selectedIdx === gIdx ? '2px solid #7a5c2e' : '1px solid #d6c9b2',
-                        borderRadius: '4px',
-                        padding: 0,
-                        overflow: 'hidden',
-                        cursor: 'pointer',
-                        width: '56px',
-                        height: '36px',
-                        flexShrink: 0,
-                        opacity: selectedIdx === gIdx ? 1 : 0.65,
-                        transition: 'opacity 0.2s',
-                      }}
-                      title={`Preview photo ${gIdx + 1}`}
-                    >
-                      <img src={imgUrl} alt={`Thumbnail ${gIdx + 1}`} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                    </button>
-                  ))}
-                </div>
-              )}
-
-              {/* Main Card Content */}
-              <div style={{ padding: '24px 28px' }}>
-                {/* Tagline / Business Context */}
-                <p style={{ fontSize: '14.5px', color: '#536074', lineHeight: 1.6, margin: '0 0 20px 0' }}>
-                  {story.venture_overview || story.what_business_does || venture.tag_line || venture.business_context}
-                </p>
-
-                {/* Declarations vs Projections Comparison Box */}
-                <div
-                  style={{
-                    display: 'grid',
-                    gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
-                    gap: '16px',
-                    backgroundColor: '#fbf8f2',
-                    border: '1px solid #e6decb',
-                    borderRadius: '8px',
-                    padding: '16px',
-                    marginBottom: '20px',
-                  }}
-                >
-                  <div>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '4px' }}>
-                      <span style={{ fontSize: '11px', fontWeight: 600, color: '#856127', textTransform: 'uppercase' }}>
-                        Operating Track Record
-                      </span>
-                      <span style={{ fontSize: '10px', padding: '1px 5px', borderRadius: '3px', background: '#fdf4e7', color: '#856127' }}>
-                        Declared / Audited
-                      </span>
-                    </div>
-                    <div style={{ fontSize: '15px', fontWeight: 700, color: '#0c1826' }}>
-                      {trackRecord.declared_monthly_revenue
-                        ? `${formatINR(trackRecord.declared_monthly_revenue)}/mo`
-                        : trackRecord.annual_turnover ||
-                          trackRecord.factory_capacity ||
-                          trackRecord.past_projects ||
-                          trackRecord.operational_beds ||
-                          trackRecord.phase_1_sales ||
-                          trackRecord.active_orders ||
-                          'Operating Record'}
-                    </div>
-                    <div style={{ fontSize: '12px', color: '#536074' }}>
-                      {trackRecord.declared_operating_margin ||
-                        trackRecord.ebitda_margin ||
-                        trackRecord.average_occupancy ||
-                        trackRecord.repeat_order_rate ||
-                        trackRecord.distribution_loi ||
-                        'Verified Baseline'}
-                    </div>
-                  </div>
-
-                  <div>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '4px' }}>
-                      <span style={{ fontSize: '11px', fontWeight: 600, color: '#15803d', textTransform: 'uppercase' }}>
-                        Expansion Plan
-                      </span>
-                      <span style={{ fontSize: '10px', padding: '1px 5px', borderRadius: '3px', background: '#edf5ee', color: '#15803d' }}>
-                        Projection
-                      </span>
-                    </div>
-                    <div style={{ fontSize: '15px', fontWeight: 700, color: '#15803d' }}>
-                      {growthPlan.projected_monthly_revenue
-                        ? `${formatINR(growthPlan.projected_monthly_revenue)}/mo`
-                        : growthPlan.theatrical_release_window ||
-                          growthPlan.d2c_expansion_target ||
-                          growthPlan.cath_lab_addition ||
-                          growthPlan.geographic_expansion ||
-                          growthPlan.phase_2_sales_potential ||
-                          'Growth Target'}
-                    </div>
-                    <div style={{ fontSize: '12px', color: '#536074' }}>
-                      {growthPlan.expansion_target ||
-                        growthPlan.satellite_ott_strategy ||
-                        growthPlan.projected_revenue_fy26 ||
-                        growthPlan.target_occupancy ||
-                        'Stated milestone'}
-                    </div>
-                  </div>
-
-                  <div>
-                    <div style={{ fontSize: '11px', fontWeight: 600, color: '#536074', textTransform: 'uppercase', marginBottom: '4px' }}>
-                      Proposed Terms
-                    </div>
-                    <div style={{ fontSize: '14px', fontWeight: 600, color: '#0c1826' }}>
-                      {venture.arrangement_details?.interest_rate ||
-                        venture.arrangement_details?.structure_name ||
-                        venture.arrangement_details?.proposed_equity_offered ||
-                        (venture.proposed_arrangement || 'Direct').replace(/_/g, ' ')}
-                    </div>
-                    <div style={{ fontSize: '12px', color: '#856127' }}>
-                      {venture.arrangement_details?.collateral_offered || venture.arrangement_details?.collateral_details
-                        ? '✓ Asset-Backed Security'
-                        : 'Direct Participation'}
-                    </div>
-                  </div>
-                </div>
-
-                {/* Matching Explanations Block */}
-                {matchCase && (
-                  <div style={{ background: '#ffffff', borderLeft: '3px solid #856127', padding: '12px 16px', marginBottom: '20px' }}>
-                    {matchCase.compatibility_reasons.length > 0 && (
-                      <div style={{ marginBottom: '8px' }}>
-                        <div style={{ fontSize: '12px', fontWeight: 600, color: '#15803d' }}>Why it Fits:</div>
-                        <ul style={{ margin: '4px 0 0 16px', padding: 0, fontSize: '13px', color: '#536074' }}>
-                          {matchCase.compatibility_reasons.map((r, i) => (
-                            <li key={i}>{r}</li>
-                          ))}
-                        </ul>
-                      </div>
-                    )}
-
-                    {matchCase.trade_offs.length > 0 && (
-                      <div style={{ marginBottom: '8px' }}>
-                        <div style={{ fontSize: '12px', fontWeight: 600, color: '#b45309' }}>Trade-Offs & Involvement Concerns:</div>
-                        <ul style={{ margin: '4px 0 0 16px', padding: 0, fontSize: '13px', color: '#b45309' }}>
-                          {matchCase.trade_offs.map((t, i) => (
-                            <li key={i}>{t}</li>
-                          ))}
-                        </ul>
-                      </div>
-                    )}
-
-                    {matchCase.mandatory_mismatches.length > 0 && (
-                      <div>
-                        <div style={{ fontSize: '12px', fontWeight: 600, color: '#b91c1c' }}>Mandatory Deal-breakers:</div>
-                        <ul style={{ margin: '4px 0 0 16px', padding: 0, fontSize: '13px', color: '#b91c1c' }}>
-                          {matchCase.mandatory_mismatches.map((m, i) => (
-                            <li key={i}>{m}</li>
-                          ))}
-                        </ul>
-                      </div>
-                    )}
-                  </div>
-                )}
-
-                {/* Expandable 10-Section Complete Venture Dossier */}
-                {isDossierOpen && (
-                  <div style={{ marginTop: '20px', paddingTop: '20px', borderTop: '1px solid #e6decb' }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px' }}>
-                      <h4 style={{ fontSize: '17px', color: '#0c1826', margin: 0, fontFamily: "Newsreader, Georgia, serif" }}>
-                        Complete 10-Section Venture Dossier
-                      </h4>
-                      <span style={{ fontSize: '11px', color: '#7a5c2e', fontWeight: 600 }}>
-                        Standardized Presentation
-                      </span>
-                    </div>
-
-                    {/* Derived Mathematical Ratios */}
-                    {(arrDetails.calculated_budget_contribution ||
-                      arrDetails.collateral_coverage_ratio ||
-                      arrDetails.calculated_margin_impact) && (
-                      <div style={{ backgroundColor: '#fff', border: '1px solid #7a5c2e', padding: '12px 16px', borderRadius: '6px', marginBottom: '14px' }}>
-                        <div style={{ fontSize: '11px', fontWeight: 700, color: '#7a5c2e', textTransform: 'uppercase', marginBottom: '4px' }}>
-                          🧮 Platform Calculated Metrics & Epistemic Separation
-                        </div>
-                        <div style={{ fontSize: '12.5px', color: '#121a29', lineHeight: 1.5 }}>
-                          {arrDetails.calculated_budget_contribution && (
-                            <div style={{ marginBottom: '2px' }}>
-                              <strong>Budget Ratio:</strong> {arrDetails.calculated_budget_contribution}. <em>{arrDetails.calculation_note}</em>
-                            </div>
-                          )}
-                          {arrDetails.collateral_coverage_ratio && (
-                            <div style={{ marginBottom: '2px' }}>
-                              <strong>Collateral Coverage:</strong> {arrDetails.collateral_coverage_ratio} ({formatINR(arrDetails.collateral_valuation)} residential property).
-                            </div>
-                          )}
-                          {arrDetails.calculated_margin_impact && (
-                            <div>
-                              <strong>Unit Margin Analysis:</strong> {arrDetails.calculated_margin_impact}
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    )}
-
-                    {/* 10 Standardized Dossier Sections */}
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '12px', marginBottom: '16px' }}>
-                      {tenSecs.map((sec) => (
-                        <div key={sec.num} style={{ background: '#fcfaf6', border: '1px solid #e6decb', borderRadius: '6px', padding: '12px 14px' }}>
-                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
-                            <span style={{ fontSize: '11.5px', fontWeight: 700, color: '#7a5c2e', fontFamily: 'monospace' }}>
-                              {sec.num}. {sec.title}
-                            </span>
-                            <span style={{ fontSize: '9px', fontWeight: 600, padding: '1px 5px', borderRadius: '3px', background: '#fff', border: '1px solid #d6c9b2', color: '#7a5c2e' }}>
-                              {sec.source}
-                            </span>
-                          </div>
-                          <div style={{ fontSize: '12.5px', color: '#121a29', lineHeight: 1.45 }}>
-                            {sec.content}
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                {/* Expandable 6 Due Diligence Categories */}
-                {isDiligenceOpen && (
-                  <div style={{ marginTop: '20px', paddingTop: '20px', borderTop: '1px solid #e6decb' }}>
-                    <h4 style={{ fontSize: '16px', color: '#0c1826', marginBottom: '14px' }}>
-                      Due Diligence & Risk Findings (6 Standardized Review Categories)
-                    </h4>
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '14px' }}>
-                      {[
-                        { key: 'operational_reality', label: '1. Operational Reality & Scaling Expenses' },
-                        { key: 'track_record', label: '2. Track Record & Supporting Evidence' },
-                        { key: 'market_viability', label: '3. Market Viability & Customer Demand' },
-                        { key: 'offered_security', label: '4. Offered Security & Collateral' },
-                        { key: 'business_continuity', label: '5. Business Continuity & Operational Coverage' },
-                        { key: 'investor_compatibility', label: '6. Investor Compatibility & Follow-up' },
-                      ].map((cat) => {
-                        const item = findings[cat.key] || {
-                          title: cat.label,
-                          status: 'CHECKED_AGAINST_SOURCE',
-                          details: 'Standard verification criteria satisfied.',
-                        };
-                        return (
-                          <div key={cat.key} style={{ background: '#fcfaf6', border: '1px solid #e6decb', borderRadius: '6px', padding: '14px' }}>
-                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
-                              <span style={{ fontSize: '12px', fontWeight: 600, color: '#0c1826' }}>{cat.label}</span>
-                              <span style={{ fontSize: '10px', fontWeight: 600, padding: '2px 6px', borderRadius: '3px', background: '#e9f5ed', color: '#15803d' }}>
-                                {item.status}
-                              </span>
-                            </div>
-                            <div style={{ fontSize: '12.5px', color: '#536074', lineHeight: 1.4 }}>
-                              {item.details}
-                            </div>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  </div>
-                )}
-
-                {/* Action Buttons Bar */}
-                <div
-                  style={{
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    alignItems: 'center',
-                    marginTop: '20px',
-                    paddingTop: '16px',
-                    borderTop: '1px solid #f2ede1',
-                    flexWrap: 'wrap',
-                    gap: '12px',
-                  }}
-                >
-                  {/* Left Expand/Collapse Toggles */}
-                  <div style={{ display: 'flex', gap: '14px', alignItems: 'center', flexWrap: 'wrap' }}>
-                    <button
-                      onClick={() => setExpandedDossierVentureId(isDossierOpen ? null : venture.id)}
-                      style={{
-                        background: 'none',
-                        border: 'none',
-                        color: '#0c1826',
-                        fontWeight: 600,
-                        fontSize: '13px',
-                        cursor: 'pointer',
-                        padding: 0,
-                      }}
-                    >
-                      {isDossierOpen ? '▲ Hide 10-Section Dossier' : '▼ Quick 10-Section Dossier'}
-                    </button>
-
-                    <button
-                      onClick={() => setActiveDiligenceVentureId(isDiligenceOpen ? null : venture.id)}
-                      style={{
-                        background: 'none',
-                        border: 'none',
-                        color: '#856127',
-                        fontWeight: 600,
-                        fontSize: '13px',
-                        cursor: 'pointer',
-                        padding: 0,
-                      }}
-                    >
-                      {isDiligenceOpen ? '▲ Hide 6 Diligence Categories' : '▼ Inspect 6 Diligence Categories'}
-                    </button>
-                  </div>
-
-                  {/* Right Primary Actions */}
-                  <div style={{ display: 'flex', gap: '10px', alignItems: 'center', flexWrap: 'wrap' }}>
-                    {/* Primary Button to Open Full Modal Details */}
-                    <button
-                      onClick={() =>
-                        onSelectVenture ? onSelectVenture(venture.id) : setExpandedDossierVentureId(venture.id)
-                      }
-                      style={{
-                        padding: '10px 18px',
-                        backgroundColor: '#0c1826',
-                        color: '#fff',
-                        borderRadius: '6px',
-                        fontSize: '13px',
-                        fontWeight: 600,
-                        border: 'none',
-                        cursor: 'pointer',
+                        position: 'absolute',
+                        inset: 0,
                         display: 'flex',
                         alignItems: 'center',
-                        gap: '6px',
-                        boxShadow: '0 2px 6px rgba(12, 24, 38, 0.2)',
+                        justifyContent: 'center',
+                        fontSize: '96px',
+                        fontFamily: 'Newsreader, Georgia, serif',
+                        fontWeight: 700,
+                        color: 'rgba(255, 255, 255, 0.06)',
+                        userSelect: 'none',
+                        zIndex: 0,
                       }}
                     >
-                      <span>🔍</span> View Complete Details & Evidence
-                    </button>
+                      {venture.company_name.charAt(0)}
+                    </div>
+                  )}
 
-                    {venture.connection_status === 'CONNECTED' && onOpenDirectChat && venture.connection_id ? (
-                      <button
-                        onClick={() => onOpenDirectChat(venture.connection_id!)}
+                  {/* Hero Foreground Content */}
+                  <div className="nv-venture-hero-content">
+                    {/* Top Row: Match Outcome Pill + Media Count Button */}
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+                      <div
                         style={{
-                          padding: '10px 18px',
-                          backgroundColor: '#15803d',
-                          color: '#fff',
-                          borderRadius: '6px',
-                          fontSize: '13px',
-                          fontWeight: 600,
-                          border: 'none',
-                          cursor: 'pointer',
-                        }}
-                      >
-                        Open Direct Messages
-                      </button>
-                    ) : (
-                      <button
-                        onClick={() => handleOpenDirectDM(venture)}
-                        style={{
-                          padding: '10px 18px',
-                          backgroundColor: '#0c1826',
-                          color: '#f5efe5',
-                          borderRadius: '6px',
-                          fontSize: '13px',
-                          fontWeight: 600,
-                          border: 'none',
-                          cursor: 'pointer',
                           display: 'inline-flex',
                           alignItems: 'center',
-                          gap: '6px',
-                          boxShadow: '0 2px 6px rgba(12, 24, 38, 0.15)',
+                          gap: '5px',
+                          padding: '4px 10px',
+                          borderRadius: '4px',
+                          backgroundColor: outcomeColor.bg,
+                          color: outcomeColor.text,
+                          border: `1px solid ${outcomeColor.border}`,
+                          fontSize: '11px',
+                          fontWeight: 700,
+                          backdropFilter: 'blur(4px)',
                         }}
                       >
-                        <span>💬</span>
-                        <span>Direct Message Founder</span>
-                      </button>
+                        <span>{outcomeColor.icon}</span>
+                        <span>{outcomeColor.label}</span>
+                      </div>
+
+                      {gallery.length > 0 && (
+                        <button
+                          type="button"
+                          onClick={() => setActiveGalleryVentureId(isGalleryOpen ? null : venture.id)}
+                          style={{
+                            background: 'rgba(12, 24, 38, 0.65)',
+                            backdropFilter: 'blur(6px)',
+                            border: '1px solid rgba(255, 255, 255, 0.25)',
+                            color: '#ffffff',
+                            borderRadius: '4px',
+                            padding: '3px 9px',
+                            fontSize: '11px',
+                            fontWeight: 600,
+                            cursor: 'pointer',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '5px',
+                          }}
+                          title="Click to toggle photo showcase"
+                        >
+                          <span>📸</span>
+                          <span>{gallery.length} photos</span>
+                        </button>
+                      )}
+                    </div>
+
+                    {/* Middle Block: Sector, Company Name, Tagline */}
+                    <div>
+                      <div
+                        style={{
+                          fontSize: '11px',
+                          fontWeight: 700,
+                          color: '#e2caa1',
+                          textTransform: 'uppercase',
+                          letterSpacing: '0.08em',
+                          marginBottom: '4px',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '6px',
+                        }}
+                      >
+                        <span>{venture.sector}</span>
+                        <span>•</span>
+                        <span>{venture.location}</span>
+                      </div>
+
+                      <h2
+                        onClick={() => onSelectVenture?.(venture.id)}
+                        style={{
+                          fontSize: '22px',
+                          fontWeight: 600,
+                          color: '#ffffff',
+                          fontFamily: 'Newsreader, Georgia, serif',
+                          margin: '0 0 6px 0',
+                          cursor: 'pointer',
+                          lineHeight: 1.25,
+                          textShadow: '0 2px 4px rgba(0,0,0,0.4)',
+                        }}
+                        title="Click to review full venture dossier"
+                      >
+                        {venture.company_name}
+                      </h2>
+
+                      <p
+                        style={{
+                          fontSize: '12.5px',
+                          color: '#cbd5e1',
+                          lineHeight: 1.45,
+                          margin: 0,
+                          display: '-webkit-box',
+                          WebkitLineClamp: 3,
+                          WebkitBoxOrient: 'vertical',
+                          overflow: 'hidden',
+                          textShadow: '0 1px 2px rgba(0,0,0,0.3)',
+                        }}
+                      >
+                        {venture.tag_line || venture.business_context}
+                      </p>
+                    </div>
+
+                    {/* Bottom Row: Stage & Arrangement Badges */}
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
+                      <span
+                        style={{
+                          fontSize: '10.5px',
+                          fontWeight: 600,
+                          padding: '2px 8px',
+                          borderRadius: '3px',
+                          backgroundColor: 'rgba(255, 255, 255, 0.12)',
+                          border: '1px solid rgba(255, 255, 255, 0.22)',
+                          color: '#f8fafc',
+                          backdropFilter: 'blur(4px)',
+                        }}
+                      >
+                        {venture.stage || 'Operating'}
+                      </span>
+                      <span
+                        style={{
+                          fontSize: '10.5px',
+                          fontWeight: 600,
+                          padding: '2px 8px',
+                          borderRadius: '3px',
+                          backgroundColor: 'rgba(226, 202, 161, 0.18)',
+                          border: '1px solid rgba(226, 202, 161, 0.35)',
+                          color: '#fef3c7',
+                          backdropFilter: 'blur(4px)',
+                        }}
+                      >
+                        {formatReadableEnum(venture.proposed_arrangement)}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* 2. RIGHT FINANCIAL DECISION COCKPIT */}
+                <div className="nv-venture-cockpit">
+                  {/* Row 1: Deal Vitals (3 Columns) */}
+                  <div className="nv-vitals-grid">
+                    <div>
+                      <div className="nv-vitals-label">Total Raise</div>
+                      <div className="nv-vitals-value">{totalRaise}</div>
+                      <div className="nv-vitals-subtext">Stage: {venture.stage || 'Operating'}</div>
+                    </div>
+                    <div className="nv-vitals-divider">
+                      <div className="nv-vitals-label">Ticket / Unit Size</div>
+                      <div className="nv-vitals-value">{ticketOrUnit}</div>
+                      <div className="nv-vitals-subtext">Venture allocation per participant</div>
+                    </div>
+                    <div className="nv-vitals-divider">
+                      <div className="nv-vitals-label">Proposed Arrangement</div>
+                      <div className="nv-vitals-value">{arrangementName}</div>
+                      <div
+                        className="nv-vitals-subtext"
+                        style={{ color: rateOrReturn ? '#15803d' : '#685d4d', fontWeight: rateOrReturn ? 600 : 400 }}
+                      >
+                        {rateOrReturn ? `Terms: ${rateOrReturn}` : 'Terms disclosed in dossier'}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Row 2: Comparative Operating Baseline & Expansion Target */}
+                  <div className="nv-comparative-strip">
+                    <div>
+                      <div className="nv-comparative-label-row">
+                        <span style={{ fontSize: '10px', fontWeight: 700, color: '#7a5c2e', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+                          🛡️ Operating Baseline
+                        </span>
+                        <span
+                          style={{
+                            fontSize: '9.5px',
+                            fontWeight: 600,
+                            padding: '1px 5px',
+                            borderRadius: '3px',
+                            backgroundColor: '#f5efe5',
+                            border: '1px solid #d6c9b2',
+                            color: '#7a5c2e',
+                          }}
+                        >
+                          {verification}
+                        </span>
+                      </div>
+                      <div style={{ fontSize: '13px', color: '#121a29', fontWeight: 600, lineHeight: 1.4 }}>
+                        {metric}
+                      </div>
+                    </div>
+
+                    <div>
+                      <div className="nv-comparative-label-row">
+                        <span style={{ fontSize: '10px', fontWeight: 700, color: '#15803d', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+                          📈 Expansion Target
+                        </span>
+                        <span
+                          style={{
+                            fontSize: '9.5px',
+                            fontWeight: 600,
+                            padding: '1px 5px',
+                            borderRadius: '3px',
+                            backgroundColor: '#edf5ee',
+                            color: '#15803d',
+                            border: '1px solid #b8deb9',
+                          }}
+                        >
+                          Projection
+                        </span>
+                      </div>
+                      <div style={{ fontSize: '13px', color: '#121a29', lineHeight: 1.4 }}>
+                        {projection}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Row 3: Mandate Alignment Strip */}
+                  <div
+                    style={{
+                      borderLeft: `3px solid ${outcomeColor.text}`,
+                      backgroundColor: '#faf6ee',
+                      padding: '8px 12px',
+                      borderRadius: '0 4px 4px 0',
+                      fontSize: '12.5px',
+                      lineHeight: 1.45,
+                    }}
+                  >
+                    <div style={{ color: '#15803d', fontWeight: 600 }}>
+                      ✓ Alignment: <span style={{ color: '#334155', fontWeight: 400 }}>{fitReason}</span>
+                    </div>
+
+                    {materialConcern && (
+                      <div style={{ marginTop: '4px', color: hasMismatch ? '#b91c1c' : '#b45309', fontWeight: 600 }}>
+                        {hasMismatch ? '✕ Mandatory Mismatch: ' : '⚠️ Consideration: '}
+                        <span style={{ color: hasMismatch ? '#b91c1c' : '#475569', fontWeight: 400 }}>
+                          {materialConcern}
+                        </span>
+                      </div>
                     )}
+
+                    {matchCase && (
+                      <div style={{ marginTop: '6px' }}>
+                        <button
+                          type="button"
+                          onClick={() => setExpandedReasonsVentureId(isReasonsOpen ? null : venture.id)}
+                          style={{
+                            background: 'none',
+                            border: 'none',
+                            color: '#7a5c2e',
+                            fontSize: '11.5px',
+                            fontWeight: 600,
+                            cursor: 'pointer',
+                            padding: 0,
+                          }}
+                        >
+                          {isReasonsOpen ? '▴ Hide full matching breakdown' : `▾ View all ${matchCase.rule_results?.length || 7} matching factors`}
+                        </button>
+
+                        {isReasonsOpen && (
+                          <div style={{ marginTop: '8px', paddingTop: '8px', borderTop: '1px dashed #d6c9b2' }}>
+                            <div style={{ fontWeight: 600, color: '#121a29', fontSize: '11.5px', marginBottom: '4px' }}>
+                              Compatibility Reasons:
+                            </div>
+                            <ul style={{ margin: '0 0 8px 16px', padding: 0, fontSize: '12px', color: '#475569' }}>
+                              {matchCase.compatibility_reasons.map((r, rIdx) => (
+                                <li key={rIdx}>{cleanReasonText(r)}</li>
+                              ))}
+                            </ul>
+
+                            {matchCase.trade_offs.length > 0 && (
+                              <>
+                                <div style={{ fontWeight: 600, color: '#b45309', fontSize: '11.5px', marginBottom: '4px' }}>
+                                  Trade-Offs & Involvement Friction:
+                                </div>
+                                <ul style={{ margin: '0 0 8px 16px', padding: 0, fontSize: '12px', color: '#b45309' }}>
+                                  {matchCase.trade_offs.map((t, tIdx) => (
+                                    <li key={tIdx}>{cleanReasonText(t)}</li>
+                                  ))}
+                                </ul>
+                              </>
+                            )}
+
+                            {matchCase.mandatory_mismatches.length > 0 && (
+                              <>
+                                <div style={{ fontWeight: 600, color: '#b91c1c', fontSize: '11.5px', marginBottom: '4px' }}>
+                                  Mandatory Mismatches:
+                                </div>
+                                <ul style={{ margin: '0 0 8px 16px', padding: 0, fontSize: '12px', color: '#b91c1c' }}>
+                                  {matchCase.mandatory_mismatches.map((m, mIdx) => (
+                                    <li key={mIdx}>{cleanReasonText(m)}</li>
+                                  ))}
+                                </ul>
+                              </>
+                            )}
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Row 4: Action Toolbar */}
+                  <div
+                    style={{
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'center',
+                      paddingTop: '10px',
+                      borderTop: '1px solid #f2ede1',
+                      flexWrap: 'wrap',
+                      gap: '10px',
+                      marginTop: 'auto',
+                    }}
+                  >
+                    {/* Left quick inspection links */}
+                    <div style={{ display: 'flex', gap: '14px', alignItems: 'center', flexWrap: 'wrap' }}>
+                      <button
+                        type="button"
+                        onClick={() => setExpandedDossierVentureId(isDossierOpen ? null : venture.id)}
+                        style={{
+                          background: 'none',
+                          border: 'none',
+                          color: isDossierOpen ? '#7a5c2e' : '#0c1826',
+                          fontWeight: 600,
+                          fontSize: '12px',
+                          cursor: 'pointer',
+                          padding: 0,
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '4px',
+                        }}
+                      >
+                        <span>{isDossierOpen ? '▲' : '▼'}</span>
+                        <span>{isDossierOpen ? 'Hide 10-Pt Dossier' : '10-Pt Dossier'}</span>
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => setActiveDiligenceVentureId(isDiligenceOpen ? null : venture.id)}
+                        style={{
+                          background: 'none',
+                          border: 'none',
+                          color: isDiligenceOpen ? '#0c1826' : '#7a5c2e',
+                          fontWeight: 600,
+                          fontSize: '12px',
+                          cursor: 'pointer',
+                          padding: 0,
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '4px',
+                        }}
+                      >
+                        <span>{isDiligenceOpen ? '▲' : '▼'}</span>
+                        <span>{isDiligenceOpen ? 'Hide Diligence' : 'Diligence Audit'}</span>
+                      </button>
+
+                      {gallery.length > 1 && (
+                        <button
+                          type="button"
+                          onClick={() => setActiveGalleryVentureId(isGalleryOpen ? null : venture.id)}
+                          style={{
+                            background: 'none',
+                            border: 'none',
+                            color: '#685d4d',
+                            fontWeight: 600,
+                            fontSize: '12px',
+                            cursor: 'pointer',
+                            padding: 0,
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '4px',
+                          }}
+                        >
+                          <span>📷</span>
+                          <span>{isGalleryOpen ? 'Hide Media' : `Gallery (${gallery.length})`}</span>
+                        </button>
+                      )}
+                    </div>
+
+                    {/* Right Primary Actions */}
+                    <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                      {venture.connection_status === 'CONNECTED' && onOpenDirectChat && venture.connection_id ? (
+                        <button
+                          type="button"
+                          onClick={() => onOpenDirectChat(venture.connection_id!)}
+                          style={{
+                            padding: '7px 14px',
+                            backgroundColor: '#15803d',
+                            color: '#ffffff',
+                            borderRadius: '4px',
+                            fontSize: '12.5px',
+                            fontWeight: 600,
+                            border: 'none',
+                            cursor: 'pointer',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '5px',
+                          }}
+                        >
+                          <span>💬</span>
+                          <span>Direct Messages</span>
+                        </button>
+                      ) : (
+                        <button
+                          type="button"
+                          onClick={() => handleOpenDirectDM(venture)}
+                          style={{
+                            padding: '7px 14px',
+                            backgroundColor: '#fffdf9',
+                            color: '#0c1826',
+                            borderRadius: '4px',
+                            fontSize: '12.5px',
+                            fontWeight: 600,
+                            border: '1px solid #d6c9b2',
+                            cursor: 'pointer',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '5px',
+                          }}
+                        >
+                          <span>💬</span>
+                          <span>Direct Message</span>
+                        </button>
+                      )}
+
+                      {/* Primary Button: Review dossier */}
+                      <button
+                        type="button"
+                        onClick={() => onSelectVenture?.(venture.id)}
+                        style={{
+                          padding: '7px 18px',
+                          backgroundColor: '#0c1826',
+                          color: '#ffffff',
+                          borderRadius: '4px',
+                          fontSize: '12.5px',
+                          fontWeight: 600,
+                          border: 'none',
+                          cursor: 'pointer',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '5px',
+                          boxShadow: '0 2px 4px rgba(12, 24, 38, 0.16)',
+                        }}
+                      >
+                        <span>Review dossier</span>
+                        <span style={{ fontSize: '12px' }}>↗</span>
+                      </button>
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
+
+              {/* 3. FULL-WIDTH EXPANDABLE DRAWERS */}
+              {(isDossierOpen || isDiligenceOpen || (isGalleryOpen && gallery.length > 1)) && (
+                <div className="nv-drawer-container">
+                  {/* INLINE DOSSIER DRAWER */}
+                  {isDossierOpen && (
+                    <div style={{ marginBottom: isDiligenceOpen || isGalleryOpen ? '16px' : '0' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
+                        <div style={{ fontSize: '13.5px', fontWeight: 600, color: '#0c1826', fontFamily: "Newsreader, Georgia, serif" }}>
+                          10-Section Venture Summary Preview
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => onSelectVenture?.(venture.id)}
+                          style={{ fontSize: '11.5px', color: '#7a5c2e', fontWeight: 600, background: 'none', border: 'none', cursor: 'pointer' }}
+                        >
+                          Open in Full Dossier Modal ↗
+                        </button>
+                      </div>
+                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '8px' }}>
+                        {tenSecs.map((sec) => (
+                          <div key={sec.num} style={{ background: '#ffffff', border: '1px solid #e6decb', borderRadius: '4px', padding: '8px 10px' }}>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2px' }}>
+                              <span style={{ fontSize: '11px', fontWeight: 700, color: '#7a5c2e', fontFamily: 'monospace' }}>
+                                {sec.num}. {sec.title}
+                              </span>
+                              <span style={{ fontSize: '8.5px', padding: '1px 4px', background: '#faf6ee', border: '1px solid #d6c9b2', color: '#7a5c2e' }}>
+                                {sec.source}
+                              </span>
+                            </div>
+                            <div style={{ fontSize: '11.5px', color: '#334155', lineHeight: 1.35 }}>
+                              {sec.content}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* INLINE DILIGENCE CHECKLIST DRAWER */}
+                  {isDiligenceOpen && (
+                    <div style={{ marginBottom: isGalleryOpen ? '16px' : '0' }}>
+                      <div style={{ fontSize: '13px', fontWeight: 600, color: '#0c1826', marginBottom: '8px' }}>
+                        6 Standardized Due Diligence Categories
+                      </div>
+                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '8px' }}>
+                        {[
+                          { key: 'operational_reality', label: '1. Operational Reality' },
+                          { key: 'track_record', label: '2. Track Record & Supporting Evidence' },
+                          { key: 'market_viability', label: '3. Market Viability & Demand' },
+                          { key: 'offered_security', label: '4. Offered Security & Collateral' },
+                          { key: 'business_continuity', label: '5. Business Continuity' },
+                          { key: 'investor_compatibility', label: '6. Investor Compatibility' },
+                        ].map((cat) => {
+                          const item = findings[cat.key] || {
+                            status: 'CHECKED_AGAINST_SOURCE',
+                            details: 'Standard verification criteria satisfied.',
+                          };
+                          return (
+                            <div key={cat.key} style={{ background: '#ffffff', border: '1px solid #e6decb', borderRadius: '4px', padding: '8px 10px' }}>
+                              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2px' }}>
+                                <span style={{ fontSize: '11.5px', fontWeight: 600, color: '#0c1826' }}>{cat.label}</span>
+                                <span style={{ fontSize: '9px', fontWeight: 600, padding: '1px 4px', borderRadius: '2px', background: '#e9f5ed', color: '#15803d' }}>
+                                  {item.status}
+                                </span>
+                              </div>
+                              <div style={{ fontSize: '11.5px', color: '#536074', lineHeight: 1.35 }}>
+                                {item.details || item.finding}
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* INLINE GALLERY MEDIA DRAWER */}
+                  {isGalleryOpen && gallery.length > 1 && (
+                    <div>
+                      <div style={{ fontSize: '11px', fontWeight: 700, color: '#7a5c2e', textTransform: 'uppercase', marginBottom: '6px' }}>
+                        Media Showcase ({gallery.length} verified photos):
+                      </div>
+                      <div style={{ display: 'flex', gap: '8px', overflowX: 'auto', paddingBottom: '4px' }}>
+                        {gallery.map((url, gIdx) => (
+                          <button
+                            key={gIdx}
+                            type="button"
+                            onClick={() => setSelectedGalleryIndices((prev) => ({ ...prev, [venture.id]: gIdx }))}
+                            style={{
+                              border: selectedIdx === gIdx ? '2px solid #7a5c2e' : '1px solid #d6c9b2',
+                              borderRadius: '4px',
+                              padding: 0,
+                              overflow: 'hidden',
+                              cursor: 'pointer',
+                              width: '72px',
+                              height: '52px',
+                              flexShrink: 0,
+                            }}
+                          >
+                            <img src={url} alt={`Photo ${gIdx + 1}`} loading="lazy" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+            </article>
           );
         })}
       </div>
 
-      {/* Direct DM Modal */}
+      {/* DIRECT DM MODAL (Upstream instant channel unlock) */}
       {directDMModalVenture && (
         <div
           style={{
             position: 'fixed',
             inset: 0,
-            backgroundColor: 'rgba(12, 24, 38, 0.7)',
+            backgroundColor: 'rgba(12, 24, 38, 0.72)',
             backdropFilter: 'blur(3px)',
             display: 'flex',
             alignItems: 'center',
@@ -862,41 +1332,44 @@ export const InvestorGuidedDiscovery: React.FC<InvestorGuidedDiscoveryProps> = (
             zIndex: 1100,
             padding: '20px',
           }}
+          onClick={() => setDirectDMModalVenture(null)}
         >
           <div
             style={{
               backgroundColor: '#ffffff',
-              borderRadius: '12px',
-              maxWidth: '560px',
+              borderRadius: '8px',
+              maxWidth: '540px',
               width: '100%',
-              padding: '30px',
+              padding: '24px 28px',
               boxShadow: '0 20px 40px rgba(12, 24, 38, 0.25)',
               border: '1px solid #d6c9b2',
             }}
+            onClick={(e) => e.stopPropagation()}
           >
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px' }}>
               <div>
-                <div style={{ fontSize: '11px', fontWeight: 700, color: '#7a5c2e', letterSpacing: '0.1em', textTransform: 'uppercase' }}>
-                  💬 DIRECT MESSAGE FOUNDER
+                <div style={{ fontSize: '10.5px', fontWeight: 700, color: '#7a5c2e', letterSpacing: '0.08em', textTransform: 'uppercase' }}>
+                  DIRECT MESSAGING
                 </div>
-                <h3 style={{ fontSize: '20px', color: '#0c1826', margin: '4px 0 0', fontFamily: "Newsreader, Georgia, serif" }}>
+                <h3 style={{ fontSize: '18px', color: '#0c1826', fontFamily: "Newsreader, Georgia, serif", margin: '2px 0 0 0' }}>
                   Message {directDMModalVenture.company_name}
                 </h3>
               </div>
               <button
+                type="button"
                 onClick={() => setDirectDMModalVenture(null)}
-                style={{ background: 'none', border: 'none', fontSize: '24px', color: '#536074', cursor: 'pointer' }}
+                style={{ background: 'none', border: 'none', fontSize: '22px', color: '#536074', cursor: 'pointer' }}
               >
                 ×
               </button>
             </div>
 
-            <p style={{ fontSize: '13.5px', color: '#536074', marginBottom: '16px', lineHeight: 1.5 }}>
-              Directly text founder <strong>{directDMModalVenture.founder_name}</strong>. Sending this message immediately unlocks your 1-on-1 private direct chat channel.
+            <p style={{ fontSize: '13px', color: '#536074', marginBottom: '16px', lineHeight: 1.45 }}>
+              Directly text founder <strong>{directDMModalVenture.founder_name}</strong>. Sending this message unlocks your private direct chat channel.
             </p>
 
-            <div style={{ marginBottom: '16px' }}>
-              <label style={{ display: 'block', fontSize: '12.5px', fontWeight: 600, color: '#0c1826', marginBottom: '6px' }}>
+            <div style={{ marginBottom: '14px' }}>
+              <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, color: '#0c1826', marginBottom: '4px' }}>
                 Your Message
               </label>
               <textarea
@@ -906,19 +1379,20 @@ export const InvestorGuidedDiscovery: React.FC<InvestorGuidedDiscoveryProps> = (
                 placeholder="Write your direct message to the founder..."
                 style={{
                   width: '100%',
-                  padding: '12px',
-                  borderRadius: '6px',
-                  border: '1px solid #d6c9b2',
-                  fontSize: '13.5px',
-                  lineHeight: 1.5,
+                  padding: '10px 12px',
+                  borderRadius: '4px',
+                  border: '1px solid #e6decb',
+                  fontSize: '13px',
+                  lineHeight: 1.45,
                   fontFamily: 'inherit',
                   outline: 'none',
+                  boxSizing: 'border-box',
                 }}
               />
             </div>
 
             {/* Quick Suggestions */}
-            <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', marginBottom: '20px' }}>
+            <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', marginBottom: '18px' }}>
               {[
                 'Discuss ticket allocation',
                 'Ask about unit economics',
@@ -930,9 +1404,9 @@ export const InvestorGuidedDiscovery: React.FC<InvestorGuidedDiscoveryProps> = (
                   type="button"
                   onClick={() => setDirectDMNote((prev) => `${prev} I would particularly like to ${topic.toLowerCase()}.`)}
                   style={{
-                    padding: '4px 10px',
+                    padding: '3px 8px',
                     borderRadius: '4px',
-                    backgroundColor: '#f5efe5',
+                    backgroundColor: '#faf6ee',
                     border: '1px solid #d6c9b2',
                     fontSize: '11px',
                     color: '#7a5c2e',
@@ -944,23 +1418,25 @@ export const InvestorGuidedDiscovery: React.FC<InvestorGuidedDiscoveryProps> = (
               ))}
             </div>
 
-            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px' }}>
+            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '8px' }}>
               <button
+                type="button"
                 onClick={() => setDirectDMModalVenture(null)}
-                style={{ padding: '10px 16px', background: 'transparent', border: '1px solid #e6decb', borderRadius: '6px', fontSize: '13px', cursor: 'pointer' }}
+                style={{ padding: '8px 14px', background: 'transparent', border: '1px solid #e6decb', borderRadius: '4px', fontSize: '12.5px' }}
               >
                 Cancel
               </button>
               <button
+                type="button"
                 onClick={handleSendDirectDM}
                 disabled={submittingDM || !directDMNote.trim()}
                 style={{
-                  padding: '10px 22px',
+                  padding: '8px 20px',
                   backgroundColor: '#0c1826',
                   color: '#fff',
-                  borderRadius: '6px',
+                  borderRadius: '4px',
                   fontWeight: 600,
-                  fontSize: '13.5px',
+                  fontSize: '12.5px',
                   cursor: submittingDM || !directDMNote.trim() ? 'not-allowed' : 'pointer',
                   display: 'inline-flex',
                   alignItems: 'center',

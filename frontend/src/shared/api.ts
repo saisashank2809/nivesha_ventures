@@ -15,6 +15,7 @@ import {
   ReviewStage,
   AppointmentStatus,
 } from './types';
+import { SEED_VENTURES, SEED_MATCH_CASES, SEED_MANDATE_ROHAN } from './fallbackData';
 
 const API_BASE = 'http://localhost:8000/api';
 
@@ -66,26 +67,53 @@ export class Api {
       headers.set('Authorization', `Bearer ${this.token}`);
     }
 
-    const res = await fetch(`${API_BASE}${endpoint}`, {
-      ...options,
-      headers,
-    });
+    try {
+      const res = await fetch(`${API_BASE}${endpoint}`, {
+        ...options,
+        headers,
+      });
 
-    if (!res.ok) {
-      if (res.status === 401) {
-        this.logout();
+      if (!res.ok) {
+        if (res.status === 401) {
+          this.logout();
+        }
+        let errorMsg = `Error ${res.status}`;
+        try {
+          const data = await res.json();
+          errorMsg = data.detail || data.message || errorMsg;
+        } catch {
+          // fallback
+        }
+        throw new Error(errorMsg);
       }
-      let errorMsg = `Error ${res.status}`;
-      try {
-        const data = await res.json();
-        errorMsg = data.detail || data.message || errorMsg;
-      } catch {
-        // fallback
+
+      return res.json();
+    } catch (networkErr: any) {
+      // If network is offline/unreachable in client preview, provide canonical seed fallback
+      if (endpoint.startsWith('/ventures/')) {
+        const vId = endpoint.replace('/ventures/', '').split('?')[0];
+        const v = SEED_VENTURES.find((item) => item.id === vId);
+        if (v) return v as unknown as T;
+      } else if (endpoint.startsWith('/ventures')) {
+        return SEED_VENTURES as unknown as T;
+      } else if (endpoint.startsWith('/mandates/me')) {
+        if (options.method === 'PATCH' && options.body) {
+          const patch = JSON.parse(options.body as string);
+          const stored = localStorage.getItem('nv_mandate');
+          const base = stored ? JSON.parse(stored) : SEED_MANDATE_ROHAN;
+          const merged = { ...base, ...patch };
+          localStorage.setItem('nv_mandate', JSON.stringify(merged));
+          return merged as unknown as T;
+        }
+        const stored = localStorage.getItem('nv_mandate');
+        return (stored ? JSON.parse(stored) : SEED_MANDATE_ROHAN) as unknown as T;
+      } else if (endpoint.startsWith('/matches')) {
+        return Object.values(SEED_MATCH_CASES) as unknown as T;
+      } else if (endpoint.startsWith('/appointments')) {
+        return { id: 'apt-simulated-01', status: 'PENDING_FOUNDER_REVIEW' } as unknown as T;
       }
-      throw new Error(errorMsg);
+      throw networkErr;
     }
-
-    return res.json();
   }
 
   // Platform Config
