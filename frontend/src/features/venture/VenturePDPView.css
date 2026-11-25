@@ -1,0 +1,416 @@
+/* ==========================================================================
+   VENTURE PDP (PRODUCT / DEAL DETAIL PAGE) STYLES
+   ========================================================================== */
+
+.nv-pdp-page {
+  background-color: #fcfbf9;
+  min-height: 100vh;
+  padding-bottom: 80px;
+}
+
+.nv-pdp-top-bar {
+  background-color: #ffffff;
+  border-bottom: 1px solid #ede5d8;
+  position: sticky;
+  top: 56px;
+  z-index: 40;
+  box-shadow: 0 1px 3px rgba(12, 24, 38, 0.03);
+}
+
+.nv-pdp-top-bar-inner {
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: 12px 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.nv-pdp-back-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: none;
+  border: 1px solid #d6c9b2;
+  border-radius: 4px;
+  padding: 6px 14px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #0c1826;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.nv-pdp-back-btn:hover {
+  background-color: #faf6ee;
+  border-color: #7a5c2e;
+}
+
+.nv-pdp-action-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #ffffff;
+  border: 1px solid #d6c9b2;
+  border-radius: 4px;
+  padding: 6px 12px;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: #475569;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.nv-pdp-action-btn:hover {
+  background-color: #f8fafc;
+  color: #0c1826;
+  border-color: #94a3b8;
+}
+
+/* Hero Section */
+.nv-pdp-hero {
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: 28px 24px 20px 24px;
+}
+
+.nv-pdp-badge-strip {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+}
+
+.nv-pdp-sector-badge {
+  font-size: 11px;
+  font-weight: 700;
+  color: #7a5c2e;
+  background-color: #faf6ee;
+  border: 1px solid #d6c9b2;
+  padding: 2px 8px;
+  border-radius: 3px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.nv-pdp-verified-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
+  font-weight: 600;
+  color: #15803d;
+  background-color: #edf5ee;
+  border: 1px solid #b8deb9;
+  padding: 2px 8px;
+  border-radius: 3px;
+}
+
+.nv-pdp-title {
+  font-family: 'Newsreader', Georgia, serif;
+  font-size: 34px;
+  font-weight: 600;
+  color: #0c1826;
+  margin: 0 0 10px 0;
+  line-height: 1.2;
+}
+
+.nv-pdp-tagline {
+  font-size: 16px;
+  color: #4c5262;
+  line-height: 1.5;
+  margin: 0 0 16px 0;
+  max-width: 900px;
+}
+
+.nv-pdp-meta-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+  font-size: 13px;
+  color: #685d4d;
+  padding-top: 12px;
+  border-top: 1px solid #ede5d8;
+}
+
+/* Gallery Showcase */
+.nv-pdp-gallery-container {
+  max-width: 1240px;
+  margin: 0 auto 28px auto;
+  padding: 0 24px;
+}
+
+.nv-pdp-gallery-main {
+  position: relative;
+  width: 100%;
+  height: 420px;
+  border-radius: 8px;
+  overflow: hidden;
+  background-color: #0c1826;
+  border: 1px solid #dcd4c3;
+  box-shadow: 0 4px 16px rgba(12, 24, 38, 0.06);
+}
+
+.nv-pdp-gallery-main img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.nv-pdp-gallery-overlay {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 16px 20px;
+  background: linear-gradient(180deg, rgba(12, 24, 38, 0) 0%, rgba(12, 24, 38, 0.75) 100%);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: #ffffff;
+}
+
+.nv-pdp-thumbnail-strip {
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
+  overflow-x: auto;
+  padding-bottom: 6px;
+}
+
+.nv-pdp-thumb-btn {
+  width: 80px;
+  height: 56px;
+  border-radius: 4px;
+  overflow: hidden;
+  border: 2px solid transparent;
+  padding: 0;
+  background: none;
+  cursor: pointer;
+  flex-shrink: 0;
+  opacity: 0.7;
+  transition: all 0.15s ease;
+}
+
+.nv-pdp-thumb-btn.active {
+  border-color: #7a5c2e;
+  opacity: 1;
+  box-shadow: 0 0 0 1px #7a5c2e;
+}
+
+.nv-pdp-thumb-btn:hover {
+  opacity: 1;
+}
+
+.nv-pdp-thumb-btn img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Two Column Layout */
+.nv-pdp-layout {
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: 0 24px;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 32px;
+}
+
+@media (min-width: 992px) {
+  .nv-pdp-layout {
+    grid-template-columns: 1fr 360px;
+  }
+}
+
+/* Content Navigation Tabs */
+.nv-pdp-nav-tabs {
+  display: flex;
+  gap: 4px;
+  border-bottom: 2px solid #ede5d8;
+  margin-bottom: 24px;
+  overflow-x: auto;
+  padding-bottom: 0;
+}
+
+.nv-pdp-tab-btn {
+  background: none;
+  border: none;
+  border-bottom: 3px solid transparent;
+  padding: 12px 16px;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: #64748b;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.15s ease;
+  margin-bottom: -2px;
+}
+
+.nv-pdp-tab-btn:hover {
+  color: #0c1826;
+}
+
+.nv-pdp-tab-btn.active {
+  color: #7a5c2e;
+  border-bottom-color: #7a5c2e;
+}
+
+/* Dossier Section Cards */
+.nv-pdp-section-card {
+  background-color: #ffffff;
+  border: 1px solid #ede5d8;
+  border-radius: 6px;
+  padding: 20px 22px;
+  margin-bottom: 16px;
+  box-shadow: 0 1px 4px rgba(12, 24, 38, 0.02);
+}
+
+.nv-pdp-section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.nv-pdp-section-number {
+  font-family: monospace;
+  font-size: 11px;
+  font-weight: 700;
+  color: #7a5c2e;
+  text-transform: uppercase;
+}
+
+.nv-pdp-section-source {
+  font-size: 9.5px;
+  font-weight: 600;
+  background-color: #faf6ee;
+  border: 1px solid #d6c9b2;
+  color: #7a5c2e;
+  padding: 1px 6px;
+  border-radius: 3px;
+  letter-spacing: 0.03em;
+}
+
+.nv-pdp-section-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: #0c1826;
+  margin: 0 0 8px 0;
+}
+
+.nv-pdp-section-content {
+  font-size: 14px;
+  color: #334155;
+  line-height: 1.6;
+  margin: 0;
+}
+
+/* Sidebar Deal Cockpit */
+.nv-pdp-sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.nv-pdp-cockpit-card {
+  background-color: #ffffff;
+  border: 1px solid #dcd4c3;
+  border-radius: 8px;
+  padding: 22px;
+  box-shadow: 0 4px 16px rgba(12, 24, 38, 0.05);
+  position: sticky;
+  top: 130px;
+}
+
+.nv-pdp-cockpit-vital-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  padding: 10px 0;
+  border-bottom: 1px solid #f2ede4;
+}
+
+.nv-pdp-cockpit-vital-row:last-child {
+  border-bottom: none;
+}
+
+.nv-pdp-vital-label {
+  font-size: 12px;
+  color: #64748b;
+  font-weight: 500;
+}
+
+.nv-pdp-vital-val {
+  font-size: 15px;
+  font-weight: 700;
+  color: #0c1826;
+}
+
+.nv-pdp-primary-btn {
+  width: 100%;
+  padding: 11px 16px;
+  background-color: #0c1826;
+  color: #ffffff;
+  border: none;
+  border-radius: 4px;
+  font-size: 13.5px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  box-shadow: 0 2px 6px rgba(12, 24, 38, 0.16);
+  transition: all 0.15s ease;
+}
+
+.nv-pdp-primary-btn:hover {
+  background-color: #172a42;
+  box-shadow: 0 4px 10px rgba(12, 24, 38, 0.22);
+}
+
+.nv-pdp-secondary-btn {
+  width: 100%;
+  padding: 10px 16px;
+  background-color: #fffdf9;
+  color: #0c1826;
+  border: 1px solid #d6c9b2;
+  border-radius: 4px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  transition: all 0.15s ease;
+}
+
+.nv-pdp-secondary-btn:hover {
+  background-color: #faf6ee;
+  border-color: #7a5c2e;
+}
+
+/* Print Styles */
+@media print {
+  .nv-pdp-top-bar,
+  .nv-pdp-sidebar,
+  .nv-pdp-nav-tabs,
+  .nv-navbar,
+  button {
+    display: none !important;
+  }
+  .nv-pdp-layout {
+    grid-template-columns: 1fr !important;
+  }
+  .nv-pdp-page {
+    background: #ffffff !important;
+  }
+}

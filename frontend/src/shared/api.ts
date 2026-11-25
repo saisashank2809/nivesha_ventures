@@ -16,6 +16,7 @@ import {
   AppointmentStatus,
 } from './types';
 import { SEED_VENTURES, SEED_MATCH_CASES, SEED_MANDATE_ROHAN } from './fallbackData';
+import { DEMO_ACCOUNTS } from './demoAccounts';
 
 const API_BASE = 'http://localhost:8000/api';
 
@@ -90,6 +91,36 @@ export class Api {
       return res.json();
     } catch (networkErr: any) {
       // If network is offline/unreachable in client preview, provide canonical seed fallback
+      if (endpoint === '/auth/login' || endpoint.startsWith('/auth/login')) {
+        const body = options.body ? JSON.parse(options.body as string) : {};
+        const email = body.email || '';
+        const demo = DEMO_ACCOUNTS.find((d) => d.email.toLowerCase() === email.toLowerCase()) || DEMO_ACCOUNTS[0];
+        const fallbackUser: User = {
+          id: demo.role === 'INVESTOR' ? 'usr-investor-01' : 'usr-founder-01',
+          email: demo.email,
+          full_name: demo.name,
+          role: demo.role,
+          firm_or_company: demo.firm,
+          created_at: new Date().toISOString(),
+        };
+        const token = 'simulated-token-for-' + demo.email;
+        this.setToken(token);
+        this.setCurrentUser(fallbackUser);
+        return { access_token: token, user: fallbackUser } as unknown as T;
+      }
+      if (endpoint.startsWith('/auth/me')) {
+        const u = this.getCurrentUser();
+        if (u) return u as unknown as T;
+        const defaultUser: User = {
+          id: 'usr-investor-01',
+          email: 'investor@peakindia.vc',
+          full_name: 'Rohan Varma',
+          role: 'INVESTOR',
+          firm_or_company: 'Varma Capital Partners',
+          created_at: new Date().toISOString(),
+        };
+        return defaultUser as unknown as T;
+      }
       if (endpoint.startsWith('/ventures/')) {
         const vId = endpoint.replace('/ventures/', '').split('?')[0];
         const v = SEED_VENTURES.find((item) => item.id === vId);
