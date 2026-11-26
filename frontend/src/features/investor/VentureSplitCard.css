@@ -157,3 +157,160 @@
     gap: 10px !important;
   }
 }
+
+/* ==========================================================================
+   FEATURED FILM VENTURE CARD (Editorial Spotlight in Discovery)
+   ========================================================================== */
+
+.nv-film-spotlight-wrap {
+  margin-bottom: 26px;
+}
+
+.nv-film-featured-card {
+  background-color: #fffdf9;
+  border: 1px solid #cdbca0;
+  border-top: 3px solid #6d2832;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 8px 24px rgba(12, 24, 38, 0.07);
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.nv-film-featured-card:hover {
+  box-shadow: 0 12px 30px rgba(12, 24, 38, 0.11);
+}
+
+.nv-film-featured-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+}
+
+@media (min-width: 900px) {
+  .nv-film-featured-grid {
+    grid-template-columns: 1.05fr 0.95fr;
+  }
+}
+
+.nv-film-photo-col {
+  position: relative;
+  min-height: 310px;
+  background-color: #0c1826;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+}
+
+.nv-film-photo-col img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.nv-film-photo-scrim {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    180deg,
+    rgba(12, 24, 38, 0.18) 0%,
+    rgba(12, 24, 38, 0.35) 55%,
+    rgba(12, 24, 38, 0.88) 100%
+  );
+  z-index: 1;
+}
+
+.nv-film-photo-top {
+  position: absolute;
+  top: 14px;
+  left: 14px;
+  right: 14px;
+  z-index: 2;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.nv-film-photo-caption {
+  position: relative;
+  z-index: 2;
+  margin: 14px;
+  padding: 8px 12px;
+  border-radius: 5px;
+  background: rgba(12, 24, 38, 0.84);
+  backdrop-filter: blur(6px);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  color: #f5efe5;
+  font-size: 11.5px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.nv-film-editorial-col {
+  padding: 22px 26px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 14px;
+  background-color: #fffdf9;
+}
+
+.nv-film-metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1px;
+  background-color: #e6decb;
+  border: 1px solid #d6c9b2;
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.nv-film-metric-cell {
+  background-color: #faf6ee;
+  padding: 10px 12px;
+}
+
+.nv-film-metric-lbl {
+  font-size: 10px;
+  font-weight: 700;
+  color: #7a5c2e;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  display: block;
+  margin-bottom: 2px;
+}
+
+.nv-film-metric-val {
+  font-family: 'Newsreader', Georgia, serif;
+  font-size: 18px;
+  font-weight: 600;
+  color: #0c1826;
+  line-height: 1.15;
+  display: block;
+}
+
+.nv-film-metric-sub {
+  font-size: 10.5px;
+  color: #685d4d;
+  display: block;
+  margin-top: 2px;
+}
+
+@media (max-width: 640px) {
+  .nv-film-photo-col {
+    min-height: 210px;
+  }
+  .nv-film-editorial-col {
+    padding: 16px;
+  }
+  .nv-film-metrics-grid {
+    grid-template-columns: 1fr;
+  }
+}

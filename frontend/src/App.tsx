@@ -15,6 +15,7 @@ import { FounderGuidedJourney } from './features/founder/FounderGuidedJourney';
 import { FounderOnboarding, OnboardingCompletionPayload } from './features/founder/FounderOnboarding';
 import { FounderDashboard } from './features/founder/FounderDashboard';
 import { PlatformReviewView } from './features/platform/PlatformReviewView';
+import { VenturePDPView } from './features/venture/VenturePDPView';
 
 export function App() {
   const [currentUser, setCurrentUser] = useState<User | null>(Api.getCurrentUser());
@@ -29,6 +30,8 @@ export function App() {
 
   const [ventures, setVentures] = useState<IVentureCard[]>([]);
   const [selectedVentureDetail, setSelectedVentureDetail] = useState<VentureDetail | null>(null);
+  const [selectedVentureId, setSelectedVentureId] = useState<string | null>(null);
+  const [previousTab, setPreviousTab] = useState<string>('INVESTOR_DISCOVERY');
   const [detailModalOpen, setDetailModalOpen] = useState(false);
   const [activeChatConnectionId, setActiveChatConnectionId] = useState<string | null>(null);
   const [unreadCount, setUnreadCount] = useState<number>(0);
@@ -126,13 +129,16 @@ export function App() {
     return () => clearInterval(interval);
   }, [currentUser]);
 
-  // Open full detail modal
+  // Open full venture PDP page
   const handleSelectVenture = async (venture: IVentureCard | string) => {
     const id = typeof venture === 'string' ? venture : venture.id;
     try {
+      setSelectedVentureId(id);
+      setPreviousTab(activeTab);
       const detail = await Api.getVentureDetail(id);
       setSelectedVentureDetail(detail);
-      setDetailModalOpen(true);
+      setActiveTab('VENTURE_PDP');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     } catch (err: any) {
       showToast(`Error opening venture detail: ${err.message}`);
     }
@@ -319,6 +325,21 @@ export function App() {
             }}
             onCancel={() => setActiveTab('FOUNDER_DASHBOARD')}
             onOpenLogin={() => handleOpenLogin('FOUNDER', false)}
+          />
+        )}
+
+        {activeTab === 'VENTURE_PDP' && (
+          <VenturePDPView
+            venture={selectedVentureDetail}
+            ventureId={selectedVentureId}
+            currentUser={currentUser}
+            onBack={() => {
+              setActiveTab(previousTab || (currentUser?.role === 'INVESTOR' ? 'INVESTOR_DISCOVERY' : 'LANDING'));
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+            }}
+            onRequestConnection={handleRequestConnection}
+            onOpenChat={handleOpenChat}
+            onOpenLogin={handleOpenLogin}
           />
         )}
 
