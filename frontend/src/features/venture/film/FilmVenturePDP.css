@@ -1,0 +1,1165 @@
+/* ==========================================================================
+   FILM VENTURE STORYTELLING PDP
+   Modular Knowledge-Driven Layout · Persistent 5-Chapter Navigation
+   ========================================================================== */
+
+.nv-film-story-page {
+  background-color: var(--bg-primary, #f5f5f7);
+  min-height: 100vh;
+  padding-bottom: 104px;
+  color: var(--text-main, #0f172a);
+  font-family: var(--font-sans);
+  font-variant-numeric: tabular-nums;
+}
+
+.nv-film-wrap {
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+/* Sticky 5-Chapter Navigation */
+.nv-film-chapters {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.nv-film-chapters::-webkit-scrollbar { display: none; }
+
+.nv-chap-pill {
+  padding: 5px 12px;
+  border-radius: 980px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-muted, #475569);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background-color 180ms ease, color 180ms ease;
+}
+
+.nv-chap-pill:hover {
+  background: rgba(15, 23, 42, 0.05);
+  color: var(--text-main, #0f172a);
+}
+
+.nv-chap-pill.active {
+  background: var(--bg-dark, #0f172a);
+  color: #ffffff;
+}
+
+.nv-topbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.nv-synced-ticket-pill {
+  padding: 5px 11px;
+  border-radius: 980px;
+  font-size: 11.5px;
+  font-weight: 700;
+  color: var(--accent-blue, #0066cc);
+  background: rgba(0, 102, 204, 0.1);
+  border: 1px solid rgba(0, 102, 204, 0.22);
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.nv-wt-toggle.active {
+  background: var(--bg-dark, #0f172a);
+  color: #ffffff;
+  border-color: var(--bg-dark, #0f172a);
+}
+
+/* Optional 30-Second Walkthrough Drawer */
+.nv-wt-drawer {
+  background: #0b1220;
+  color: #ffffff;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+  padding: 20px 0 24px;
+}
+
+.nv-wt-bar {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 6px;
+  margin-bottom: 16px;
+}
+
+.nv-wt-seg {
+  height: 5px;
+  background: rgba(255, 255, 255, 0.18);
+  border-radius: 999px;
+  border: none;
+  padding: 0;
+  overflow: hidden;
+  cursor: pointer;
+}
+
+.nv-wt-seg-fill {
+  display: block;
+  height: 100%;
+  background: #38bdf8;
+}
+
+.nv-wt-stage {
+  display: grid;
+  grid-template-columns: 1.35fr 1fr;
+  gap: 20px;
+  align-items: center;
+}
+
+.nv-wt-kicker {
+  display: block;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: #7dd3fc;
+  margin-bottom: 5px;
+}
+
+.nv-wt-title {
+  font-size: 21px;
+  font-weight: 700;
+  color: #ffffff;
+  margin: 0 0 6px 0;
+}
+
+.nv-wt-copy {
+  font-size: 13.5px;
+  color: #cbd5e1;
+  line-height: 1.5;
+  margin: 0 0 12px 0;
+}
+
+.nv-wt-metrics {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.nv-wt-metric-pill {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 10px;
+  padding: 8px 12px;
+}
+
+.nv-wt-metric-pill strong {
+  display: block;
+  font-size: 13.5px;
+  color: #ffffff;
+}
+
+.nv-wt-metric-pill span {
+  font-size: 11px;
+  color: #cbd5e1;
+}
+
+.nv-wt-controls {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 10px;
+}
+
+.nv-wt-timer {
+  font-size: 12px;
+  font-weight: 600;
+  color: #94a3b8;
+}
+
+.nv-wt-btn {
+  padding: 6px 13px;
+  border-radius: 980px;
+  font-size: 12px;
+  font-weight: 600;
+  background: rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  cursor: pointer;
+}
+
+.nv-wt-btn.primary {
+  background: var(--accent-blue, #0066cc);
+  border-color: var(--accent-blue, #0066cc);
+}
+
+.nv-wt-static-grid {
+  margin-top: 16px;
+  padding-top: 14px;
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  gap: 10px;
+}
+
+.nv-wt-static-cell {
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: 10px;
+  padding: 10px 12px;
+  font-size: 12px;
+}
+
+.nv-wt-static-cell strong {
+  display: block;
+  color: #7dd3fc;
+  margin-bottom: 3px;
+}
+
+.nv-wt-static-cell span {
+  color: #cbd5e1;
+}
+
+/* Shared Storytelling Typography & Alternating Bands */
+.nv-story-band {
+  padding: 40px 0;
+}
+
+.nv-story-h2 {
+  font-size: clamp(21px, 2.6vw, 27px);
+  font-weight: 700;
+  letter-spacing: -0.025em;
+  line-height: 1.15;
+  margin: 0;
+  color: var(--text-main, #0f172a);
+}
+
+.nv-story-sub {
+  font-size: 14px;
+  color: var(--text-muted, #475569);
+  margin: 6px 0 0 0;
+  max-width: 660px;
+  line-height: 1.5;
+}
+
+.nv-band-mist {
+  background: var(--bg-primary, #f5f5f7);
+}
+
+.nv-band-white {
+  background: #ffffff;
+  border-top: 1px solid var(--border-light, rgba(15, 23, 42, 0.07));
+  border-bottom: 1px solid var(--border-light, rgba(15, 23, 42, 0.07));
+}
+
+.nv-dark-kicker {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #e2b866;
+  margin-bottom: 5px;
+}
+
+/* 1. Full-Bleed Cinematic Film Opportunity Hero */
+.nv-cine-hero {
+  position: relative;
+  overflow: hidden;
+  background-color: #0b1220;
+  color: #ffffff;
+  min-height: 500px;
+  padding: 44px 0 38px;
+  display: flex;
+  align-items: stretch;
+}
+
+.nv-cine-bg-stack {
+  position: absolute;
+  inset: -18px 0 -18px 0;
+  z-index: 0;
+  will-change: transform;
+}
+
+.nv-cine-bg-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 35%;
+  opacity: 0;
+  transform: scale(1);
+  transition: opacity 900ms ease;
+}
+
+.nv-cine-bg-img.active {
+  opacity: 0.92;
+}
+
+.nv-cine-bg-img.zooming {
+  animation: nvKenBurns 14s ease-out forwards;
+}
+
+@keyframes nvKenBurns {
+  from { transform: scale(1); }
+  to { transform: scale(1.06); }
+}
+
+.nv-cine-bg-fallback {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 75% 30%, #1e3a5f 0%, #0b1220 72%);
+  z-index: 0;
+}
+
+.nv-cine-scrim {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: linear-gradient(
+    95deg,
+    rgba(9, 15, 28, 0.96) 0%,
+    rgba(11, 18, 32, 0.88) 46%,
+    rgba(15, 23, 42, 0.62) 76%,
+    rgba(15, 23, 42, 0.38) 100%
+  );
+}
+
+.nv-cine-bottom-blend {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 92px;
+  z-index: 1;
+  background: linear-gradient(
+    to bottom,
+    rgba(11, 18, 32, 0) 0%,
+    rgba(11, 18, 32, 0.68) 65%,
+    #0b1220 100%
+  );
+  pointer-events: none;
+}
+
+.nv-cine-inner {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 24px;
+}
+
+.nv-cine-content {
+  max-width: 620px;
+}
+
+.nv-hero-badges {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: #cbd5e1;
+  margin-bottom: 16px;
+}
+
+.nv-dark-chip {
+  padding: 3px 10px;
+  border-radius: 980px;
+  background: rgba(255, 255, 255, 0.14);
+  color: #ffffff;
+  font-weight: 600;
+  font-size: 11.5px;
+}
+
+.nv-cine-studio-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 6px;
+}
+
+.nv-cine-accent-rule {
+  width: 28px;
+  height: 2px;
+  border-radius: 2px;
+  background: linear-gradient(90deg, #e2b866, rgba(226, 184, 102, 0.35));
+  flex-shrink: 0;
+}
+
+.nv-cine-studio {
+  font-size: 12.5px;
+  font-weight: 700;
+  letter-spacing: 0.11em;
+  text-transform: uppercase;
+  color: #e2b866;
+}
+
+.nv-cine-title {
+  font-size: clamp(38px, 5.2vw, 58px);
+  font-weight: 800;
+  letter-spacing: -0.036em;
+  line-height: 1.02;
+  color: #ffffff;
+  margin: 0;
+  text-shadow: 0 2px 24px rgba(0, 0, 0, 0.45);
+}
+
+.nv-cine-desc {
+  margin: 13px 0 8px 0;
+  font-size: 15.5px;
+  line-height: 1.52;
+  color: #e2e8f0;
+  max-width: 560px;
+}
+
+.nv-cine-promoter {
+  font-size: 13px;
+  color: #cbd5e1;
+}
+.nv-cine-promoter strong { color: #ffffff; }
+
+.nv-cine-figures {
+  margin-top: 22px;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  background: linear-gradient(135deg, rgba(15, 23, 42, 0.64), rgba(30, 41, 59, 0.48));
+  backdrop-filter: saturate(160%) blur(14px);
+  -webkit-backdrop-filter: saturate(160%) blur(14px);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.09);
+  border-radius: 15px;
+  padding: 14px 18px;
+  gap: 14px;
+}
+
+.nv-hero-fig + .nv-hero-fig {
+  border-left: 1px solid rgba(255, 255, 255, 0.12);
+  padding-left: 14px;
+}
+
+.nv-hero-fig-lbl {
+  display: block;
+  font-size: 10.5px;
+  color: #cbd5e1;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.nv-hero-fig-val {
+  display: block;
+  font-size: clamp(18px, 2vw, 23px);
+  font-weight: 700;
+  color: #ffffff;
+  margin-top: 2px;
+}
+
+.nv-hero-fig-sub {
+  display: block;
+  font-size: 11px;
+  color: #7dd3fc;
+}
+
+.nv-hero-cta-row {
+  margin-top: 18px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+}
+
+.nv-ghost-dark-btn {
+  padding: 10px 16px;
+  border-radius: 980px;
+  background: rgba(255, 255, 255, 0.12);
+  color: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.24);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.nv-ghost-dark-btn:hover { background: rgba(255, 255, 255, 0.18); }
+
+/* Bottom-Right Compact Gallery Controls & Disclosure */
+.nv-cine-media-dock {
+  align-self: flex-end;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+  background: rgba(11, 18, 32, 0.72);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 980px;
+  padding: 6px 10px 6px 14px;
+}
+
+.nv-cine-disclosure {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 11.5px;
+  color: #e2e8f0;
+}
+
+.nv-cine-count {
+  font-weight: 700;
+  color: #7dd3fc;
+}
+
+.nv-cine-controls {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.nv-cine-ctrl-btn {
+  width: 26px;
+  height: 22px;
+  border-radius: 980px;
+  border: 1px solid rgba(255, 255, 255, 0.24);
+  background: rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+  font-size: 10.5px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+.nv-cine-ctrl-btn:disabled { opacity: 0.45; cursor: default; }
+
+.nv-cine-pip {
+  width: 28px;
+  height: 20px;
+  border-radius: 5px;
+  padding: 0;
+  overflow: hidden;
+  border: 1.5px solid rgba(255, 255, 255, 0.25);
+  background: #0f172a;
+  opacity: 0.65;
+  cursor: pointer;
+  transition: opacity 160ms ease, border-color 160ms ease, transform 160ms ease;
+}
+
+.nv-cine-pip.active {
+  opacity: 1;
+  border-color: #38bdf8;
+  transform: scale(1.06);
+}
+
+.nv-cine-pip img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* Short Staggered Entrance Animation on First Paint */
+@keyframes nvHeroEnter {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.nv-cine-hero:not(.reduced-motion) .nv-stagger-1 { animation: nvHeroEnter 360ms ease both; }
+.nv-cine-hero:not(.reduced-motion) .nv-stagger-2 { animation: nvHeroEnter 360ms ease 60ms both; }
+.nv-cine-hero:not(.reduced-motion) .nv-stagger-3 { animation: nvHeroEnter 360ms ease 120ms both; }
+.nv-cine-hero:not(.reduced-motion) .nv-stagger-4 { animation: nvHeroEnter 360ms ease 180ms both; }
+
+/* 2. Mandate Compatibility Split Strip — Elevated transition from Dark Hero */
+.nv-band-fit {
+  position: relative;
+  z-index: 3;
+  background: linear-gradient(180deg, #ffffff 0%, #fbfbfd 100%);
+  border-top: 1px solid rgba(255, 255, 255, 0.65);
+  border-bottom: 1px solid var(--border-light, rgba(15, 23, 42, 0.08));
+  box-shadow: 0 -18px 40px rgba(9, 15, 28, 0.16);
+  padding: 30px 0;
+}
+
+.nv-fit-split {
+  display: grid;
+  grid-template-columns: 1fr 1.35fr;
+  gap: 28px;
+  align-items: center;
+}
+
+.nv-fit-checklist {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px 18px;
+}
+
+.nv-fit-row {
+  padding: 9px 0;
+  border-bottom: 1px solid rgba(15, 23, 42, 0.07);
+  font-size: 12.5px;
+}
+
+.nv-fit-row strong { display: block; color: var(--text-main, #0f172a); margin-bottom: 2px; }
+.nv-fit-row span { color: var(--text-muted, #475569); font-size: 12px; }
+.nv-fit-row.warn strong { color: #b45309; }
+.nv-fit-row.danger strong { color: #dc2626; }
+
+/* 3. Funding Composition Split Bar */
+.nv-funding-split {
+  display: grid;
+  grid-template-columns: 1fr 1.25fr;
+  gap: 28px;
+  align-items: center;
+}
+
+.nv-funding-bar-track {
+  height: 44px;
+  border-radius: 12px;
+  overflow: hidden;
+  display: flex;
+  background: #e2e8f0;
+  border: 1px solid rgba(15, 23, 42, 0.1);
+  margin-bottom: 10px;
+}
+
+.nv-fb-seg {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 700;
+  color: #ffffff;
+  transition: width 750ms cubic-bezier(0.22, 1, 0.36, 1);
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.nv-fb-seg.promoter {
+  background: repeating-linear-gradient(45deg, #475569, #475569 8px, #334155 8px, #334155 16px);
+}
+.nv-fb-seg.external { background: var(--accent-blue, #0066cc); }
+
+.nv-funding-notes {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  font-size: 12.5px;
+  color: var(--text-muted, #475569);
+}
+
+/* 4. Interactive Capital Expenditure */
+.nv-spend-split {
+  display: grid;
+  grid-template-columns: 1.15fr 1fr;
+  gap: 28px;
+  align-items: center;
+}
+
+.nv-spend-bars {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.nv-spend-row {
+  text-align: left;
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid rgba(15, 23, 42, 0.08);
+  padding: 9px 10px;
+  cursor: pointer;
+  border-radius: 10px;
+  width: 100%;
+  transition: background-color 180ms ease;
+}
+
+.nv-spend-row:hover,
+.nv-spend-row.active { background: #f8fafc; }
+
+.nv-spend-top {
+  display: flex;
+  justify-content: space-between;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--text-main, #0f172a);
+  margin-bottom: 5px;
+}
+
+.nv-spend-track {
+  height: 9px;
+  border-radius: 999px;
+  background: #e2e8f0;
+  overflow: hidden;
+}
+
+.nv-spend-fill {
+  height: 100%;
+  border-radius: 999px;
+  transition: width 700ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.nv-spend-spotlight {
+  border-radius: 16px;
+  overflow: hidden;
+  background: var(--bg-dark, #0f172a);
+  color: #ffffff;
+}
+
+.nv-spend-spotlight img {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+  display: block;
+  opacity: 0.78;
+}
+
+.nv-spend-img-fallback {
+  height: 140px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #94a3b8;
+  font-size: 13px;
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.nv-spend-spotlight-body {
+  padding: 14px 16px;
+}
+.nv-spend-spotlight-body strong { font-size: 14.5px; display: block; margin-bottom: 4px; }
+.nv-spend-spotlight-body p { font-size: 12.5px; color: #cbd5e1; margin: 0; line-height: 1.45; }
+
+/* 5. Dark Ticket Selector */
+.nv-band-dark-ticket {
+  background: var(--bg-dark, #0f172a);
+  color: #ffffff;
+}
+
+.nv-ticket-pills {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+  margin: 18px 0 22px;
+}
+
+.nv-tk-btn {
+  padding: 12px 14px;
+  border-radius: 12px;
+  border: 1.5px solid rgba(255, 255, 255, 0.16);
+  background: rgba(255, 255, 255, 0.06);
+  color: #f8fafc;
+  text-align: left;
+  cursor: pointer;
+}
+.nv-tk-btn:hover { background: rgba(255, 255, 255, 0.11); }
+.nv-tk-btn.active { background: var(--accent-blue, #0066cc); border-color: #7dd3fc; }
+.nv-tk-btn strong { display: block; font-size: 17px; }
+.nv-tk-btn span { font-size: 11.5px; color: #cbd5e1; }
+
+.nv-tk-outputs {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 16px;
+  padding-top: 16px;
+  border-top: 1px solid rgba(255, 255, 255, 0.14);
+}
+.nv-tk-out-lbl { font-size: 11px; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.05em; display: block; }
+.nv-tk-out-val { font-size: 16px; font-weight: 700; color: #ffffff; display: block; margin-top: 2px; }
+.nv-tk-out-sub { font-size: 12px; color: #cbd5e1; display: block; margin-top: 2px; }
+
+/* 6. Continuous Conduit Journey */
+.nv-band-conduit {
+  background: var(--bg-subtle, #fbfbfd);
+  border-bottom: 1px solid rgba(15, 23, 42, 0.07);
+}
+
+.nv-conduit-shell {
+  margin-top: 18px;
+  background: #ffffff;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  border-radius: 18px;
+  padding: 16px 14px;
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.04);
+}
+
+.nv-conduit-desktop { width: 100%; height: auto; display: block; }
+.nv-pipe-base { fill: none; stroke: #e2e8f0; stroke-width: 11; stroke-linecap: round; }
+.nv-pipe-flow { fill: none; stroke: var(--accent-blue, #0066cc); stroke-width: 4; stroke-dasharray: 10 12; animation: nvStoryDash 1.4s linear infinite; }
+.nv-pipe-green { fill: none; stroke: #16a34a; stroke-width: 4; stroke-dasharray: 8 10; animation: nvStoryDash 1.6s linear infinite; }
+.nv-pipe-red { fill: none; stroke: #dc2626; stroke-width: 4; stroke-dasharray: 6 9; animation: nvStoryDash 1.6s linear infinite; }
+
+@keyframes nvStoryDash { to { stroke-dashoffset: -44; } }
+
+.nv-conduit-mobile { display: none; flex-direction: column; gap: 0; }
+.nv-cm-step { display: flex; gap: 12px; align-items: flex-start; }
+.nv-cm-rail { width: 24px; display: flex; flex-direction: column; align-items: center; flex-shrink: 0; }
+.nv-cm-dot {
+  width: 22px; height: 22px; border-radius: 50%; background: var(--accent-blue, #0066cc); color: #ffffff;
+  font-size: 11px; font-weight: 700; display: flex; align-items: center; justify-content: center;
+}
+.nv-cm-dot.warn { background: #b45309; }
+.nv-cm-dot.ok { background: #16a34a; }
+.nv-cm-line { width: 2px; height: 22px; background: #cbd5e1; }
+.nv-cm-body { padding-bottom: 10px; font-size: 13px; }
+.nv-cm-body strong { display: block; color: var(--text-main, #0f172a); }
+.nv-cm-body span { font-size: 12px; color: var(--text-muted, #475569); }
+
+/* 7. Dark Revenue Constellation */
+.nv-band-dark-constellation {
+  background: radial-gradient(circle at 50% 50%, #1e293b 0%, #0f172a 75%);
+  color: #ffffff;
+}
+
+.nv-rev-stage {
+  margin-top: 20px;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  gap: 20px;
+  align-items: center;
+}
+
+.nv-rev-col { display: flex; flex-direction: column; gap: 12px; }
+
+.nv-rev-stream {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 14px;
+  padding: 12px 15px;
+  opacity: 1;
+  transform: translateY(0);
+  transition: transform 420ms ease, border-color 220ms ease;
+}
+
+.nv-band-dark-constellation.in-view .nv-rev-stream {
+  border-color: rgba(255, 255, 255, 0.22);
+}
+
+.nv-rev-stream-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+
+.nv-rev-stream p {
+  margin: 0;
+  font-size: 12px;
+  color: #cbd5e1;
+  line-height: 1.42;
+}
+
+.nv-rev-hub-center { text-align: center; }
+
+.nv-rev-aperture {
+  width: 144px;
+  height: 144px;
+  border-radius: 50%;
+  padding: 5px;
+  background: linear-gradient(135deg, rgba(180, 138, 62, 0.75), rgba(56, 189, 248, 0.45));
+  margin: 0 auto;
+}
+.nv-rev-aperture img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; border: 3px solid #0f172a; }
+.nv-rev-aperture-text { display: flex; align-items: center; justify-content: center; font-size: 36px; font-weight: 700; color: #ffffff; }
+
+/* 8. Outcome Visualizer */
+.nv-outcome-split {
+  margin-top: 18px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+.nv-outcome-panel {
+  border-radius: 16px;
+  padding: 18px 20px;
+}
+.nv-outcome-panel.ok { background: #ecfdf5; border: 1px solid rgba(22, 163, 74, 0.24); }
+.nv-outcome-panel.loss { background: #fef2f2; border: 1px solid rgba(220, 38, 38, 0.24); }
+
+.nv-out-heading { display: block; font-size: 15px; color: var(--text-main, #0f172a); }
+.nv-out-desc { font-size: 13px; color: var(--text-muted, #475569); margin: 5px 0 8px 0; line-height: 1.45; }
+
+.nv-out-bar-row {
+  display: grid;
+  grid-template-columns: 118px 1fr;
+  gap: 8px;
+  align-items: center;
+  margin-top: 8px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.nv-out-track { height: 9px; border-radius: 999px; background: rgba(15, 23, 42, 0.08); overflow: hidden; }
+.nv-out-fill { height: 100%; border-radius: 999px; }
+
+/* 9. Producer Portfolio (Dedicated Section) */
+.nv-prod-header-split {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr;
+  gap: 24px;
+  align-items: center;
+}
+
+.nv-prod-identity {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+}
+
+.nv-prod-photo {
+  width: 72px;
+  height: 72px;
+  border-radius: 16px;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.nv-prod-monogram {
+  width: 72px;
+  height: 72px;
+  border-radius: 16px;
+  background: var(--bg-dark, #0f172a);
+  color: #ffffff;
+  border: 2px solid rgba(180, 138, 62, 0.55);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.nv-prod-monogram strong { font-size: 22px; line-height: 1; }
+.nv-prod-monogram span { font-size: 9px; color: #94a3b8; text-transform: uppercase; margin-top: 3px; }
+
+.nv-prod-metrics-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+  margin-top: 8px;
+}
+
+.nv-prod-fact {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-main, #0f172a);
+  background: #ffffff;
+  border: 1px solid rgba(15, 23, 42, 0.09);
+  border-radius: 980px;
+  padding: 3px 10px;
+}
+
+.nv-poster-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.nv-poster-slot {
+  background: #ffffff;
+  border: 1px dashed rgba(15, 23, 42, 0.24);
+  border-radius: 12px;
+  padding: 12px;
+  font-size: 12px;
+}
+.nv-poster-slot strong { display: block; color: var(--text-main, #0f172a); margin-bottom: 3px; }
+.nv-poster-slot span { color: var(--text-subtle, #64748b); font-size: 11.5px; }
+
+/* 10. Production Readiness (Dedicated Section) */
+.nv-readiness-layout {
+  display: grid;
+  grid-template-columns: 1.45fr 1fr;
+  gap: 20px;
+  align-items: start;
+}
+
+.nv-ms-rail {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.nv-ms-card {
+  background: var(--bg-primary, #f5f5f7);
+  padding: 11px;
+  border-radius: 12px;
+  border: 1px solid rgba(15, 23, 42, 0.06);
+}
+
+.nv-ms-bar {
+  display: block;
+  height: 4px;
+  border-radius: 999px;
+  margin-bottom: 7px;
+}
+.nv-ms-bar.done { background: #16a34a; }
+.nv-ms-bar.current { background: var(--accent-blue, #0066cc); }
+.nv-ms-bar.target { background: #64748b; }
+.nv-ms-bar.gap { background: repeating-linear-gradient(90deg, #dc2626 0 6px, transparent 6px 10px); }
+
+.nv-assets-panel {
+  background: var(--bg-primary, #f5f5f7);
+  border-radius: 12px;
+  padding: 12px;
+  border: 1px solid rgba(15, 23, 42, 0.06);
+}
+
+.nv-assets-strip {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 7px;
+}
+
+.nv-asset-thumb {
+  border-radius: 8px;
+  overflow: hidden;
+  aspect-ratio: 16 / 10;
+}
+.nv-asset-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+/* 11. Evidence & Risks */
+.nv-ev-risk-grid {
+  display: grid;
+  grid-template-columns: 1.15fr 1fr;
+  gap: 24px;
+  align-items: start;
+}
+
+.nv-risk-alert-panel {
+  background: #fef2f2;
+  border-left: 4px solid #dc2626;
+  border-radius: 0 14px 14px 0;
+  padding: 16px 18px;
+  font-size: 13px;
+  color: #450a0a;
+}
+
+.nv-risk-bullets {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
+
+.nv-risk-bullets li {
+  line-height: 1.48;
+}
+
+/* 12. Take Your Next Step */
+.nv-action-split {
+  margin-top: 18px;
+  display: grid;
+  grid-template-columns: 1fr 1.1fr;
+  gap: 24px;
+  align-items: start;
+}
+
+.nv-concern-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.nv-composer-card {
+  background: var(--bg-primary, #f5f5f7);
+  border-radius: 16px;
+  padding: 16px 18px;
+  border: 1px solid rgba(15, 23, 42, 0.07);
+}
+
+.nv-composer-textarea {
+  width: 100%;
+  box-sizing: border-box;
+  border-radius: 11px;
+  border: 1px solid rgba(15, 23, 42, 0.14);
+  background: #ffffff;
+  color: var(--text-main, #0f172a);
+  padding: 10px 12px;
+  font-size: 13px;
+  line-height: 1.48;
+  font-family: inherit;
+  margin-bottom: 10px;
+}
+
+/* Responsive Breakpoints */
+@media (max-width: 960px) {
+  .nv-fit-split,
+  .nv-funding-split,
+  .nv-spend-split,
+  .nv-rev-stage,
+  .nv-outcome-split,
+  .nv-prod-header-split,
+  .nv-readiness-layout,
+  .nv-ev-risk-grid,
+  .nv-action-split,
+  .nv-wt-stage {
+    grid-template-columns: 1fr;
+  }
+
+  .nv-rev-hub-center { order: -1; }
+  .nv-ticket-pills,
+  .nv-tk-outputs,
+  .nv-ms-rail {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 720px) {
+  .nv-film-wrap { padding: 0 14px; }
+  .nv-cine-hero { padding: 26px 0 24px; min-height: 460px; }
+  .nv-cine-scrim {
+    background: linear-gradient(
+      180deg,
+      rgba(11, 18, 32, 0.88) 0%,
+      rgba(11, 18, 32, 0.84) 55%,
+      rgba(11, 18, 32, 0.94) 100%
+    );
+  }
+  .nv-cine-figures { padding: 11px 12px; gap: 8px; }
+  .nv-cine-media-dock {
+    align-self: stretch;
+    border-radius: 14px;
+    justify-content: space-between;
+    padding: 8px 11px;
+  }
+  .nv-story-band { padding: 28px 0; }
+  .nv-back-label,
+  .nv-hide-xs { display: none; }
+  .nv-film-chapters { max-width: 165px; }
+  .nv-hero-fig + .nv-hero-fig { padding-left: 8px; }
+  .nv-hero-fig-val { font-size: 16px; }
+  .nv-fit-checklist,
+  .nv-funding-notes,
+  .nv-poster-grid,
+  .nv-concern-grid {
+    grid-template-columns: 1fr;
+  }
+  .nv-funding-bar-track {
+    flex-direction: column;
+    height: auto;
+  }
+  .nv-fb-seg {
+    width: 100% !important;
+    padding: 9px 10px;
+  }
+  .nv-conduit-desktop { display: none; }
+  .nv-conduit-mobile { display: flex; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .nv-fb-seg,
+  .nv-spend-fill,
+  .nv-rev-stream,
+  .nv-cine-bg-img {
+    transition: none !important;
+  }
+  .nv-cine-bg-img.zooming,
+  .nv-pipe-flow,
+  .nv-pipe-green,
+  .nv-pipe-red {
+    animation: none !important;
+  }
+  .nv-rev-stream {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}

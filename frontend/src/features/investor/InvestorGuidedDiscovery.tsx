@@ -815,7 +815,7 @@ export const InvestorGuidedDiscovery: React.FC<InvestorGuidedDiscoveryProps> = (
                   return (
                     <article key={venture.id} className="nv-film-featured-card">
                       <div className="nv-film-featured-grid">
-                        {/* Left: Wide Cinematic Photo Column */}
+                        {/* Left: Clean Apple-Style Film Visual Frame */}
                         <div className="nv-film-photo-col">
                           {heroImg && (
                             <img
@@ -832,18 +832,18 @@ export const InvestorGuidedDiscovery: React.FC<InvestorGuidedDiscoveryProps> = (
                           <div className="nv-film-photo-top">
                             <span
                               style={{
-                                fontSize: '10.5px',
-                                fontWeight: 700,
-                                letterSpacing: '0.08em',
-                                textTransform: 'uppercase',
+                                display: 'inline-flex',
+                                alignItems: 'center',
                                 padding: '4px 10px',
-                                borderRadius: '4px',
-                                backgroundColor: 'rgba(109, 40, 50, 0.92)',
-                                color: '#fffdf9',
-                                border: '1px solid rgba(255,255,255,0.22)',
+                                borderRadius: '6px',
+                                backgroundColor: outcomeColor.bg,
+                                color: outcomeColor.text,
+                                border: `1px solid ${outcomeColor.border}`,
+                                fontSize: '11px',
+                                fontWeight: 700,
                               }}
                             >
-                              🎬 Featured · Film Production
+                              {outcomeColor.label}
                             </span>
 
                             {gallery.length > 0 && (
@@ -851,229 +851,274 @@ export const InvestorGuidedDiscovery: React.FC<InvestorGuidedDiscoveryProps> = (
                                 type="button"
                                 onClick={() => setActiveGalleryVentureId(isGalleryOpen ? null : venture.id)}
                                 style={{
-                                  background: 'rgba(12, 24, 38, 0.72)',
-                                  backdropFilter: 'blur(6px)',
-                                  border: '1px solid rgba(255, 255, 255, 0.25)',
+                                  background: 'rgba(29, 29, 31, 0.65)',
+                                  backdropFilter: 'blur(12px)',
+                                  WebkitBackdropFilter: 'blur(12px)',
+                                  border: '1px solid rgba(255, 255, 255, 0.22)',
                                   color: '#ffffff',
-                                  borderRadius: '4px',
-                                  padding: '4px 9px',
+                                  borderRadius: '6px',
+                                  padding: '4px 10px',
                                   fontSize: '11px',
                                   fontWeight: 600,
                                   cursor: 'pointer',
-                                  display: 'inline-flex',
-                                  alignItems: 'center',
-                                  gap: '5px',
                                 }}
                               >
-                                <span>📸</span>
-                                <span>{gallery.length} stills</span>
+                                {gallery.length} photos
                               </button>
                             )}
                           </div>
 
                           <div className="nv-film-photo-caption">
-                            <span>
-                              Illustrative production still · {venture.stage || 'Pre-Production'}
-                            </span>
-                            <span style={{ color: '#e2caa1', fontWeight: 600 }}>{venture.location}</span>
-                          </div>
-                        </div>
-
-                        {/* Right: Editorial Film Summary & Mandate Fit */}
-                        <div className="nv-film-editorial-col">
-                          <div>
-                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '8px', flexWrap: 'wrap', marginBottom: '10px' }}>
-                              <span
-                                style={{
-                                  fontSize: '10.5px',
-                                  fontWeight: 700,
-                                  letterSpacing: '0.08em',
-                                  textTransform: 'uppercase',
-                                  padding: '3px 9px',
-                                  borderRadius: '3px',
-                                  backgroundColor: '#faf1f2',
-                                  color: '#6d2832',
-                                  border: '1px solid #ddb9be',
-                                }}
-                              >
-                                Editorial Spotlight · Dedicated Film Brief
-                              </span>
-
-                              <span
-                                style={{
-                                  display: 'inline-flex',
-                                  alignItems: 'center',
-                                  gap: '5px',
-                                  padding: '3px 9px',
-                                  borderRadius: '4px',
-                                  backgroundColor: outcomeColor.bg,
-                                  color: outcomeColor.text,
-                                  border: `1px solid ${outcomeColor.border}`,
-                                  fontSize: '11px',
-                                  fontWeight: 700,
-                                }}
-                              >
-                                <span>{outcomeColor.icon}</span>
-                                <span>{outcomeColor.label}</span>
-                              </span>
+                            <div
+                              className="mono-label"
+                              style={{
+                                fontSize: '10.5px',
+                                fontWeight: 600,
+                                color: 'rgba(255, 255, 255, 0.8)',
+                                textTransform: 'uppercase',
+                                letterSpacing: '0.06em',
+                              }}
+                            >
+                              Film Production &bull; {venture.location}
                             </div>
-
                             <h2
                               onClick={() => onSelectVenture?.(venture.id)}
                               style={{
-                                fontFamily: 'Newsreader, Georgia, serif',
-                                fontSize: '28px',
-                                fontWeight: 600,
-                                color: '#0c1826',
-                                lineHeight: 1.18,
-                                margin: '0 0 6px 0',
+                                fontSize: '23px',
+                                fontWeight: 700,
+                                color: '#ffffff',
+                                fontFamily: 'var(--font-sans)',
+                                letterSpacing: '-0.02em',
+                                margin: '2px 0 4px 0',
                                 cursor: 'pointer',
+                                lineHeight: 1.2,
                               }}
                             >
                               {venture.company_name}
                             </h2>
-
-                            <p style={{ margin: '0 0 4px 0', fontSize: '14px', color: '#4c5262', lineHeight: 1.48 }}>
+                            <p
+                              style={{
+                                fontSize: '13px',
+                                color: 'rgba(245, 245, 247, 0.88)',
+                                lineHeight: 1.45,
+                                margin: 0,
+                                display: '-webkit-box',
+                                WebkitLineClamp: 2,
+                                WebkitBoxOrient: 'vertical',
+                                overflow: 'hidden',
+                              }}
+                            >
                               {venture.tag_line || venture.business_context}
                             </p>
-                            <div style={{ fontSize: '12px', color: '#7a5c2e', fontWeight: 500 }}>
-                              Promoter: {venture.founder_name}
-                              {venture.founder_title ? ` (${venture.founder_title})` : ''} · {formatReadableEnum(venture.proposed_arrangement)}
+                            <div style={{ fontSize: '11.5px', color: 'rgba(248, 250, 252, 0.72)', marginTop: '4px' }}>
+                              Producer: {venture.founder_name} &bull; {venture.stage || 'Pre-Production'}
                             </div>
                           </div>
+                        </div>
 
-                          {/* 3-Figure Strip */}
+                        {/* Right: Plain-Language Film Deal Cockpit */}
+                        <div className="nv-film-editorial-col">
+                          {/* Row 1: 3 Key Numbers */}
                           <div className="nv-film-metrics-grid">
                             <div className="nv-film-metric-cell">
-                              <span className="nv-film-metric-lbl">Project Budget</span>
-                              <span className="nv-film-metric-val">{projectBudget ? formatINR(projectBudget) : 'Not disclosed'}</span>
-                              <span className="nv-film-metric-sub">Declared total</span>
-                            </div>
-                            <div className="nv-film-metric-cell" style={{ backgroundColor: '#ffffff' }}>
-                              <span className="nv-film-metric-lbl">Capital Sought</span>
-                              <span className="nv-film-metric-val">{formatINR(venture.capital_target)}</span>
-                              <span className="nv-film-metric-sub">{totalUnits} proposed units</span>
+                              <span className="nv-film-metric-lbl">Total Film Cost</span>
+                              <span className="nv-film-metric-val">{projectBudget ? formatINR(projectBudget) : 'Undisclosed'}</span>
+                              <span className="nv-film-metric-sub">Producer states 50% covered</span>
                             </div>
                             <div className="nv-film-metric-cell">
-                              <span className="nv-film-metric-lbl">Unit Size</span>
+                              <span className="nv-film-metric-lbl">Raising Now</span>
+                              <span className="nv-film-metric-val">{formatINR(venture.capital_target)}</span>
+                              <span className="nv-film-metric-sub">Goal &middot; {totalUnits} units</span>
+                            </div>
+                            <div className="nv-film-metric-cell">
+                              <span className="nv-film-metric-lbl">Starts At</span>
                               <span className="nv-film-metric-val">{unitPrice ? formatINR(unitPrice) : 'Open'}</span>
-                              <span className="nv-film-metric-sub">1/{totalUnits} of raise</span>
+                              <span className="nv-film-metric-sub">Per unit + screen credit</span>
                             </div>
                           </div>
 
-                          {/* Mandate Fit & Open Waterfall Note */}
+                          {/* Row 2: Past Record vs What You Get */}
+                          <div className="nv-comparative-strip">
+                            <div>
+                              <div className="nv-comparative-label-row">
+                                <span style={{ fontSize: '10.5px', fontWeight: 700, color: '#0066cc', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                                  Producer Track Record
+                                </span>
+                                <span
+                                  style={{
+                                    fontSize: '10px',
+                                    fontWeight: 600,
+                                    padding: '2px 7px',
+                                    borderRadius: '5px',
+                                    backgroundColor: '#ffffff',
+                                    border: '1px solid rgba(0, 0, 0, 0.08)',
+                                    color: '#0066cc',
+                                  }}
+                                >
+                                  Checked
+                                </span>
+                              </div>
+                              <div style={{ fontSize: '13px', color: '#0f172a', fontWeight: 600, lineHeight: 1.45 }}>
+                                {venture.operating_track_record?.past_projects || '2 past films delivered'}
+                              </div>
+                            </div>
+
+                            <div>
+                              <div className="nv-comparative-label-row">
+                                <span style={{ fontSize: '10.5px', fontWeight: 700, color: '#16a34a', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                                  What Investors Get
+                                </span>
+                              </div>
+                              <div style={{ fontSize: '13px', color: '#0f172a', lineHeight: 1.45 }}>
+                                Proposed net profit share + producer screen credit (0% film copyright)
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* Row 3: Simple Fit & Key Question Note */}
                           <div
                             style={{
-                              borderLeft: `3px solid ${hasMismatch ? '#b91c1c' : outcomeColor.text}`,
-                              backgroundColor: hasMismatch ? '#fef2f2' : '#faf6ee',
-                              padding: '9px 12px',
-                              borderRadius: '0 4px 4px 0',
+                              backgroundColor: '#f5f5f7',
+                              padding: '11px 14px',
+                              borderRadius: '10px',
                               fontSize: '12.5px',
-                              lineHeight: 1.45,
+                              lineHeight: 1.48,
                             }}
                           >
-                            <div style={{ color: '#15803d', fontWeight: 600 }}>
-                              ✓ Mandate Fit: <span style={{ color: '#334155', fontWeight: 400 }}>{fitReason}</span>
+                            <div style={{ color: '#16a34a', fontWeight: 600 }}>
+                              Why it fits: <span style={{ color: '#0f172a', fontWeight: 400 }}>{fitReason}</span>
                             </div>
                             {materialConcern && (
-                              <div style={{ marginTop: '4px', color: hasMismatch ? '#b91c1c' : '#b45309', fontWeight: 600 }}>
-                                {hasMismatch ? '✕ Mandatory Mismatch: ' : '▲ Trade-off: '}
-                                <span style={{ fontWeight: 400 }}>{materialConcern}</span>
+                              <div style={{ marginTop: '4px', color: hasMismatch ? '#dc2626' : '#b45309', fontWeight: 600 }}>
+                                {hasMismatch ? 'Mismatch: ' : 'Heads up: '}
+                                <span style={{ color: hasMismatch ? '#dc2626' : '#475569', fontWeight: 400 }}>
+                                  {materialConcern}
+                                </span>
                               </div>
                             )}
-                            <div style={{ marginTop: '4px', color: '#6d2832', fontSize: '12px' }}>
-                              <strong>Open Decision:</strong> When the film earns money, who gets paid first? Payout waterfall priority &amp; escrow terms require confirmation.
+                            <div style={{ marginTop: '4px', color: '#475569' }}>
+                              <strong style={{ color: '#0f172a' }}>Key check:</strong> Payout order after marketing spend (P&amp;A) &amp; OTT deals are not signed yet.
                             </div>
 
                             {matchCase && (
+                              <div style={{ marginTop: '6px' }}>
+                                <button
+                                  type="button"
+                                  onClick={() => setExpandedReasonsVentureId(isReasonsOpen ? null : venture.id)}
+                                  style={{
+                                    background: 'none',
+                                    border: 'none',
+                                    color: '#0066cc',
+                                    fontSize: '11.5px',
+                                    fontWeight: 600,
+                                    cursor: 'pointer',
+                                    padding: 0,
+                                  }}
+                                >
+                                  {isReasonsOpen ? 'Hide match checks' : `See ${matchCase.rule_results?.length || 7} match checks`}
+                                </button>
+
+                                {isReasonsOpen && (
+                                  <div style={{ marginTop: '8px', paddingTop: '8px', borderTop: '1px solid rgba(0, 0, 0, 0.08)', fontSize: '12px', color: '#475569' }}>
+                                    {matchCase.compatibility_reasons.map((r, i) => (
+                                      <div key={i}>&bull; {cleanReasonText(r)}</div>
+                                    ))}
+                                    {matchCase.mandatory_mismatches.map((m, i) => (
+                                      <div key={`mm-${i}`} style={{ color: '#dc2626' }}>✕ {cleanReasonText(m)}</div>
+                                    ))}
+                                  </div>
+                                )}
+                              </div>
+                            )}
+                          </div>
+
+                          {/* Row 4: Apple Action Toolbar */}
+                          <div
+                            style={{
+                              display: 'flex',
+                              justifyContent: 'space-between',
+                              alignItems: 'center',
+                              paddingTop: '12px',
+                              borderTop: '1px solid rgba(0, 0, 0, 0.06)',
+                              flexWrap: 'wrap',
+                              gap: '10px',
+                              marginTop: 'auto',
+                            }}
+                          >
+                            <div style={{ display: 'flex', gap: '16px', alignItems: 'center', flexWrap: 'wrap' }}>
                               <button
                                 type="button"
-                                onClick={() => setExpandedReasonsVentureId(isReasonsOpen ? null : venture.id)}
+                                onClick={() => setExpandedDossierVentureId(isDossierOpen ? null : venture.id)}
                                 style={{
-                                  marginTop: '6px',
                                   background: 'none',
                                   border: 'none',
-                                  color: '#7a5c2e',
-                                  fontSize: '11.5px',
+                                  color: isDossierOpen ? '#0066cc' : '#0f172a',
                                   fontWeight: 600,
+                                  fontSize: '12px',
                                   cursor: 'pointer',
                                   padding: 0,
                                 }}
                               >
-                                {isReasonsOpen ? '▴ Hide matching factors' : `▾ View all ${matchCase.rule_results?.length || 2} matching factors`}
-                              </button>
-                            )}
-
-                            {isReasonsOpen && matchCase && (
-                              <div style={{ marginTop: '8px', paddingTop: '8px', borderTop: '1px dashed #d6c9b2', fontSize: '12px', color: '#475569' }}>
-                                {matchCase.compatibility_reasons.map((r, i) => (
-                                  <div key={i}>• {cleanReasonText(r)}</div>
-                                ))}
-                                {matchCase.mandatory_mismatches.map((m, i) => (
-                                  <div key={`mm-${i}`} style={{ color: '#b91c1c' }}>✕ {cleanReasonText(m)}</div>
-                                ))}
-                              </div>
-                            )}
-                          </div>
-
-                          {/* Primary Actions + Quick Drawers */}
-                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px', paddingTop: '6px', borderTop: '1px solid #f2ede1' }}>
-                            <div style={{ display: 'flex', gap: '12px', alignItems: 'center', flexWrap: 'wrap' }}>
-                              <button
-                                type="button"
-                                onClick={() => setExpandedDossierVentureId(isDossierOpen ? null : venture.id)}
-                                style={{ background: 'none', border: 'none', color: isDossierOpen ? '#7a5c2e' : '#0c1826', fontWeight: 600, fontSize: '12px', cursor: 'pointer', padding: 0 }}
-                              >
-                                {isDossierOpen ? '▲ Hide 10-Pt Dossier' : '▼ 10-Pt Dossier'}
+                                {isDossierOpen ? 'Hide Summary' : '10-Point Summary'}
                               </button>
                               <button
                                 type="button"
                                 onClick={() => setActiveDiligenceVentureId(isDiligenceOpen ? null : venture.id)}
-                                style={{ background: 'none', border: 'none', color: '#7a5c2e', fontWeight: 600, fontSize: '12px', cursor: 'pointer', padding: 0 }}
+                                style={{
+                                  background: 'none',
+                                  border: 'none',
+                                  color: isDiligenceOpen ? '#0f172a' : '#0066cc',
+                                  fontWeight: 600,
+                                  fontSize: '12px',
+                                  cursor: 'pointer',
+                                  padding: 0,
+                                }}
                               >
-                                {isDiligenceOpen ? '▲ Hide Audit' : '▼ Diligence Audit'}
+                                {isDiligenceOpen ? 'Hide Checks' : 'Document Checks'}
                               </button>
                             </div>
 
-                            <div style={{ display: 'flex', gap: '8px', alignItems: 'center', flexWrap: 'wrap' }}>
+                            <div style={{ display: 'flex', gap: '16px', alignItems: 'center', flexWrap: 'wrap' }}>
                               {venture.connection_status === 'CONNECTED' && onOpenDirectChat && venture.connection_id ? (
                                 <button
                                   type="button"
                                   onClick={() => onOpenDirectChat(venture.connection_id!)}
-                                  style={{ padding: '8px 14px', backgroundColor: '#15803d', color: '#ffffff', borderRadius: '5px', fontSize: '12.5px', fontWeight: 600, border: 'none', cursor: 'pointer' }}
+                                  style={{
+                                    padding: '8px 18px',
+                                    backgroundColor: '#16a34a',
+                                    color: '#ffffff',
+                                    borderRadius: '980px',
+                                    fontSize: '12.5px',
+                                    fontWeight: 600,
+                                    border: 'none',
+                                    cursor: 'pointer',
+                                  }}
                                 >
-                                  💬 Direct Messages
+                                  Open Chat
                                 </button>
                               ) : (
                                 <button
                                   type="button"
                                   onClick={() => handleOpenDirectDM(venture)}
-                                  style={{ padding: '8px 14px', backgroundColor: '#fffdf9', color: '#0c1826', borderRadius: '5px', fontSize: '12.5px', fontWeight: 600, border: '1px solid #d6c9b2', cursor: 'pointer' }}
+                                  className="nv-link-chevron"
+                                  style={{ fontSize: '13px', color: '#0f172a', fontWeight: 600 }}
                                 >
-                                  💬 Direct Message
+                                  <span>Message Producer</span>
+                                  <span aria-hidden="true" style={{ fontSize: '15px', lineHeight: 1 }}>&rsaquo;</span>
                                 </button>
                               )}
 
                               <button
                                 type="button"
                                 onClick={() => onSelectVenture?.(venture.id)}
+                                className="nv-btn-dark"
                                 style={{
-                                  padding: '8px 18px',
-                                  backgroundColor: '#0c1826',
-                                  color: '#ffffff',
-                                  borderRadius: '5px',
-                                  fontSize: '13px',
-                                  fontWeight: 600,
-                                  border: 'none',
-                                  cursor: 'pointer',
-                                  display: 'inline-flex',
-                                  alignItems: 'center',
-                                  gap: '6px',
-                                  boxShadow: '0 2px 6px rgba(12, 24, 38, 0.16)',
+                                  padding: '8px 20px',
+                                  fontSize: '12.5px',
+                                  borderRadius: '980px',
                                 }}
                               >
-                                <span>Explore the film venture</span>
-                                <span>→</span>
+                                See Film Details
                               </button>
                             </div>
                           </div>

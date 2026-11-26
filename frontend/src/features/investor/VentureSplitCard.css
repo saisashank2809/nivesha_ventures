@@ -159,25 +159,26 @@
 }
 
 /* ==========================================================================
-   FEATURED FILM VENTURE CARD (Editorial Spotlight in Discovery)
+   FEATURED FILM VENTURE CARD (Apple-Style Editorial Spotlight in Discovery)
    ========================================================================== */
 
 .nv-film-spotlight-wrap {
-  margin-bottom: 26px;
+  margin-bottom: 24px;
 }
 
 .nv-film-featured-card {
-  background-color: #fffdf9;
-  border: 1px solid #cdbca0;
-  border-top: 3px solid #6d2832;
-  border-radius: 10px;
+  background-color: #ffffff;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  border-radius: 20px;
   overflow: hidden;
-  box-shadow: 0 8px 24px rgba(12, 24, 38, 0.07);
-  transition: box-shadow 0.2s ease, transform 0.2s ease;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
+  transition: transform 0.22s cubic-bezier(0.25, 0.1, 0.25, 1), box-shadow 0.22s cubic-bezier(0.25, 0.1, 0.25, 1), border-color 0.18s ease;
 }
 
 .nv-film-featured-card:hover {
-  box-shadow: 0 12px 30px rgba(12, 24, 38, 0.11);
+  transform: translateY(-2px);
+  box-shadow: 0 14px 34px rgba(15, 23, 42, 0.1);
+  border-color: rgba(0, 102, 204, 0.28);
 }
 
 .nv-film-featured-grid {
@@ -187,18 +188,19 @@
 
 @media (min-width: 900px) {
   .nv-film-featured-grid {
-    grid-template-columns: 1.05fr 0.95fr;
+    grid-template-columns: 380px minmax(0, 1fr);
   }
 }
 
 .nv-film-photo-col {
   position: relative;
-  min-height: 310px;
-  background-color: #0c1826;
+  min-height: 300px;
+  background-color: #0f172a;
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  justify-content: flex-end;
+  justify-content: space-between;
+  padding: 20px;
 }
 
 .nv-film-photo-col img {
@@ -208,6 +210,7 @@
   height: 100%;
   object-fit: cover;
   display: block;
+  z-index: 0;
 }
 
 .nv-film-photo-scrim {
@@ -215,18 +218,15 @@
   inset: 0;
   background: linear-gradient(
     180deg,
-    rgba(12, 24, 38, 0.18) 0%,
-    rgba(12, 24, 38, 0.35) 55%,
-    rgba(12, 24, 38, 0.88) 100%
+    rgba(15, 23, 42, 0.35) 0%,
+    rgba(15, 23, 42, 0.55) 55%,
+    rgba(15, 23, 42, 0.94) 100%
   );
   z-index: 1;
 }
 
 .nv-film-photo-top {
-  position: absolute;
-  top: 14px;
-  left: 14px;
-  right: 14px;
+  position: relative;
   z-index: 2;
   display: flex;
   justify-content: space-between;
@@ -238,19 +238,12 @@
 .nv-film-photo-caption {
   position: relative;
   z-index: 2;
-  margin: 14px;
-  padding: 8px 12px;
-  border-radius: 5px;
-  background: rgba(12, 24, 38, 0.84);
-  backdrop-filter: blur(6px);
-  border: 1px solid rgba(255, 255, 255, 0.14);
-  color: #f5efe5;
-  font-size: 11.5px;
+  color: rgba(248, 250, 252, 0.92);
+  font-size: 12px;
+  line-height: 1.45;
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 8px;
-  flex-wrap: wrap;
+  flex-direction: column;
+  gap: 4px;
 }
 
 .nv-film-editorial-col {
@@ -259,58 +252,64 @@
   flex-direction: column;
   justify-content: space-between;
   gap: 14px;
-  background-color: #fffdf9;
+  background-color: #ffffff;
+  min-width: 0;
 }
 
 .nv-film-metrics-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 1px;
-  background-color: #e6decb;
-  border: 1px solid #d6c9b2;
-  border-radius: 6px;
-  overflow: hidden;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid rgba(15, 23, 42, 0.06);
 }
 
-.nv-film-metric-cell {
-  background-color: #faf6ee;
-  padding: 10px 12px;
+.nv-film-metric-cell + .nv-film-metric-cell {
+  border-left: 1px solid rgba(15, 23, 42, 0.08);
+  padding-left: 14px;
 }
 
 .nv-film-metric-lbl {
-  font-size: 10px;
-  font-weight: 700;
-  color: #7a5c2e;
+  font-size: 10.5px;
+  font-weight: 600;
+  color: #0066cc;
   text-transform: uppercase;
-  letter-spacing: 0.06em;
+  letter-spacing: 0.05em;
   display: block;
-  margin-bottom: 2px;
+  margin-bottom: 3px;
 }
 
 .nv-film-metric-val {
-  font-family: 'Newsreader', Georgia, serif;
   font-size: 18px;
-  font-weight: 600;
-  color: #0c1826;
+  font-weight: 700;
+  color: #0f172a;
   line-height: 1.15;
   display: block;
 }
 
 .nv-film-metric-sub {
-  font-size: 10.5px;
-  color: #685d4d;
+  font-size: 11.5px;
+  color: #475569;
   display: block;
   margin-top: 2px;
 }
 
 @media (max-width: 640px) {
   .nv-film-photo-col {
-    min-height: 210px;
+    min-height: 220px;
+    padding: 16px;
   }
   .nv-film-editorial-col {
     padding: 16px;
   }
   .nv-film-metrics-grid {
     grid-template-columns: 1fr;
+    gap: 10px;
+  }
+  .nv-film-metric-cell + .nv-film-metric-cell {
+    border-left: none;
+    border-top: 1px solid rgba(15, 23, 42, 0.06);
+    padding-left: 0;
+    padding-top: 10px;
   }
 }
