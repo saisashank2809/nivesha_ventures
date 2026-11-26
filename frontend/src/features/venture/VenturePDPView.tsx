@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { VentureDetail, User, UserRole } from '../../shared/types';
+import { VentureDetail, User, UserRole, MatchCase, InvestorMandate } from '../../shared/types';
 import { formatINR } from '../../shared/formatters';
 import { Api } from '../../shared/api';
 import './VenturePDPView.css';
@@ -29,6 +29,10 @@ export const VenturePDPView: React.FC<VenturePDPViewProps> = ({
   const [selectedImgIndex, setSelectedImgIndex] = useState(0);
   const [note, setNote] = useState('');
   const [showInquiryForm, setShowInquiryForm] = useState(false);
+  const [selectedFilmUnit, setSelectedFilmUnit] = useState(0);
+  const [selectedQuestionIdx, setSelectedQuestionIdx] = useState(0);
+  const [matchCase, setMatchCase] = useState<MatchCase | null>(null);
+  const [mandate, setMandate] = useState<InvestorMandate | null>(null);
   const [copiedShare, setCopiedShare] = useState(false);
   const [appointmentModalOpen, setAppointmentModalOpen] = useState(false);
   const [appointmentTopic, setAppointmentTopic] = useState('Dossier deep-dive & terms review');
@@ -57,6 +61,35 @@ export const VenturePDPView: React.FC<VenturePDPViewProps> = ({
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }, []);
+
+  // Load actual matching & mandate context when signed in as Investor
+  useEffect(() => {
+    if (!venture) return;
+    const isFilm =
+      /film|cinema|motion picture|creative media|entertainment/i.test(venture.sector || '') ||
+      (venture as any).custom_answers?.business_type === 'FILM_ENTERTAINMENT';
+    if (!isFilm || currentUser?.role !== 'INVESTOR' || !Api.getToken()) {
+      setMatchCase(null);
+      setMandate(null);
+      return;
+    }
+
+    let cancelled = false;
+    Promise.allSettled([Api.getMatchCases(), Api.getMyMandate()]).then(([mcRes, mRes]) => {
+      if (cancelled) return;
+      if (mcRes.status === 'fulfilled') {
+        const found = mcRes.value.find((mc) => mc.venture_id === venture.id) || null;
+        setMatchCase(found);
+      }
+      if (mRes.status === 'fulfilled') {
+        setMandate(mRes.value);
+      }
+    });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [venture?.id, currentUser?.id, currentUser?.role]);
 
   if (loading) {
     return (
@@ -149,6 +182,7 @@ export const VenturePDPView: React.FC<VenturePDPViewProps> = ({
     try {
       await Api.createAppointment({
         venture_id: venture.id,
+        match_case_id: matchCase?.id || undefined,
         meeting_purpose: appointmentTopic,
         preferred_times: [appointmentDate || new Date(Date.now() + 86400000 * 2).toISOString().slice(0, 10)],
       });
@@ -165,6 +199,11 @@ export const VenturePDPView: React.FC<VenturePDPViewProps> = ({
       }, 2500);
     }
   };
+
+  // ─── Film detection ────────────────────────────────────────────────────────
+  const isFilmVenture =
+    /film|cinema|motion picture|creative media|entertainment/i.test(venture.sector || '') ||
+    (venture as any).custom_answers?.business_type === 'FILM_ENTERTAINMENT';
 
   const arrangementName =
     arrDetails.structure_name ||
@@ -183,6 +222,744 @@ export const VenturePDPView: React.FC<VenturePDPViewProps> = ({
       : venture.ticket_min
       ? `From ${formatINR(venture.ticket_min)}`
       : 'Open';
+
+  // ─── FILM-DEDICATED EDITORIAL PDP ──────────────────────────────────────────
+  if (isFilmVenture) {
+    const arrD = arrDetails as Record<string, any>;
+    const projectBudget: number | null = arrD.total_budget || arrD.total_project_budget || null;
+    const capitalSought = arrD.capital_sought || venture.capital_target;
+    const perUnit = arrD.unit_price || venture.ticket_min || null;
+    const totalUnits = arrD.total_units || (perUnit && capitalSought ? Math.round(capitalSought / perUnit) : null);
+    const promoterShare = projectBudget && projectBudget > capitalSought ? projectBudget - capitalSought : 0;
+
+    // Parse itemized deployment buckets only when explicitly present in venture_story.use_of_capital
+    const useOfCapitalText = String(story.use_of_capital || '');
+    const parsedDeployItems = Array.from(useOfCapitalText.matchAll(/([^,;()]+?)\s*\((₹[^)]+)\)/g)).map((m) => ({
+      label: m[1].replace(/^and\s+/i, '').trim(),
+      amount: m[2].trim(),
+    }));
+
+    // Build concise ~35-45 word summary without duplicating the 3 financial metrics
+    const rawOverview = [story.venture_overview, story.current_position]
+      .filter(Boolean)
+      .join(' ')
+      .replace(/₹[\d.,]+\s*(?:Cr(?:ores?)?|L(?:akhs?)?)/gi, '')
+      .replace(/\s+/g, ' ')
+      .trim();
+    const summaryWords = (rawOverview || venture.tag_line || '').split(/\s+/).filter(Boolean);
+    const conciseSummary =
+      summaryWords.length > 48 ? `${summaryWords.slice(0, 45).join(' ').replace(/[.,;:]$/, '')}.` : summaryWords.join(' ');
+
+    const creditTiers: Array<{ tier: string; min_investment: string; perks: string }> = Array.isArray(arrD.credit_tiers)
+      ? arrD.credit_tiers
+      : [];
+
+    const waterfallSteps = String(
+      arrD.waterfall_recovery_order || '1. P&A costs -> 2. Investor Principal Recoupment -> 3. Talent Backend -> 4. Equity Profit Split'
+    )
+      .split(/\s*(?:->|→)\s*/)
+      .filter(Boolean);
+
+    const statusBadge = (rawStatus?: string) => {
+      const s = (rawStatus || 'DECLARED').toUpperCase();
+      if (s === 'VERIFIED' || s === 'BUDGET_LOCKED') return { cls: 'verified', label: s.replace(/_/g, ' ') };
+      if (s === 'PARTLY_VERIFIED' || s === 'PARTIALLY_VERIFIED' || s === 'SUPPORTED') {
+        return { cls: 'partial', label: s === 'PARTIALLY_VERIFIED' ? 'PARTLY VERIFIED' : s.replace(/_/g, ' ') };
+      }
+      if (s === 'UNRESOLVED_CHECK' || s === 'UNRESOLVED' || s === 'OPEN_QUESTION') {
+        return { cls: 'unresolved', label: 'UNRESOLVED' };
+      }
+      return { cls: 'declared', label: s.replace(/_/g, ' ') };
+    };
+
+    const verificationTag = statusBadge(venture.verification_status);
+    const findingEntries = Object.entries(findings || {});
+    const missingItems = Array.from(
+      new Set([...(venture.missing_information || []), ...(matchCase?.missing_information || [])])
+    );
+
+    const unitChoices = perUnit
+      ? [
+          { label: `1 Unit · ${formatINR(perUnit)}`, desc: `1 unit (${formatINR(perUnit)}${totalUnits ? `, 1/${totalUnits} of raise` : ''})` },
+          { label: `2 Units · ${formatINR(perUnit * 2)}`, desc: `2 units (${formatINR(perUnit * 2)})` },
+          { label: `4 Units · ${formatINR(perUnit * 4)}`, desc: `4 units (${formatINR(perUnit * 4)})` },
+        ]
+      : [{ label: '1 Allocation Unit', desc: '1 proposed unit' }];
+    const currentUnit = unitChoices[selectedFilmUnit] || unitChoices[0];
+
+    // Contextual clarification questions built strictly from actual venture + match data
+    const clarificationQuestions: string[] = Array.from(
+      new Set([
+        'When the film earns revenue, what is the exact P&A cap and whether OTT pre-sales bypass it for first-dollar recoupment?',
+        ...(venture.diligence_brief?.questions_for_founder || []),
+        ...missingItems.map((m) => `What is the current status and timeline for: ${m}`),
+        ...(matchCase?.trade_offs || []).map((t) => `Clarify mandate trade-off: ${t}`),
+      ])
+    ).slice(0, 5);
+
+    const findingLabelMap: Record<string, string> = {
+      crew_credentials: 'Crew Credentials',
+      script_ip_copyright: 'Script IP & Copyright',
+      budget_breakdown: 'Production Budget Breakdown',
+      comparable_multipliers: 'Comparable Box-Office Multipliers',
+      talent_binding: 'Lead Cast Binding',
+      operational_reality: 'Operational Reality',
+      track_record: 'Financial Track Record',
+    };
+
+    const formatFindingLabel = (key: string) =>
+      findingLabelMap[key] ||
+      key.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
+
+    const buildEnquiryText = (unitDesc: string, qIdx: number) => {
+      const q = clarificationQuestions[qIdx] || clarificationQuestions[0];
+      return `Hello ${venture.founder_name}, I am reviewing ${unitDesc} in ${venture.company_name}. Could you clarify: ${q}`;
+    };
+
+    const effectiveNote = note || buildEnquiryText(currentUnit.desc, selectedQuestionIdx);
+
+    const handleSelectUnit = (idx: number) => {
+      setSelectedFilmUnit(idx);
+      const nextUnit = unitChoices[idx] || unitChoices[0];
+      setNote(buildEnquiryText(nextUnit.desc, selectedQuestionIdx));
+    };
+
+    const handleSelectQuestion = (idx: number) => {
+      setSelectedQuestionIdx(idx);
+      setNote(buildEnquiryText(currentUnit.desc, idx));
+      const box = document.getElementById('nv-film-enquiry-panel');
+      if (box) box.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    };
+
+    const outcomeMeta = matchCase
+      ? matchCase.outcome === 'POTENTIALLY_SUITABLE'
+        ? { cls: 'pass', label: 'Potentially Suitable for Your Mandate' }
+        : matchCase.outcome === 'UNSUITABLE'
+        ? { cls: 'mismatch', label: 'Mandatory Mismatch with Your Mandate' }
+        : { cls: '', label: 'Needs More Information for Your Mandate' }
+      : null;
+
+    const raisePctOfBudget = projectBudget && projectBudget > 0 ? Math.round((capitalSought / projectBudget) * 100) : null;
+    const promoterPctOfBudget = raisePctOfBudget !== null ? 100 - raisePctOfBudget : null;
+
+    return (
+      <div className="nv-film-pdp-page">
+        {/* Top Bar */}
+        <div className="nv-pdp-top-bar">
+          <div className="nv-pdp-top-bar-inner">
+            <button type="button" onClick={onBack} className="nv-pdp-back-btn">
+              <span>←</span>
+              <span>Back to Opportunities</span>
+            </button>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <button type="button" onClick={handleCopyShare} className="nv-pdp-action-btn">
+                <span>🔗</span>
+                <span>{copiedShare ? 'Link Copied!' : 'Share Opportunity'}</span>
+              </button>
+              <button type="button" onClick={() => window.print()} className="nv-pdp-action-btn">
+                <span>🖨️</span>
+                <span>Print Dossier</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* 4-Stage Navigation Rail */}
+        <div className="nv-film-stage-rail">
+          <div className="nv-film-stage-rail-inner">
+            <div className="nv-film-stage-steps">
+              <a href="#film-stage-1" className="nv-film-stage-link lead">1. Opportunity</a>
+              <a href="#film-stage-2" className="nv-film-stage-link">2. Investment</a>
+              <a href="#film-stage-3" className="nv-film-stage-link">3. Trust &amp; Uncertainty</a>
+              <a href="#film-stage-4" className="nv-film-stage-link">4. Next Action</a>
+            </div>
+            <span style={{ fontSize: '11.5px', color: '#7a5c2e', fontWeight: 600, whiteSpace: 'nowrap' }}>
+              Capital Facilitation · Zero Platform Custody
+            </span>
+          </div>
+        </div>
+
+        <main className="nv-film-container">
+          {/* STAGE 1: UNDERSTAND THE OPPORTUNITY */}
+          <section id="film-stage-1" className="nv-film-hero">
+            <div className="nv-film-meta-line">
+              <span className="nv-film-sector-tag">{venture.sector}</span>
+              <span>· {venture.location}</span>
+              <span>· {venture.stage || 'Pre-Production'}</span>
+              <span className={`nv-film-status-tag ${verificationTag.cls}`}>{verificationTag.label}</span>
+            </div>
+
+            <div className="nv-film-hero-grid">
+              <div className="nv-film-copy-col">
+                <div>
+                  <h1 className="nv-pdp-title" style={{ marginBottom: '10px' }}>
+                    {venture.company_name}
+                  </h1>
+                  <p className="nv-film-summary">{conciseSummary}</p>
+                  <div style={{ fontSize: '12.5px', color: '#685d4d', marginTop: '8px' }}>
+                    Promoter: <strong style={{ color: '#0c1826' }}>{venture.founder_name}</strong>
+                    {venture.founder_title ? ` (${venture.founder_title})` : ''}
+                  </div>
+                </div>
+
+                {/* Three Primary Financial Metrics */}
+                <div className="nv-film-3figs" aria-label="Primary Financial Metrics">
+                  <div className="nv-film-3fig-cell">
+                    <span className="nv-film-3fig-lbl">Total Budget</span>
+                    <span className="nv-film-3fig-val">{projectBudget ? formatINR(projectBudget) : 'Undisclosed'}</span>
+                    <span className="nv-film-3fig-sub">Declared production cost</span>
+                  </div>
+                  <div className="nv-film-3fig-cell">
+                    <span className="nv-film-3fig-lbl">Capital Sought</span>
+                    <span className="nv-film-3fig-val">{formatINR(capitalSought)}</span>
+                    <span className="nv-film-3fig-sub">Target raise · not secured</span>
+                  </div>
+                  <div className="nv-film-3fig-cell">
+                    <span className="nv-film-3fig-lbl">Per Proposed Unit</span>
+                    <span className="nv-film-3fig-val">{perUnit ? formatINR(perUnit) : 'Open'}</span>
+                    <span className="nv-film-3fig-sub">
+                      {totalUnits ? `1/${totalUnits} of proposed raise` : 'Minimum ticket'}
+                    </span>
+                  </div>
+                </div>
+
+                {/* Personalised Relevance (strictly from MatchCase + InvestorMandate) */}
+                {matchCase && outcomeMeta ? (
+                  <div className={`nv-film-relevance-strip ${outcomeMeta.cls}`}>
+                    <div style={{ fontWeight: 700, color: '#0c1826', marginBottom: '3px' }}>
+                      Mandate Relevance: {outcomeMeta.label}
+                    </div>
+                    {matchCase.compatibility_reasons[0] && (
+                      <div>{matchCase.compatibility_reasons[0]}</div>
+                    )}
+                    {mandate?.ticket_max && perUnit && (
+                      <div style={{ fontSize: '12px', color: '#4c5262', marginTop: '2px' }}>
+                        Your mandate range: {formatINR(mandate.ticket_min)} – {formatINR(mandate.ticket_max)} vs. {formatINR(perUnit)} minimum unit.
+                      </div>
+                    )}
+                    {matchCase.mandatory_mismatches[0] ? (
+                      <div style={{ color: '#991b1b', fontWeight: 600, marginTop: '3px' }}>
+                        Mismatch: {matchCase.mandatory_mismatches[0]}
+                      </div>
+                    ) : matchCase.trade_offs[0] ? (
+                      <div style={{ color: '#92400e', marginTop: '3px' }}>
+                        Trade-off: {matchCase.trade_offs[0]}
+                      </div>
+                    ) : null}
+                  </div>
+                ) : (
+                  <div className="nv-film-relevance-strip muted">
+                    {currentUser?.role === 'INVESTOR'
+                      ? 'Personalised mandate evaluation unavailable for this venture.'
+                      : 'Sign in with an investor mandate to evaluate personal ticket and structure fit.'}
+                  </div>
+                )}
+
+                <div style={{ display: 'flex', alignItems: 'center', gap: '18px', flexWrap: 'wrap' }}>
+                  <a href="#film-stage-4" className="nv-pdp-primary-btn" style={{ width: 'auto', textDecoration: 'none' }}>
+                    <span>Review Open Questions &amp; Enquire →</span>
+                  </a>
+                  <a
+                    href="#film-stage-2"
+                    style={{ fontSize: '13px', fontWeight: 600, color: '#7a5c2e', textDecoration: 'underline', textUnderlineOffset: '3px' }}
+                  >
+                    Inspect Investment Structure ↓
+                  </a>
+                </div>
+              </div>
+
+              {/* Still Presentation */}
+              <div>
+                <figure className="nv-film-photo-box">
+                  <img
+                    className="nv-film-still-img"
+                    src={activeImage}
+                    alt={`${venture.company_name} visual reference`}
+                  />
+                  <figcaption className="nv-film-photo-cap">
+                    <span>Illustrative mood reference · Not on-set production footage</span>
+                    {gallery.length > 1 && <span>{selectedImgIndex + 1} / {gallery.length}</span>}
+                  </figcaption>
+                </figure>
+
+                {gallery.length > 1 && (
+                  <div className="nv-pdp-thumbnail-strip">
+                    {gallery.map((url, idx) => (
+                      <button
+                        key={idx}
+                        type="button"
+                        className={`nv-pdp-thumb-btn ${selectedImgIndex === idx ? 'active' : ''}`}
+                        onClick={() => setSelectedImgIndex(idx)}
+                      >
+                        <img src={url} alt={`Reference still ${idx + 1}`} />
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+          </section>
+
+          {/* STAGE 2: UNDERSTAND THE INVESTMENT */}
+          <section id="film-stage-2" className="nv-film-stage">
+            <div className="nv-film-stage-head">
+              <div>
+                <div className="nv-film-kicker">02 · Understand the Investment</div>
+                <h2 className="nv-film-h2">Capital Utilisation, Unit Rights &amp; Recovery Structure</h2>
+              </div>
+              <span className="nv-film-status-tag partial">Proposed Terms · Pending Execution</span>
+            </div>
+
+            {/* Capital Stack Bar */}
+            {projectBudget && promoterShare > 0 && raisePctOfBudget !== null && promoterPctOfBudget !== null && (
+              <div style={{ marginBottom: '26px' }}>
+                <div className="nv-film-stack-bar" role="img" aria-label={`Capital stack: ${promoterPctOfBudget}% promoter/deferrals and ${raisePctOfBudget}% external raise sought`}>
+                  <div
+                    className="nv-film-stack-seg"
+                    style={{ width: `${promoterPctOfBudget}%`, backgroundColor: '#ebe2d3', color: '#121a29', borderRight: '2px solid #faf8f4' }}
+                  >
+                    Promoter &amp; Deferrals · {promoterPctOfBudget}% (Declared)
+                  </div>
+                  <div
+                    className="nv-film-stack-seg"
+                    style={{ width: `${raisePctOfBudget}%`, backgroundColor: '#0c1826', color: '#ffffff' }}
+                  >
+                    External Raise Sought · {raisePctOfBudget}% (Not Secured)
+                  </div>
+                </div>
+
+                {parsedDeployItems.length > 0 ? (
+                  <div className="nv-film-deploy-strip">
+                    {parsedDeployItems.slice(0, 3).map((item, idx) => (
+                      <div key={idx}>
+                        <div style={{ fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', color: '#7a5c2e' }}>
+                          {item.label}
+                        </div>
+                        <div style={{ fontFamily: 'Newsreader, Georgia, serif', fontSize: '19px', fontWeight: 600, color: '#0c1826', marginTop: '2px' }}>
+                          {item.amount}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <p style={{ margin: '0 0 12px 0', fontSize: '13.5px', color: '#4c5262' }}>
+                    <strong>Declared Use of Capital:</strong> {useOfCapitalText || 'Production shooting, VFX pipeline, and post-production finishing.'}
+                  </p>
+                )}
+
+                <details className="nv-film-accordion">
+                  <summary>
+                    <span>Unit proportion &amp; capital commitment notes</span>
+                    <span style={{ fontSize: '12px', color: '#7a5c2e' }}>Expand ▾</span>
+                  </summary>
+                  <div className="nv-film-acc-body">
+                    <div>{story.capital_requirement || `External financing target is ${formatINR(capitalSought)} alongside declared promoter/vendor deferrals.`}</div>
+                    {perUnit && totalUnits && projectBudget && (
+                      <div style={{ marginTop: '6px' }}>
+                        <strong>Unit Proportion:</strong> 1 unit equals <strong>1/{totalUnits}</strong> of the proposed external raise ({Math.round((perUnit / projectBudget) * 1000) / 10}% relative to declared total budget). External funds are not yet secured or held in confirmed escrow.
+                      </div>
+                    )}
+                  </div>
+                </details>
+              </div>
+            )}
+
+            {/* Financial Rights vs. Producer Credits */}
+            <div className="nv-film-2col" style={{ marginBottom: '28px' }}>
+              <div>
+                <h3 className="nv-film-ledger-title">
+                  <span>Financial Rights</span>
+                  <span className="nv-film-status-tag unresolved">Requires Signed Terms</span>
+                </h3>
+                <div className="nv-film-kv-row">
+                  <span>Raise Participation</span>
+                  <strong>{totalUnits ? `1 / ${totalUnits} of external raise` : 'Fractional participation'}</strong>
+                </div>
+                <div className="nv-film-kv-row">
+                  <span>Film IP &amp; Copyright</span>
+                  <strong>0% — Retained by Studio</strong>
+                </div>
+                <div className="nv-film-kv-row">
+                  <span>Budget Contribution Note</span>
+                  <span style={{ textAlign: 'right', maxWidth: '300px', color: '#334155' }}>
+                    Funding share does not confer IP ownership; any receipt share depends on executed deal terms.
+                  </span>
+                </div>
+                <div className="nv-film-kv-row">
+                  <span>Reporting Governance</span>
+                  <strong>Quarterly audited expense ledger (Proposed)</strong>
+                </div>
+              </div>
+
+              <div>
+                <h3 className="nv-film-ledger-title">
+                  <span>Producer Screen Credits</span>
+                  <span className="nv-film-status-tag declared">Attribution Only</span>
+                </h3>
+                {creditTiers.length > 0 ? (
+                  creditTiers.map((ct, idx) => (
+                    <div key={idx} className="nv-film-kv-row">
+                      <span>
+                        <strong style={{ color: '#0c1826' }}>{ct.tier}</strong>
+                        <span style={{ display: 'block', fontSize: '12px', color: '#64748b' }}>{ct.perks}</span>
+                      </span>
+                      <strong style={{ whiteSpace: 'nowrap', color: '#7a5c2e' }}>{ct.min_investment}</strong>
+                    </div>
+                  ))
+                ) : (
+                  <div style={{ fontSize: '13px', color: '#64748b', padding: '8px 0' }}>
+                    Tiered screen credits disclosed in deal documents. Credits carry billing attribution only, with zero payout priority.
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Capital Recovery Mechanism */}
+            <div>
+              <h3 className="nv-film-ledger-title">
+                <span>Capital Recovery Mechanism</span>
+                <span className="nv-film-status-tag unresolved">Conflicting Repayment Notes</span>
+              </h3>
+              <div className="nv-film-waterfall-strip">
+                {waterfallSteps.map((stepText, idx) => (
+                  <div key={idx} className="nv-film-wf-node">
+                    <div style={{ fontSize: '10px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', color: '#7a5c2e', marginBottom: '3px' }}>
+                      Priority Step {idx + 1}
+                    </div>
+                    <div style={{ fontSize: '13px', fontWeight: 600, color: '#0c1826' }}>
+                      {stepText.replace(/^\d+\.\s*/, '')}
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              <div className="nv-film-conflict-callout">
+                <strong>Unresolved Repayment Terms:</strong> Existing founder records contain conflicting recoupment statements — the waterfall schedule lists <em>1. P&amp;A costs</em> ahead of investor principal without disclosing a P&amp;A cap,{' '}
+                {arrD.calculation_note ? <em>{arrD.calculation_note}</em> : 'net profit split cites a 60% investor recoupment pool'}, whereas the narrative proposal cites{' '}
+                <em>100% first-dollar recoupment from OTT &amp; satellite pre-sales</em>. Priority must be settled in signed agreements.
+              </div>
+            </div>
+          </section>
+
+          {/* STAGE 3: UNDERSTAND TRUST AND UNCERTAINTY */}
+          <section id="film-stage-3" className="nv-film-stage">
+            <div className="nv-film-stage-head">
+              <div>
+                <div className="nv-film-kicker">03 · Understand Trust &amp; Uncertainty</div>
+                <h2 className="nv-film-h2">Track Record, Verification Evidence &amp; Open Gaps</h2>
+              </div>
+            </div>
+
+            {/* Track Record Strip */}
+            <div className="nv-film-3ledger">
+              <div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
+                  <span style={{ fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', color: '#7a5c2e' }}>
+                    Past Delivery
+                  </span>
+                  <span className={`nv-film-status-tag ${statusBadge(findings.track_record?.status || 'RECORDED').cls}`}>
+                    {findings.track_record?.status === 'VERIFIED' ? 'VERIFIED' : 'DECLARED'}
+                  </span>
+                </div>
+                <div style={{ fontSize: '13.5px', color: '#121a29', lineHeight: 1.5 }}>
+                  {trackRecord.past_projects || story.execution_capability || 'Prior production track record disclosed in dossier.'}
+                </div>
+              </div>
+
+              <div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
+                  <span style={{ fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', color: '#7a5c2e' }}>
+                    Release &amp; Revenue Talks
+                  </span>
+                  <span className="nv-film-status-tag declared">Non-Binding</span>
+                </div>
+                <div style={{ fontSize: '13.5px', color: '#121a29', lineHeight: 1.5 }}>
+                  {growthPlan.theatrical_release_window ? `Window: ${growthPlan.theatrical_release_window}. ` : ''}
+                  {growthPlan.satellite_ott_strategy || trackRecord.distribution_loi || 'Distribution & OTT agreements not yet contracted.'}
+                </div>
+              </div>
+
+              <div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
+                  <span style={{ fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', color: '#7a5c2e' }}>
+                    Peer Benchmarks
+                  </span>
+                  <span className="nv-film-status-tag partial">Benchmark Only</span>
+                </div>
+                <div style={{ fontSize: '13.5px', color: '#121a29', lineHeight: 1.5 }}>
+                  {trackRecord.declared_box_office_multipliers
+                    ? `${trackRecord.declared_box_office_multipliers} (${trackRecord.declared_box_office_label || 'Not a guaranteed return'}).`
+                    : 'Comparable film box-office multiples are non-predictive.'}
+                </div>
+              </div>
+            </div>
+
+            {/* Evidence Ledger vs. Risks & Missing Info */}
+            <div className="nv-film-2col" style={{ marginBottom: '20px' }}>
+              <div>
+                <h3 className="nv-film-ledger-title">
+                  <span>Supporting Evidence</span>
+                  <span style={{ fontSize: '12px', color: '#64748b', fontFamily: 'Inter, sans-serif', fontWeight: 500 }}>
+                    {findingEntries.length} checks
+                  </span>
+                </h3>
+                {findingEntries.length > 0 ? (
+                  findingEntries.map(([key, val]: [string, any]) => {
+                    const b = statusBadge(val?.status);
+                    return (
+                      <div key={key} className="nv-film-evidence-row">
+                        <div style={{ minWidth: 0 }}>
+                          <div style={{ fontSize: '13px', fontWeight: 600, color: '#0c1826' }}>
+                            {formatFindingLabel(key)}
+                          </div>
+                          <div style={{ fontSize: '12.5px', color: '#4c5262', lineHeight: 1.45, marginTop: '2px' }}>
+                            {val?.finding || val?.details}
+                          </div>
+                        </div>
+                        <span className={`nv-film-status-tag ${b.cls}`}>{b.label}</span>
+                      </div>
+                    );
+                  })
+                ) : (
+                  <div style={{ fontSize: '13px', color: '#64748b', padding: '8px 0' }}>
+                    Detailed verification findings pending reviewer update.
+                  </div>
+                )}
+
+                {(venture.pitch_deck_url || venture.video_url) && (
+                  <div style={{ display: 'flex', gap: '14px', paddingTop: '10px', fontSize: '12.5px' }}>
+                    {venture.pitch_deck_url && (
+                      <a href={venture.pitch_deck_url} target="_blank" rel="noreferrer" style={{ color: '#7a5c2e', fontWeight: 600, textDecoration: 'underline' }}>
+                        Open Pitch Deck ↗
+                      </a>
+                    )}
+                    {venture.video_url && (
+                      <a href={venture.video_url} target="_blank" rel="noreferrer" style={{ color: '#7a5c2e', fontWeight: 600, textDecoration: 'underline' }}>
+                        Watch Reference Video ↗
+                      </a>
+                    )}
+                  </div>
+                )}
+              </div>
+
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+                <div>
+                  <h3 className="nv-film-ledger-title">
+                    <span>Important Risks</span>
+                    <span className="nv-film-status-tag unresolved">Material</span>
+                  </h3>
+                  <ul style={{ margin: '0 0 0 18px', padding: 0, fontSize: '13px', color: '#334155', lineHeight: 1.6 }}>
+                    <li>
+                      <strong>Repayment Order Conflict:</strong> Uncapped P&amp;A ranking vs. 60% net pool vs. 100% OTT recoupment notes require reconciliation.
+                    </li>
+                    <li>
+                      <strong>Escrow &amp; Revenue Contracts:</strong> No confirmed escrow receipt ledger on file; OTT pre-sales and distributor LOIs remain non-binding.
+                    </li>
+                    {story.risks_and_dependencies && (
+                      <li>
+                        <strong>Production &amp; Release Dependencies:</strong> {story.risks_and_dependencies}
+                      </li>
+                    )}
+                  </ul>
+                </div>
+
+                <div>
+                  <h3 className="nv-film-ledger-title">
+                    <span>Missing Information</span>
+                    <span className="nv-film-status-tag unresolved">{missingItems.length} Unresolved</span>
+                  </h3>
+                  {missingItems.length > 0 ? (
+                    <ul style={{ margin: '0 0 0 18px', padding: 0, fontSize: '13px', color: '#991b1b', lineHeight: 1.6 }}>
+                      {missingItems.map((mi, idx) => (
+                        <li key={idx}>{mi}</li>
+                      ))}
+                    </ul>
+                  ) : (
+                    <div style={{ fontSize: '13px', color: '#64748b' }}>
+                      No missing items logged; verify executed deal terms, completion bond, and escrow setup directly with the promoter.
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            <details className="nv-film-accordion">
+              <summary>
+                <span>Full 10-Section Reference Dossier ({tenSections.length} sections)</span>
+                <span style={{ fontSize: '12px', color: '#7a5c2e' }}>Expand ▾</span>
+              </summary>
+              <div className="nv-film-acc-body">
+                <div className="nv-film-dossier-grid">
+                  {tenSections.map((sec) => (
+                    <div key={sec.num} style={{ borderBottom: '1px solid #ede5d8', paddingBottom: '10px' }}>
+                      <div style={{ fontSize: '11px', fontWeight: 700, color: '#7a5c2e', marginBottom: '3px' }}>
+                        {sec.num}. {sec.title} · <span style={{ fontWeight: 500 }}>{sec.source}</span>
+                      </div>
+                      <div style={{ fontSize: '12.5px', color: '#334155', lineHeight: 1.48 }}>{sec.content}</div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </details>
+          </section>
+
+          {/* STAGE 4: DECIDE THE NEXT ACTION */}
+          <section id="film-stage-4" className="nv-film-stage">
+            <div className="nv-film-stage-head">
+              <div>
+                <div className="nv-film-kicker">04 · Decide the Next Action</div>
+                <h2 className="nv-film-h2">Clarify Unresolved Terms with {venture.founder_name}</h2>
+              </div>
+            </div>
+
+            <div className="nv-film-2col">
+              {/* Clarification Questions */}
+              <div>
+                <h3 className="nv-film-ledger-title">
+                  <span>Contextual Clarification Questions</span>
+                  <span style={{ fontSize: '11.5px', color: '#64748b', fontFamily: 'Inter, sans-serif', fontWeight: 500 }}>
+                    Click to prefill enquiry
+                  </span>
+                </h3>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                  {clarificationQuestions.map((q, idx) => (
+                    <button
+                      key={idx}
+                      type="button"
+                      className={`nv-film-question-btn ${selectedQuestionIdx === idx ? 'active' : ''}`}
+                      onClick={() => handleSelectQuestion(idx)}
+                    >
+                      <span style={{ fontWeight: 700, color: '#7a5c2e', marginRight: '6px' }}>{idx + 1}.</span>
+                      {q}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Enquiry & Meeting Box */}
+              <div id="nv-film-enquiry-panel" className="nv-film-enquiry-box">
+                <div style={{ fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', color: '#7a5c2e', marginBottom: '6px' }}>
+                  Direct Founder Enquiry
+                </div>
+                <div style={{ fontSize: '13.5px', fontWeight: 600, color: '#0c1826', marginBottom: '12px' }}>
+                  To: {venture.founder_name} · {venture.company_name}
+                </div>
+
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginBottom: '12px' }}>
+                  {unitChoices.map((uc, idx) => (
+                    <button
+                      key={idx}
+                      type="button"
+                      className={`nv-film-choice-chip ${selectedFilmUnit === idx ? 'active' : ''}`}
+                      onClick={() => handleSelectUnit(idx)}
+                    >
+                      {uc.label}
+                    </button>
+                  ))}
+                </div>
+
+                <textarea
+                  rows={4}
+                  value={effectiveNote}
+                  onChange={(e) => setNote(e.target.value)}
+                  style={{
+                    width: '100%',
+                    boxSizing: 'border-box',
+                    padding: '10px 12px',
+                    fontSize: '13px',
+                    lineHeight: 1.5,
+                    borderRadius: '4px',
+                    border: '1px solid #d6c9b2',
+                    backgroundColor: '#faf8f4',
+                    marginBottom: '12px',
+                    fontFamily: 'inherit',
+                  }}
+                />
+
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px' }}>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (!currentUser) {
+                        onOpenLogin('INVESTOR', false);
+                        return;
+                      }
+                      onRequestConnection(venture.id, effectiveNote);
+                    }}
+                    className="nv-pdp-primary-btn"
+                    style={{ flex: 1 }}
+                  >
+                    <span>
+                      {venture.connection_status === 'CONNECTED'
+                        ? 'Send Clarification & Open Chat →'
+                        : 'Request Payout Schedule & Enquire →'}
+                    </span>
+                  </button>
+
+                  {venture.connection_status === 'CONNECTED' && onOpenChat && venture.connection_id ? (
+                    <button
+                      type="button"
+                      onClick={() => onOpenChat(venture.connection_id!)}
+                      className="nv-pdp-secondary-btn"
+                      style={{ width: 'auto' }}
+                    >
+                      <span>💬</span>
+                      <span>Direct Chat</span>
+                    </button>
+                  ) : null}
+
+                  <button
+                    type="button"
+                    onClick={() => setAppointmentModalOpen(true)}
+                    className="nv-pdp-secondary-btn"
+                    style={{ width: 'auto' }}
+                  >
+                    <span>📅</span>
+                    <span>Schedule 15-Min Call</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </section>
+        </main>
+
+        {/* APPOINTMENT MODAL */}
+        {appointmentModalOpen && (
+          <div style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(12, 24, 38, 0.72)', backdropFilter: 'blur(3px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1200, padding: '20px' }} onClick={() => setAppointmentModalOpen(false)}>
+            <div style={{ backgroundColor: '#ffffff', borderRadius: '8px', maxWidth: '460px', width: '100%', padding: '24px', border: '1px solid #d6c9b2' }} onClick={(e) => e.stopPropagation()}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px' }}>
+                <h3 style={{ margin: 0, fontSize: '18px', color: '#0c1826', fontFamily: 'Newsreader, Georgia, serif' }}>Schedule Diligence Call</h3>
+                <button type="button" onClick={() => setAppointmentModalOpen(false)} style={{ background: 'none', border: 'none', fontSize: '18px', cursor: 'pointer', color: '#64748b' }}>✕</button>
+              </div>
+              {appointmentSent ? (
+                <div style={{ padding: '24px 0', textAlign: 'center' }}>
+                  <div style={{ fontSize: '36px', marginBottom: '8px' }}>✓</div>
+                  <div style={{ fontSize: '16px', fontWeight: 600, color: '#15803d' }}>Meeting Request Dispatched!</div>
+                </div>
+              ) : (
+                <form onSubmit={handleBookAppointment}>
+                  <div style={{ marginBottom: '12px' }}>
+                    <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, color: '#0c1826', marginBottom: '4px' }}>Agenda</label>
+                    <input type="text" value={appointmentTopic} onChange={(e) => setAppointmentTopic(e.target.value)} style={{ width: '100%', boxSizing: 'border-box', padding: '8px 10px', fontSize: '13px', border: '1px solid #d6c9b2', borderRadius: '4px' }} />
+                  </div>
+                  <div style={{ marginBottom: '16px' }}>
+                    <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, color: '#0c1826', marginBottom: '4px' }}>Preferred Date</label>
+                    <input type="date" value={appointmentDate} onChange={(e) => setAppointmentDate(e.target.value)} style={{ width: '100%', boxSizing: 'border-box', padding: '8px 10px', fontSize: '13px', border: '1px solid #d6c9b2', borderRadius: '4px' }} />
+                  </div>
+                  <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>
+                    <button type="button" onClick={() => setAppointmentModalOpen(false)} style={{ padding: '8px 14px', background: 'none', border: '1px solid #d6c9b2', borderRadius: '4px', fontSize: '13px', cursor: 'pointer' }}>Cancel</button>
+                    <button type="submit" className="nv-pdp-primary-btn" style={{ width: 'auto', padding: '8px 18px', fontSize: '13px' }}>Confirm Meeting Request</button>
+                  </div>
+                </form>
+              )}
+            </div>
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  // ─── END FILM PDP — generic Malabar PDP continues below ────────────────────
 
   return (
     <div className="nv-pdp-page">

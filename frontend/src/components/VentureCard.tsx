@@ -35,82 +35,73 @@ const FilmVentureCard: React.FC<VentureCardProps> = ({ venture, onSelect, onRequ
   return (
     <article
       style={{
-        backgroundColor: '#0c1826',
-        border: '1px solid #1e2d3f',
-        boxShadow: '0 12px 32px -8px rgba(0,0,0,0.5)',
+        backgroundColor: '#fffdf9',
+        border: '1px solid #cdbca0',
+        borderTop: '3px solid #6d2832',
+        borderRadius: '8px',
+        boxShadow: '0 8px 24px -10px rgba(12, 24, 38, 0.12)',
         display: 'flex',
         flexDirection: 'column',
         boxSizing: 'border-box',
         overflow: 'hidden',
         transition: 'transform 0.2s ease, box-shadow 0.2s ease',
-        fontFamily: "Inter, system-ui, sans-serif",
+        fontFamily: 'Inter, system-ui, sans-serif',
       }}
     >
       {/* ── Cinematic Hero Image ── */}
-      <div style={{ position: 'relative', height: '200px', overflow: 'hidden', flexShrink: 0 }}>
+      <div style={{ position: 'relative', height: '190px', overflow: 'hidden', flexShrink: 0, backgroundColor: '#0c1826' }}>
         <img
           src={heroUrl}
           alt={venture.company_name}
           loading="lazy"
           style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
         />
-        {/* dark gradient overlay */}
         <div
           style={{
-            position: 'absolute', inset: 0,
-            background: 'linear-gradient(to bottom, rgba(12,24,38,0.15) 0%, rgba(12,24,38,0.75) 70%, rgba(12,24,38,1) 100%)',
+            position: 'absolute',
+            inset: 0,
+            background: 'linear-gradient(to bottom, rgba(12,24,38,0.18) 0%, rgba(12,24,38,0.82) 100%)',
           }}
         />
-        {/* top-left badge strip */}
-        <div
-          style={{
-            position: 'absolute', top: '12px', left: '12px',
-            display: 'flex', gap: '6px', alignItems: 'center',
-          }}
-        >
+        <div style={{ position: 'absolute', top: '12px', left: '12px', right: '12px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '6px' }}>
           <span
             style={{
-              fontSize: '10px', fontWeight: 700, letterSpacing: '0.12em',
-              textTransform: 'uppercase', color: '#f5c842',
-              backgroundColor: 'rgba(12,24,38,0.7)', backdropFilter: 'blur(4px)',
-              padding: '3px 8px', borderRadius: '2px',
-              border: '1px solid rgba(245,200,66,0.4)',
+              fontSize: '10px',
+              fontWeight: 700,
+              letterSpacing: '0.1em',
+              textTransform: 'uppercase',
+              color: '#6d2832',
+              backgroundColor: '#faf1f2',
+              padding: '3px 8px',
+              borderRadius: '3px',
+              border: '1px solid #ddb9be',
             }}
           >
-            🎬 {venture.sector}
+            🎬 Featured · Film Production
           </span>
           <span
             style={{
-              fontSize: '10px', fontWeight: 600,
-              backgroundColor: venture.verification_status === 'VERIFIED'
-                ? 'rgba(21,128,61,0.85)' : 'rgba(180,83,9,0.85)',
-              color: '#fff', padding: '3px 7px', borderRadius: '2px',
-              backdropFilter: 'blur(4px)',
-            }}
-          >
-            {venture.verification_status === 'VERIFIED' ? '✓ Verified' : 'In Diligence'}
-          </span>
-        </div>
-        {/* stage pill top-right */}
-        <div style={{ position: 'absolute', top: '12px', right: '12px' }}>
-          <span
-            style={{
-              fontSize: '10px', fontWeight: 600, color: '#c9b48a',
-              backgroundColor: 'rgba(12,24,38,0.7)', backdropFilter: 'blur(4px)',
-              padding: '3px 8px', borderRadius: '2px',
-              border: '1px solid rgba(201,180,138,0.35)',
+              fontSize: '10px',
+              fontWeight: 600,
+              color: '#f5efe5',
+              backgroundColor: 'rgba(12,24,38,0.78)',
+              padding: '3px 8px',
+              borderRadius: '3px',
+              border: '1px solid rgba(255,255,255,0.2)',
             }}
           >
             {venture.stage || 'Production'}
           </span>
         </div>
-        {/* bottom overlay: title + tagline */}
         <div style={{ position: 'absolute', bottom: '12px', left: '14px', right: '14px' }}>
           <h3
             style={{
-              margin: 0, lineHeight: 1.2, color: '#f5efe5',
-              fontFamily: "Newsreader, Georgia, serif",
-              fontSize: '20px', fontWeight: 600,
+              margin: 0,
+              lineHeight: 1.2,
+              color: '#fffdf9',
+              fontFamily: 'Newsreader, Georgia, serif',
+              fontSize: '21px',
+              fontWeight: 600,
               textShadow: '0 1px 4px rgba(0,0,0,0.6)',
             }}
           >
@@ -118,10 +109,15 @@ const FilmVentureCard: React.FC<VentureCardProps> = ({ venture, onSelect, onRequ
           </h3>
           <p
             style={{
-              margin: '4px 0 0 0', fontSize: '12px', color: '#c9b48a',
-              lineHeight: 1.4, opacity: 0.9,
-              display: '-webkit-box', WebkitLineClamp: 2,
-              WebkitBoxOrient: 'vertical', overflow: 'hidden',
+              margin: '4px 0 0 0',
+              fontSize: '12px',
+              color: '#f5efe5',
+              lineHeight: 1.4,
+              opacity: 0.92,
+              display: '-webkit-box',
+              WebkitLineClamp: 2,
+              WebkitBoxOrient: 'vertical',
+              overflow: 'hidden',
             }}
           >
             {venture.tag_line || venture.business_context}
@@ -133,76 +129,89 @@ const FilmVentureCard: React.FC<VentureCardProps> = ({ venture, onSelect, onRequ
       <div
         style={{
           padding: '10px 14px',
-          borderBottom: '1px solid #1e2d3f',
-          display: 'flex', alignItems: 'center', gap: '8px',
+          borderBottom: '1px solid #e6dccb',
+          backgroundColor: '#fbf8f2',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '8px',
         }}
       >
         <div
           style={{
-            width: '28px', height: '28px', borderRadius: '50%',
-            backgroundColor: '#1e2d3f', border: '1px solid #2e4059',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            fontSize: '12px', fontWeight: 700, color: '#c9b48a',
-            fontFamily: "Newsreader, Georgia, serif", flexShrink: 0,
+            width: '28px',
+            height: '28px',
+            borderRadius: '50%',
+            backgroundColor: '#0c1826',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            fontSize: '12px',
+            fontWeight: 700,
+            color: '#f5efe5',
+            fontFamily: 'Newsreader, Georgia, serif',
+            flexShrink: 0,
           }}
         >
           {venture.founder_name.charAt(0)}
         </div>
-        <div style={{ fontSize: '12px', color: '#94a3b8', lineHeight: 1.3 }}>
-          <span style={{ color: '#c9b48a', fontWeight: 600 }}>{venture.founder_name}</span>
-          {venture.founder_title ? <span style={{ color: '#64748b' }}> · {venture.founder_title}</span> : null}
-          <span style={{ color: '#475569' }}> · {venture.location}</span>
+        <div style={{ fontSize: '12px', color: '#4c5262', lineHeight: 1.3 }}>
+          <strong style={{ color: '#0c1826' }}>{venture.founder_name}</strong>
+          {venture.founder_title ? <span> · {venture.founder_title}</span> : null}
+          <span style={{ color: '#7a5c2e' }}> · {venture.location}</span>
         </div>
       </div>
 
       {/* ── 3-figure production budget strip ── */}
       <div
         style={{
-          display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)',
-          borderBottom: '1px solid #1e2d3f',
+          display: 'grid',
+          gridTemplateColumns: 'repeat(3, 1fr)',
+          borderBottom: '1px solid #e6dccb',
+          backgroundColor: '#faf6ee',
         }}
       >
         {[
-          { label: 'Project Budget', value: formatINR(venture.capital_target ? venture.capital_target * 2 : 0) || '₹12 Cr', sub: 'Total production cost' },
-          { label: 'Capital Sought', value: formatINR(venture.capital_target), sub: 'Investor raise' },
-          { label: 'Per Unit', value: formatINR(venture.ticket_min), sub: 'Min ticket size' },
+          { label: 'Project Budget', value: formatINR((venture.arrangement_details as any)?.total_budget || (venture.capital_target ? venture.capital_target * 2 : 0)), sub: 'Declared total' },
+          { label: 'Capital Sought', value: formatINR(venture.capital_target), sub: 'External raise' },
+          { label: 'Per Unit', value: formatINR(venture.ticket_min), sub: 'Proposed unit' },
         ].map((fig, i) => (
           <div
             key={i}
             style={{
-              padding: '12px 10px',
-              borderRight: i < 2 ? '1px solid #1e2d3f' : 'none',
+              padding: '11px 10px',
+              borderRight: i < 2 ? '1px solid #e6dccb' : 'none',
               textAlign: 'center',
             }}
           >
-            <div style={{ fontSize: '9px', textTransform: 'uppercase', letterSpacing: '0.1em', color: '#475569', fontWeight: 600, marginBottom: '3px' }}>
+            <div style={{ fontSize: '9.5px', textTransform: 'uppercase', letterSpacing: '0.08em', color: '#7a5c2e', fontWeight: 700, marginBottom: '2px' }}>
               {fig.label}
             </div>
-            <div style={{ fontSize: '15px', fontWeight: 700, color: '#f5efe5', fontFamily: "Newsreader, Georgia, serif" }}>
+            <div style={{ fontSize: '16px', fontWeight: 600, color: '#0c1826', fontFamily: 'Newsreader, Georgia, serif' }}>
               {fig.value}
             </div>
-            <div style={{ fontSize: '9px', color: '#475569', marginTop: '2px' }}>{fig.sub}</div>
+            <div style={{ fontSize: '9.5px', color: '#685d4d', marginTop: '2px' }}>{fig.sub}</div>
           </div>
         ))}
       </div>
 
       {/* ── Traction metrics chips ── */}
       {topMetrics.length > 0 && (
-        <div style={{ padding: '10px 14px', display: 'flex', flexWrap: 'wrap', gap: '5px', borderBottom: '1px solid #1e2d3f' }}>
+        <div style={{ padding: '10px 14px', display: 'flex', flexWrap: 'wrap', gap: '5px', borderBottom: '1px solid #f1ece2' }}>
           {topMetrics.map((m, i) => {
             const s = getStatusStyle(m.status);
             return (
               <span
                 key={i}
                 style={{
-                  fontSize: '10.5px', padding: '3px 8px', borderRadius: '2px',
-                  backgroundColor: 'rgba(30,45,63,0.8)',
+                  fontSize: '10.5px',
+                  padding: '3px 8px',
+                  borderRadius: '3px',
+                  backgroundColor: '#ffffff',
                   border: `1px solid ${s.border}`,
                   color: s.text,
                 }}
               >
                 <strong>{m.label}:</strong> {m.value}
-                {m.period ? <span style={{ color: '#475569' }}> · {m.period}</span> : null}
               </span>
             );
           })}
@@ -212,19 +221,18 @@ const FilmVentureCard: React.FC<VentureCardProps> = ({ venture, onSelect, onRequ
       {/* ── Open question callout ── */}
       <div
         style={{
-          margin: '0 14px 0 14px',
-          marginTop: '12px',
+          margin: '12px 14px 0 14px',
           padding: '9px 12px',
-          backgroundColor: 'rgba(245,200,66,0.07)',
-          border: '1px solid rgba(245,200,66,0.2)',
-          borderRadius: '3px',
+          backgroundColor: '#fdf2f2',
+          borderLeft: '3px solid #991b1b',
+          borderRadius: '0 4px 4px 0',
           fontSize: '11.5px',
-          color: '#c9b48a',
+          color: '#3f1d1d',
           lineHeight: 1.45,
         }}
       >
-        <span style={{ fontWeight: 700, color: '#f5c842' }}>⚠ Open:</span>{' '}
-        When the film earns, who gets paid first? Payout schedule not yet confirmed.
+        <span style={{ fontWeight: 700, color: '#991b1b' }}>Open Decision:</span>{' '}
+        When the film earns money, who gets paid first? Payout waterfall requires signed deal terms.
       </div>
 
       {/* ── Footer actions ── */}
@@ -232,21 +240,26 @@ const FilmVentureCard: React.FC<VentureCardProps> = ({ venture, onSelect, onRequ
         style={{
           padding: '12px 14px',
           marginTop: '12px',
-          borderTop: '1px solid #1e2d3f',
+          borderTop: '1px solid #e6dccb',
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center',
           gap: '8px',
+          backgroundColor: '#fffdf9',
         }}
       >
         <button
           type="button"
           onClick={() => onSelect(venture)}
           style={{
-            background: 'none', border: 'none',
-            color: '#c9b48a', fontSize: '12px', fontWeight: 600,
-            cursor: 'pointer', padding: 0,
-            textDecoration: 'underline', textUnderlineOffset: '3px',
+            padding: '7px 14px',
+            backgroundColor: '#0c1826',
+            color: '#ffffff',
+            border: 'none',
+            borderRadius: '4px',
+            fontSize: '12px',
+            fontWeight: 600,
+            cursor: 'pointer',
           }}
         >
           Explore the film venture →
@@ -257,11 +270,17 @@ const FilmVentureCard: React.FC<VentureCardProps> = ({ venture, onSelect, onRequ
             type="button"
             onClick={() => onOpenChat && venture.connection_id && onOpenChat(venture.connection_id)}
             style={{
-              padding: '6px 14px',
-              backgroundColor: '#15803d', color: '#fff',
-              border: 'none', fontSize: '12px', fontWeight: 600,
-              cursor: 'pointer', borderRadius: '2px',
-              display: 'flex', alignItems: 'center', gap: '5px',
+              padding: '7px 12px',
+              backgroundColor: '#15803d',
+              color: '#fff',
+              border: 'none',
+              fontSize: '12px',
+              fontWeight: 600,
+              cursor: 'pointer',
+              borderRadius: '4px',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '5px',
             }}
           >
             <span>💬</span> Chat
@@ -270,9 +289,12 @@ const FilmVentureCard: React.FC<VentureCardProps> = ({ venture, onSelect, onRequ
           <span
             style={{
               padding: '6px 10px',
-              backgroundColor: 'rgba(30,45,63,0.8)',
-              border: '1px solid #2e4059', color: '#64748b',
-              fontSize: '11px', fontWeight: 600, borderRadius: '2px',
+              backgroundColor: '#faf6ee',
+              border: '1px solid #d6c9b2',
+              color: '#7a5c2e',
+              fontSize: '11px',
+              fontWeight: 600,
+              borderRadius: '4px',
             }}
           >
             ⌛ Requested
@@ -282,11 +304,14 @@ const FilmVentureCard: React.FC<VentureCardProps> = ({ venture, onSelect, onRequ
             type="button"
             onClick={() => onRequestConnection && onRequestConnection(venture)}
             style={{
-              padding: '6px 14px',
-              backgroundColor: '#f5c842', color: '#0c1826',
-              border: 'none', fontSize: '12px', fontWeight: 700,
-              cursor: 'pointer', borderRadius: '2px',
-              display: 'inline-flex', alignItems: 'center', gap: '4px',
+              padding: '7px 12px',
+              backgroundColor: '#faf6ee',
+              color: '#0c1826',
+              border: '1px solid #c5b59b',
+              fontSize: '12px',
+              fontWeight: 600,
+              cursor: 'pointer',
+              borderRadius: '4px',
             }}
           >
             Request payout schedule
