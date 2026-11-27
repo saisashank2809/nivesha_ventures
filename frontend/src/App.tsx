@@ -223,18 +223,20 @@ export function App() {
         </div>
       )}
 
-      {/* Navigation Bar */}
-      <Navbar
-        currentUser={currentUser}
-        activeTab={activeTab}
-        onNavigate={(tab) => {
-          setActiveTab(tab);
-          window.scrollTo({ top: 0, behavior: 'smooth' });
-        }}
-        onOpenLogin={handleOpenLogin}
-        onUserChanged={handleUserChanged}
-        unreadCount={unreadCount}
-      />
+      {/* Navigation Bar (hidden on full-immersion Venture PDP pages) */}
+      {activeTab !== 'VENTURE_PDP' && (
+        <Navbar
+          currentUser={currentUser}
+          activeTab={activeTab}
+          onNavigate={(tab) => {
+            setActiveTab(tab);
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+          }}
+          onOpenLogin={handleOpenLogin}
+          onUserChanged={handleUserChanged}
+          unreadCount={unreadCount}
+        />
+      )}
 
       {/* Main View Switcher */}
       <main style={{ flex: 1 }}>
