@@ -16,11 +16,16 @@ Decision Order:
 4. Preference variances & monitoring burdens surfaced as explicit TRADE_OFFS.
 """
 
-from typing import Dict, Any, List
-from app.models.models import Venture, InvestorMandate, MatchOutcome
+from typing import Dict, Any, List, Optional
+from datetime import datetime, timezone
+from app.models.models import Venture, InvestorMandate, InvestorProfile, MatchCase, MatchOutcome, VerificationStatus, ReviewStage
 
 
-def evaluate_match(venture: Venture, mandate: InvestorMandate) -> Dict[str, Any]:
+def evaluate_match(
+    venture: Venture,
+    mandate: InvestorMandate,
+    profile: Optional[InvestorProfile] = None,
+) -> Dict[str, Any]:
     rule_results: List[Dict[str, Any]] = []
     compatibility_reasons: List[str] = []
     mandatory_mismatches: List[str] = []
@@ -183,17 +188,27 @@ def evaluate_match(venture: Venture, mandate: InvestorMandate) -> Dict[str, Any]
         })
 
     # 6. Time Horizon
-    m_horizon = getattr(mandate, "time_horizon", "3_TO_5_YEARS")
+    m_horizon = getattr(mandate, "time_horizon", "3_TO_5_YEARS") or "3_TO_5_YEARS"
     arr_details = venture.arrangement_details or {}
-    v_horizon = arr_details.get("repayment_schedule", "2_TO_3_YEARS")
-    compatibility_reasons.append(f"Time horizon compatible: Venture planning on {v_horizon}; investor mandate accepts {m_horizon}.")
-    rule_results.append({
-        "rule": "time_horizon",
-        "dimension": "Time Horizon",
-        "result": "PASS",
-        "reason": f"Expected tenure compatible ({v_horizon} vs. {m_horizon}).",
-        "is_mandatory": False,
-    })
+    v_horizon = str(arr_details.get("repayment_schedule", "2_TO_3_YEARS"))
+    if m_horizon == "UNDER_1_YEAR" and any(k in v_horizon for k in ("2_TO_3", "3_TO_5", "5_YEAR")):
+        trade_offs.append(f"Time horizon trade-off: Investor prefers under 1 year, while venture plans on {v_horizon}.")
+        rule_results.append({
+            "rule": "time_horizon",
+            "dimension": "Time Horizon",
+            "result": "TRADE_OFF",
+            "reason": f"Investor short horizon ({m_horizon}) vs. venture schedule ({v_horizon}).",
+            "is_mandatory": False,
+        })
+    else:
+        compatibility_reasons.append(f"Time horizon compatible: Venture planning on {v_horizon}; investor mandate accepts {m_horizon}.")
+        rule_results.append({
+            "rule": "time_horizon",
+            "dimension": "Time Horizon",
+            "result": "PASS",
+            "reason": f"Expected tenure compatible ({v_horizon} vs. {m_horizon}).",
+            "is_mandatory": False,
+        })
 
     # 7. Involvement and Follow-Up Expectations (Key Requirement!)
     m_involvement = getattr(mandate, "desired_involvement", "PASSIVE")
@@ -234,11 +249,163 @@ def evaluate_match(venture: Venture, mandate: InvestorMandate) -> Dict[str, Any]
     else:
         outcome = MatchOutcome.POTENTIALLY_SUITABLE
 
+    # Compute 0–100 Match Score (70 pts Mandate Rules + 30 pts InvestorProfile Signals)
+    rule_weights = {
+        "funding_arrangement": (15, 8),
+        "sector": (15, 6),
+        "ticket_range": (15, 0),
+        "stage": (10, 5),
+        "geography": (5, 2),
+        "time_horizon": (5, 2),
+        "involvement_and_followup": (5, 2),
+    }
+    mandate_score = 0
+    for rr in rule_results:
+        pass_pts, tradeoff_pts = rule_weights.get(rr["rule"], (0, 0))
+        if rr["result"] == "PASS":
+            mandate_score += pass_pts
+        elif rr["result"] == "TRADE_OFF":
+            mandate_score += tradeoff_pts
+
+    profile_score = 0
+    recommendation_reasons: List[str] = []
+
+    if profile is None:
+        profile_score = 15  # Neutral baseline when no onboarding profile exists yet
+    else:
+        # 1. Risk tolerance alignment (10 pts)
+        risk = (profile.risk_tolerance_level or "").strip()
+        is_debt_like = v_arr in ("LOAN", "SECURED_COLLATERAL_DEBT", "PROJECT_DEVELOPMENT_FINANCING")
+        is_equity_like = v_arr in ("EQUITY", "FRACTIONAL_EQUITY_UNITS", "GROWTH_EQUITY_WITH_REV_SHARE", "PARTIAL_EQUITY_BUYOUT")
+        if risk == "Prefer capital preservation":
+            if is_debt_like or venture.verification_status == VerificationStatus.VERIFIED:
+                profile_score += 10
+                recommendation_reasons.append("Aligns with your capital-preservation & asset-backed preference")
+            else:
+                profile_score += 3
+        elif risk in ("Can tolerate substantial loss", "Can tolerate total loss of a single investment"):
+            if is_equity_like:
+                profile_score += 10
+                recommendation_reasons.append("Matches your higher-upside equity risk appetite")
+            else:
+                profile_score += 6
+        elif risk == "Can tolerate some loss":
+            profile_score += 8 if (is_debt_like or "REV_SHARE" in v_arr) else 6
+        else:
+            profile_score += 5
+
+        # 2. Primary objective alignment (10 pts)
+        objective = (profile.primary_objective or "").strip()
+        if objective == "Regular income":
+            if is_debt_like or "REV_SHARE" in v_arr:
+                profile_score += 10
+                recommendation_reasons.append("Structured for regular yield/payouts matching your income goal")
+            else:
+                profile_score += 4
+        elif objective in ("Long-term capital growth", "Strategic partnership"):
+            if is_equity_like:
+                profile_score += 10
+                recommendation_reasons.append(f"Fits your {objective.lower()} objective")
+            else:
+                profile_score += 5
+        else:
+            profile_score += 7
+
+        # 3. Evidence & verification readiness (10 pts)
+        ev_score = 4 if venture.verification_status == VerificationStatus.VERIFIED else (2 if venture.verification_status == VerificationStatus.PARTIALLY_VERIFIED else 1)
+        findings_text = str(venture.due_diligence_findings or {}).lower()
+        track_text = str(venture.operating_track_record or {}).lower()
+        combined_text = f"{findings_text} {track_text}"
+        for ev in (profile.expected_evidence or []):
+            ev_low = str(ev).lower()
+            if ("financial" in ev_low and ("gst" in combined_text or "revenue" in combined_text or "audited" in combined_text)) or \
+               ("asset" in ev_low and ("collateral" in combined_text or "deed" in combined_text or "property" in combined_text)) or \
+               ("traction" in ev_low and ("order" in combined_text or "sales" in combined_text or "beds" in combined_text)) or \
+               ("legal" in ev_low and ("verified" in combined_text or "rera" in combined_text or "nabh" in combined_text)):
+                ev_score += 2
+        profile_score += min(10, ev_score)
+
+    match_score = min(100, mandate_score + profile_score)
+    if outcome == MatchOutcome.UNSUITABLE:
+        match_score = min(match_score, 35)
+
+    # Ensure at least 2 plain-English recommendation reasons
+    for reason in compatibility_reasons:
+        if len(recommendation_reasons) >= 3:
+            break
+        if reason not in recommendation_reasons:
+            recommendation_reasons.append(reason)
+
     return {
         "outcome": outcome,
+        "match_score": match_score,
+        "recommendation_reasons": recommendation_reasons[:3],
         "compatibility_reasons": compatibility_reasons,
         "mandatory_mismatches": mandatory_mismatches,
         "trade_offs": trade_offs,
         "missing_information": missing_info,
         "rule_results": rule_results,
     }
+
+
+def rank_ventures_for_investor(
+    ventures: List[Venture],
+    mandate: InvestorMandate,
+    profile: Optional[InvestorProfile] = None,
+    limit: int = 3,
+) -> List[Dict[str, Any]]:
+    """Evaluates and ranks ventures for 'Recommended For You'."""
+    evaluated = []
+    for v in ventures:
+        res = evaluate_match(v, mandate, profile)
+        evaluated.append({"venture": v, **res})
+
+    suitable = [e for e in evaluated if e["outcome"] != MatchOutcome.UNSUITABLE]
+    pool = suitable if suitable else evaluated
+    pool.sort(
+        key=lambda x: (1 if x["outcome"] == MatchOutcome.POTENTIALLY_SUITABLE else 0, x["match_score"]),
+        reverse=True,
+    )
+    return pool[:limit]
+
+
+def recompute_matches_for_mandate(
+    db,
+    mandate: InvestorMandate,
+    profile: Optional[InvestorProfile] = None,
+) -> None:
+    """Re-evaluates and upserts MatchCase rows for all ventures against an updated mandate."""
+    ventures = db.query(Venture).all()
+    for venture in ventures:
+        eval_result = evaluate_match(venture, mandate, profile)
+        mc = (
+            db.query(MatchCase)
+            .filter(MatchCase.venture_id == venture.id, MatchCase.mandate_id == mandate.id)
+            .first()
+        )
+        if not mc:
+            mc = MatchCase(
+                venture_id=venture.id,
+                mandate_id=mandate.id,
+                venture_version=venture.version,
+                mandate_version=mandate.version,
+                outcome=eval_result["outcome"],
+                compatibility_reasons=eval_result["compatibility_reasons"],
+                mandatory_mismatches=eval_result["mandatory_mismatches"],
+                trade_offs=eval_result["trade_offs"],
+                missing_information=eval_result["missing_information"],
+                rule_results=eval_result["rule_results"],
+                review_stage=ReviewStage.DRAFT,
+            )
+            db.add(mc)
+        else:
+            mc.venture_version = venture.version
+            mc.mandate_version = mandate.version
+            mc.outcome = eval_result["outcome"]
+            mc.compatibility_reasons = eval_result["compatibility_reasons"]
+            mc.mandatory_mismatches = eval_result["mandatory_mismatches"]
+            mc.trade_offs = eval_result["trade_offs"]
+            mc.missing_information = eval_result["missing_information"]
+            mc.rule_results = eval_result["rule_results"]
+            mc.updated_at = datetime.now(timezone.utc)
+    db.commit()

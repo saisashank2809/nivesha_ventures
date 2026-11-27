@@ -321,6 +321,19 @@ export interface InvestorProfile {
   raw_discovery_answers: Record<string, any>;
 }
 
+export interface RecommendedVentureMatch {
+  venture_id: string;
+  company_name: string;
+  sector: string;
+  location: string;
+  capital_target: number;
+  proposed_arrangement: string;
+  hero_image_url?: string | null;
+  match_score: number;
+  outcome: MatchOutcome;
+  recommendation_reasons: string[];
+}
+
 export interface InvestorAnalysisResult {
   investor_summary: string;
   extracted_preferences: Record<string, any>;

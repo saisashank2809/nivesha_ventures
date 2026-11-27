@@ -264,6 +264,7 @@ export function App() {
           <InvestorGuidedDiscovery
             currentUser={currentUser}
             onOpenLogin={() => handleOpenLogin('INVESTOR', false)}
+            onOpenOnboarding={() => setActiveTab('INVESTOR_ONBOARDING')}
             onOpenDirectChat={handleOpenChat}
             onSelectVenture={handleSelectVenture}
           />

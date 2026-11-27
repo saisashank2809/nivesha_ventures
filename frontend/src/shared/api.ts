@@ -11,6 +11,7 @@ import {
   OnboardingAnalysisResult,
   InvestorProfile,
   InvestorAnalysisResult,
+  RecommendedVentureMatch,
   AIChatResponse,
   AIChatMessage,
   MatchCase,
@@ -142,6 +143,8 @@ export class Api {
         }
         const stored = localStorage.getItem('nv_mandate');
         return (stored ? JSON.parse(stored) : SEED_MANDATE_ROHAN) as unknown as T;
+      } else if (endpoint.startsWith('/matches/recommended')) {
+        return [] as unknown as T;
       } else if (endpoint.startsWith('/matches')) {
         return Object.values(SEED_MATCH_CASES) as unknown as T;
       } else if (endpoint.startsWith('/appointments')) {
@@ -273,6 +276,10 @@ export class Api {
 
   public static async getMatchCases(): Promise<MatchCase[]> {
     return this.request<MatchCase[]>('/matches');
+  }
+
+  public static async getRecommendedMatches(): Promise<RecommendedVentureMatch[]> {
+    return this.request<RecommendedVentureMatch[]>('/matches/recommended');
   }
 
   public static async getMatchCase(id: string): Promise<MatchCase> {

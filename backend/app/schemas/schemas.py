@@ -264,6 +264,19 @@ class MatchRunRequest(BaseModel):
     mandate_id: Optional[str] = None  # If omitted, uses current user's mandate
 
 
+class RecommendedVentureMatchResponse(BaseModel):
+    venture_id: str
+    company_name: str
+    sector: str
+    location: str
+    capital_target: float
+    proposed_arrangement: str
+    hero_image_url: Optional[str] = None
+    match_score: int
+    outcome: MatchOutcome
+    recommendation_reasons: List[str] = Field(default_factory=list)
+
+
 # --- Appointment Request Schemas ---
 
 class AppointmentRequestCreate(BaseModel):

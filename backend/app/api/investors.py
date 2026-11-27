@@ -15,6 +15,7 @@ from app.schemas.schemas import (
     InvestorOnboardingSubmitRequest,
 )
 from app.services.ai_service import AIAssistantService
+from app.services.matching_service import recompute_matches_for_mandate
 from app.api.auth import get_current_user
 
 router = APIRouter(prefix="/mandates", tags=["mandates"])
@@ -90,6 +91,8 @@ def update_my_mandate(
 
     db.commit()
     db.refresh(mandate)
+    profile = db.query(InvestorProfile).filter(InvestorProfile.investor_id == current_user.id).first()
+    recompute_matches_for_mandate(db, mandate, profile)
     return InvestorMandateResponse.model_validate(mandate)
 
 
@@ -272,6 +275,7 @@ def submit_investor_onboarding(
     db.commit()
     db.refresh(profile)
     db.refresh(mandate)
+    recompute_matches_for_mandate(db, mandate, profile)
 
     return {
         "status": "SUCCESS",

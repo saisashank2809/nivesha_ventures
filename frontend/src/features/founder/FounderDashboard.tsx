@@ -111,7 +111,7 @@ export const FounderDashboard: React.FC<FounderDashboardProps> = ({
     try {
       setLoading(true);
       const [v, conns, fp] = await Promise.all([
-        Api.getMyVenture(),
+        Api.getMyVenture().catch(() => null),
         Api.getConnections().catch(() => []),
         Api.getFounderProfile().catch(() => null),
       ]);
@@ -1640,15 +1640,6 @@ export const FounderDashboard: React.FC<FounderDashboardProps> = ({
                 </button>
               )}
             </div>
-
-            {founderProfile?.ai_summary && (
-              <div style={{ backgroundColor: '#f8fafc', border: '1px solid #cbd5e1', borderLeft: '4px solid #7a5c2e', padding: '16px 20px', fontSize: '14px', color: '#121a29', lineHeight: 1.6 }}>
-                <div style={{ fontSize: '11px', fontWeight: 700, color: '#7a5c2e', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '6px' }}>
-                  AI Co-Pilot Profile Synthesis
-                </div>
-                {founderProfile.ai_summary}
-              </div>
-            )}
 
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(340px, 1fr))', gap: '14px' }}>
               {discoveryRows.map((row) => (

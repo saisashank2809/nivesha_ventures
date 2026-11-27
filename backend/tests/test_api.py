@@ -405,3 +405,48 @@ def test_investor_onboarding_and_profile_flow():
         headers={"Authorization": f"Bearer {founder_token}"},
     )
     assert forbidden_resp.status_code == 403
+
+
+def test_recommended_matches_ranking():
+    """Verify conservative collateral investor onboarding ranks secured debt above high-risk equity."""
+    investor_token = get_auth_token("investor@peakindia.vc")
+
+    submit_resp = client.post(
+        "/api/mandates/onboarding/submit",
+        json={
+            "answers": {
+                "investor_type": "Family office",
+                "investing_capacity_type": "Organization",
+                "primary_objective": "Regular income",
+                "risk_tolerance_level": "Prefer capital preservation",
+                "expected_evidence": ["Asset information", "Financial records"],
+                "accepted_arrangements": ["SECURED_COLLATERAL_DEBT", "LOAN"],
+                "target_sectors": ["Industrial Manufacturing", "Food & Beverage"],
+                "target_stages": ["Established", "Growing / Expansion"],
+                "locations": ["Bengaluru", "India"],
+                "ticket_min": 1000000,
+                "ticket_max": 3000000,
+            },
+            "confirmed_mandate": {
+                "accepted_arrangements": ["SECURED_COLLATERAL_DEBT", "LOAN"],
+                "mandatory_arrangements": ["SECURED_COLLATERAL_DEBT", "LOAN"],
+                "target_sectors": ["Industrial Manufacturing", "Food & Beverage"],
+                "ticket_min": 1000000,
+                "ticket_max": 3000000,
+                "locations": ["Bengaluru", "India"],
+            },
+        },
+        headers={"Authorization": f"Bearer {investor_token}"},
+    )
+    assert submit_resp.status_code == 200
+
+    rec_resp = client.get(
+        "/api/matches/recommended",
+        headers={"Authorization": f"Bearer {investor_token}"},
+    )
+    assert rec_resp.status_code == 200
+    recs = rec_resp.json()
+    assert len(recs) >= 1
+    assert recs[0]["match_score"] > 50
+    assert recs[0]["proposed_arrangement"] in ("SECURED_COLLATERAL_DEBT", "LOAN")
+    assert len(recs[0]["recommendation_reasons"]) >= 1

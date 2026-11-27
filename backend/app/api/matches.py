@@ -4,9 +4,9 @@ from typing import List, Optional
 from datetime import datetime, timezone
 
 from app.models.database import get_db
-from app.models.models import MatchCase, Venture, InvestorMandate, User, UserRole, ReviewStage
-from app.schemas.schemas import MatchCaseResponse, MatchRunRequest
-from app.services.matching_service import evaluate_match
+from app.models.models import MatchCase, Venture, InvestorMandate, InvestorProfile, User, UserRole, ReviewStage
+from app.schemas.schemas import MatchCaseResponse, MatchRunRequest, RecommendedVentureMatchResponse
+from app.services.matching_service import evaluate_match, rank_ventures_for_investor
 from app.api.auth import get_current_user
 
 router = APIRouter(prefix="/matches", tags=["matches"])
@@ -56,8 +56,9 @@ def run_match_assessment(
     if not mandate:
         raise HTTPException(status_code=404, detail="Investor mandate not found.")
 
-    # Evaluate using shared deterministic matching engine
-    eval_result = evaluate_match(venture, mandate)
+    # Evaluate using shared deterministic matching engine + investor profile signals
+    profile = db.query(InvestorProfile).filter(InvestorProfile.investor_id == mandate.investor_id).first()
+    eval_result = evaluate_match(venture, mandate, profile)
 
     # Find existing or create new MatchCase
     mc = (
@@ -122,6 +123,40 @@ def list_match_cases(
         cases = db.query(MatchCase).order_by(MatchCase.created_at.desc()).all()
 
     return [format_match_case(c) for c in cases]
+
+
+@router.get("/recommended", response_model=List[RecommendedVentureMatchResponse])
+def get_recommended_matches(
+    limit: int = 3,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    if current_user.role != UserRole.INVESTOR:
+        raise HTTPException(status_code=403, detail="Only investors can fetch personalized venture recommendations.")
+
+    mandate = db.query(InvestorMandate).filter(InvestorMandate.investor_id == current_user.id).first()
+    if not mandate:
+        return []
+
+    profile = db.query(InvestorProfile).filter(InvestorProfile.investor_id == current_user.id).first()
+    ventures = db.query(Venture).all()
+    ranked = rank_ventures_for_investor(ventures, mandate, profile, limit=limit)
+
+    return [
+        RecommendedVentureMatchResponse(
+            venture_id=item["venture"].id,
+            company_name=item["venture"].company_name,
+            sector=item["venture"].sector,
+            location=item["venture"].location,
+            capital_target=item["venture"].capital_target,
+            proposed_arrangement=item["venture"].proposed_arrangement,
+            hero_image_url=item["venture"].hero_image_url,
+            match_score=item["match_score"],
+            outcome=item["outcome"],
+            recommendation_reasons=item["recommendation_reasons"],
+        )
+        for item in ranked
+    ]
 
 
 @router.get("/{id}", response_model=MatchCaseResponse)

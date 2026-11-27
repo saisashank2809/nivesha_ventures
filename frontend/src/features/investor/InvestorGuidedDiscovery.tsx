@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { VentureCard, InvestorMandate, User, MatchCase } from '../../shared/types';
+import { VentureCard, InvestorMandate, InvestorProfile, RecommendedVentureMatch, User, MatchCase } from '../../shared/types';
 import { Api } from '../../shared/api';
 import { formatINR } from '../../shared/formatters';
 import './VentureSplitCard.css';
@@ -186,6 +186,7 @@ const getTenSections = (venture: VentureCard) => {
 interface InvestorGuidedDiscoveryProps {
   currentUser: User | null;
   onOpenLogin: () => void;
+  onOpenOnboarding?: () => void;
   onOpenDirectChat?: (connectionId: string) => void;
   onSelectVenture?: (ventureId: string) => void;
 }
@@ -193,10 +194,13 @@ interface InvestorGuidedDiscoveryProps {
 export const InvestorGuidedDiscovery: React.FC<InvestorGuidedDiscoveryProps> = ({
   currentUser,
   onOpenLogin,
+  onOpenOnboarding,
   onOpenDirectChat,
   onSelectVenture,
 }) => {
   const [mandate, setMandate] = useState<InvestorMandate | null>(null);
+  const [investorProfile, setInvestorProfile] = useState<InvestorProfile | null>(null);
+  const [recommendedMatches, setRecommendedMatches] = useState<RecommendedVentureMatch[]>([]);
   const [ventures, setVentures] = useState<VentureCard[]>([]);
   const [matchCases, setMatchCases] = useState<Record<string, MatchCase>>({});
   const [loading, setLoading] = useState(true);
@@ -239,19 +243,27 @@ export const InvestorGuidedDiscovery: React.FC<InvestorGuidedDiscoveryProps> = (
       });
       setMatchCases(caseMap);
 
-      if (currentUser?.role === 'INVESTOR') {
+      if (currentUser?.role === 'INVESTOR' && Api.getToken()) {
         try {
-          const m = await Api.getMyMandate();
-          setMandate(m);
-          if (m.accepted_arrangements && m.accepted_arrangements.length > 0) {
-            setSelectedArrangement(m.accepted_arrangements[0]);
-          } else if (m.acceptable_structures && m.acceptable_structures.length > 0) {
-            setSelectedArrangement(m.acceptable_structures[0]);
+          const [m, fp, recs] = await Promise.all([
+            Api.getMyMandate().catch(() => null),
+            Api.getInvestorProfile().catch(() => null),
+            Api.getRecommendedMatches().catch(() => []),
+          ]);
+          if (m) {
+            setMandate(m);
+            if (m.accepted_arrangements && m.accepted_arrangements.length > 0) {
+              setSelectedArrangement(m.accepted_arrangements[0]);
+            } else if (m.acceptable_structures && m.acceptable_structures.length > 0) {
+              setSelectedArrangement(m.acceptable_structures[0]);
+            }
+            if (m.desired_involvement) setSelectedInvolvement(m.desired_involvement);
+            if (m.willing_to_follow_up) setSelectedFollowUp(m.willing_to_follow_up);
+            if (m.ticket_min !== undefined && m.ticket_min !== null) setMinContribution(m.ticket_min);
+            if (m.ticket_max !== undefined && m.ticket_max !== null) setMaxContribution(m.ticket_max);
           }
-          if (m.desired_involvement) setSelectedInvolvement(m.desired_involvement);
-          if (m.willing_to_follow_up) setSelectedFollowUp(m.willing_to_follow_up);
-          if (m.ticket_min !== undefined && m.ticket_min !== null) setMinContribution(m.ticket_min);
-          if (m.ticket_max !== undefined && m.ticket_max !== null) setMaxContribution(m.ticket_max);
+          setInvestorProfile(fp);
+          setRecommendedMatches(Array.isArray(recs) ? recs : []);
         } catch {
           // If no stored mandate, fall back to default
         }
@@ -297,18 +309,7 @@ export const InvestorGuidedDiscovery: React.FC<InvestorGuidedDiscoveryProps> = (
         ticket_max: maxContribution,
       });
       setMandate(updated);
-
-      // Re-run matching evaluations for all ventures
-      const newCases: Record<string, MatchCase> = {};
-      for (const v of ventures) {
-        try {
-          const evaluated = await Api.runMatchAssessment(v.id, updated.id);
-          newCases[v.id] = evaluated;
-        } catch {
-          // fallback
-        }
-      }
-      setMatchCases(newCases);
+      await loadData();
       setIsEditingMandate(false);
     } catch (err: any) {
       alert(`Error updating preferences: ${err.message}`);
@@ -635,6 +636,130 @@ export const InvestorGuidedDiscovery: React.FC<InvestorGuidedDiscoveryProps> = (
           </div>
         )}
       </div>
+
+      {/* 1.5 RECOMMENDED FOR YOU STRIP */}
+      {currentUser?.role === 'INVESTOR' && (
+        <div style={{ marginBottom: '26px' }}>
+          {!investorProfile?.onboarding_completed && onOpenOnboarding && (
+            <div
+              style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                gap: '12px',
+                flexWrap: 'wrap',
+                padding: '14px 18px',
+                backgroundColor: '#fffdf9',
+                border: '1px solid #d6c9b2',
+                borderLeft: '4px solid #B48A3E',
+                borderRadius: '10px',
+                marginBottom: '16px',
+              }}
+            >
+              <div style={{ fontSize: '13.5px', color: '#121a29' }}>
+                <strong>Personalize your matches:</strong> Complete your 2-minute Investor Discovery to refine risk, objective, and evidence rankings.
+              </div>
+              <button
+                type="button"
+                onClick={onOpenOnboarding}
+                style={{
+                  padding: '8px 16px',
+                  backgroundColor: '#B48A3E',
+                  color: '#ffffff',
+                  border: 'none',
+                  borderRadius: '6px',
+                  fontSize: '12.5px',
+                  fontWeight: 600,
+                  cursor: 'pointer',
+                }}
+              >
+                Start Investor Discovery &rarr;
+              </button>
+            </div>
+          )}
+
+          {recommendedMatches.length > 0 && (
+            <div>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>
+                <div style={{ fontSize: '13px', fontWeight: 700, color: '#121a29', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
+                  Recommended For You
+                </div>
+                <span style={{ fontSize: '12px', color: '#64748b' }}>
+                  Ranked by mandate rules &amp; investor profile fit
+                </span>
+              </div>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '14px' }}>
+                {recommendedMatches.map((rec, idx) => (
+                  <div
+                    key={rec.venture_id}
+                    style={{
+                      backgroundColor: '#fffdf9',
+                      border: idx === 0 ? '1.5px solid #B48A3E' : '1px solid #d6c9b2',
+                      borderRadius: '12px',
+                      padding: '18px',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      justifyContent: 'space-between',
+                      gap: '12px',
+                    }}
+                  >
+                    <div>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
+                        <span
+                          style={{
+                            fontSize: '11px',
+                            fontWeight: 700,
+                            backgroundColor: '#B48A3E',
+                            color: '#ffffff',
+                            padding: '3px 8px',
+                            borderRadius: '4px',
+                          }}
+                        >
+                          {idx === 0 ? 'Top Recommended Match' : 'Recommended Match'}
+                        </span>
+                        <span style={{ fontSize: '13px', fontWeight: 700, color: '#15803d' }}>
+                          {rec.match_score}% Match
+                        </span>
+                      </div>
+                      <div style={{ fontSize: '16px', fontWeight: 700, color: '#121a29', marginBottom: '4px' }}>
+                        {rec.company_name}
+                      </div>
+                      <div style={{ fontSize: '12px', color: '#64748b', marginBottom: '10px' }}>
+                        {rec.sector} • {rec.location} • {formatINR(rec.capital_target)}
+                      </div>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                        {(rec.recommendation_reasons || []).slice(0, 2).map((reason, rIdx) => (
+                          <div key={rIdx} style={{ fontSize: '12.5px', color: '#334155', lineHeight: 1.4 }}>
+                            • {cleanReasonText(reason)}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={() => onSelectVenture?.(rec.venture_id)}
+                      style={{
+                        width: '100%',
+                        padding: '9px 14px',
+                        backgroundColor: '#0c1826',
+                        color: '#f5efe5',
+                        border: 'none',
+                        borderRadius: '6px',
+                        fontSize: '12.5px',
+                        fontWeight: 600,
+                        cursor: 'pointer',
+                      }}
+                    >
+                      See Full Details &rarr;
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+      )}
 
       {/* 2. FILM SPOTLIGHT + COMPACT VENTURE LIST */}
       {(() => {
